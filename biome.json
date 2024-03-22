@@ -1,0 +1,55 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.5.2/schema.json",
+	"files": {
+		"ignore": [
+			"node_modules",
+			"dist",
+			"./.github/workflows",
+			"./pnpm-lock.yaml",
+			"./src/metadata.ts"
+		],
+		"ignoreUnknown": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noParameterAssign": "off"
+			},
+			"suspicious": {
+				"noAssignInExpressions": "off"
+			},
+			"complexity": {
+				"noStaticOnlyClass": "off"
+			}
+		}
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": false,
+		"indentWidth": 4,
+		"lineEnding": "lf",
+		"indentStyle": "tab"
+	},
+	"javascript": {
+		"formatter": {
+			"trailingComma": "none",
+			"semicolons": "always",
+			"quoteStyle": "single"
+		},
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": true
+		}
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"vcs": {
+		"enabled": true,
+		"defaultBranch": "main",
+		"useIgnoreFile": true,
+		"clientKind": "git",
+		"root": "."
+	}
+}
