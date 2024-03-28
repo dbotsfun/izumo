@@ -18,12 +18,22 @@
 		"forceConsistentCasingInFileNames": true,
 		"noFallthroughCasesInSwitch": true,
 		"strictFunctionTypes": true,
+		"noUnusedLocals": true,
+		"strict": true,
+		"composite": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"exactOptionalPropertyTypes": false,
+		"noImplicitOverride": true,
+		"pretty": true,
 
 		"paths": {
-			"@/*": ["src/*"],
 			"@utils/*": ["src/lib/utils/*"],
 			"@constants/*": ["src/lib/constants/*"],
-			"@modules/*": ["src/modules/*"]
+			"@modules/*": ["src/modules/*"],
+			"@database/*": ["src/database/*"],
+			"@lib/*": ["src/lib/*"],
+			"@/*": ["src/*"]
 		}
 	}
 }
