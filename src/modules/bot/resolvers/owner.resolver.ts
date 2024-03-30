@@ -4,10 +4,13 @@ import { ValidationTypes } from 'class-validator';
 import { BotOwnerObject } from '../objects/owner/owner.object';
 import { BotOwnerService } from '../services/owner.service';
 
+/**
+ * Resolver for handling bot owner-related operations.
+ */
 @Resolver(() => BotOwnerObject)
 @UsePipes(ValidationTypes)
 export class BotOwnerResolver {
-	public constructor(private _botOwnerService: BotOwnerService) {}
+	public constructor(private _botOwnerService: BotOwnerService) { }
 
 	@Query(() => BotOwnerObject, {
 		name: 'getOwner',

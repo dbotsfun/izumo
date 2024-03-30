@@ -16,7 +16,8 @@
 			"recommended": true,
 			"style": {
 				"noParameterAssign": "off",
-				"useImportType": "off"
+				"useImportType": "off",
+				"useLiteralEnumMembers": "off"
 			},
 			"suspicious": {
 				"noAssignInExpressions": "off"

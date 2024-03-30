@@ -1,3 +1,4 @@
+import { ErrorMessages } from '@constants/errors';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { BotTagObject } from '../objects/tag/tag.object';
@@ -10,7 +11,7 @@ export class BotTagService {
 	 */
 	public constructor(
 		@Inject('DATABASE') private _drizzleService: DrizzleService
-	) {}
+	) { }
 
 	/**
 	 * Retrieves the tags associated with a bot.
@@ -27,7 +28,9 @@ export class BotTagService {
 			.execute();
 
 		if (!response.length) {
-			throw new NotFoundException();
+			throw new NotFoundException(
+				ErrorMessages.TAGS_NOT_FOUND
+			);
 		}
 
 		return response.map((table) => table.tag);

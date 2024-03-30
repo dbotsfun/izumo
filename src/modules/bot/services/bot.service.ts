@@ -1,3 +1,4 @@
+import { ErrorMessages } from '@constants/errors';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { BotObject } from '../objects/bot/bot.object';
@@ -10,7 +11,7 @@ export class BotService {
 	 */
 	public constructor(
 		@Inject('DATABASE') private _drizzleService: DrizzleService
-	) {}
+	) { }
 
 	/**
 	 * Retrieves a bot by its ID.
@@ -26,8 +27,12 @@ export class BotService {
 			.execute();
 
 		if (!response) {
-			throw new NotFoundException();
+			throw new NotFoundException(
+				ErrorMessages.BOT_NOT_FOUND
+			);
 		}
+
+		// TODO: Check user permissions, throw error if user can't view bot
 
 		return response;
 	}

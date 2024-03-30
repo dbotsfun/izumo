@@ -1,3 +1,4 @@
+import { ErrorMessages } from '@constants/errors';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { BotOwnerObject } from '../objects/owner/owner.object';
@@ -10,7 +11,7 @@ export class BotOwnerService {
 	 */
 	public constructor(
 		@Inject('DATABASE') private _drizzleService: DrizzleService
-	) {}
+	) { }
 
 	/**
 	 * Retrieves the owner of a bot by ID.
@@ -27,7 +28,9 @@ export class BotOwnerService {
 			.execute();
 
 		if (!response) {
-			throw new NotFoundException();
+			throw new NotFoundException(
+				ErrorMessages.USER_NOT_FOUND
+			);
 		}
 
 		return response;
@@ -48,7 +51,9 @@ export class BotOwnerService {
 			.execute();
 
 		if (!response.length) {
-			throw new NotFoundException();
+			throw new NotFoundException(
+				ErrorMessages.USERS_NOT_FOUND
+			);
 		}
 
 		return response.map((table) => table.owner);
