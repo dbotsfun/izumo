@@ -30,6 +30,9 @@ export const botToTag = pgTable(
 	}
 );
 
+export type ItagsInsert = typeof tags.$inferInsert;
+export type ItagsSelect = typeof tags.$inferSelect;
+
 export const tagsRelations = relations(tags, ({ one }) => ({
 	bots: one(botToTag, {
 		fields: [tags.name],
