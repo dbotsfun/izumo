@@ -10,7 +10,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { validate } from '@utils/index';
 import type { Request, Response } from 'express';
 import * as schema from './database/schema';
-import { BotModule } from './modules/bot/modules/bot.module';
+import { BotModule } from './modules/bot/bot.module';
 
 @Module({
 	imports: [

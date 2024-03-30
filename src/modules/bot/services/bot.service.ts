@@ -1,5 +1,4 @@
-// biome-ignore lint/style/useImportType: <explanation>
-import { DrizzleService } from '@lib/types';
+import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { BotObject } from '../objects/bot/bot.object';
 

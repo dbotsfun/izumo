@@ -17,5 +17,7 @@
 	},
 	"[javascript][json][jsonc][typescript][typescriptreact]": {
 		"editor.defaultFormatter": "biomejs.biome"
-	}
+	},
+
+	"typescript.preferences.preferTypeOnlyAutoImports": true
 }

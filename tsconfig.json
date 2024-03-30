@@ -26,6 +26,9 @@
 		"exactOptionalPropertyTypes": false,
 		"noImplicitOverride": true,
 		"pretty": true,
+		"newLine": "lf",
+		"noUnusedParameters": true,
+		"preserveConstEnums": true,
 
 		"paths": {
 			"@utils/*": ["src/lib/utils/*"],

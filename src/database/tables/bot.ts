@@ -105,9 +105,9 @@ export const botsRelations = relations(bots, ({ many }) => ({
 	tags: many(tags, { relationName: 'bot_tags' })
 }));
 
-export const botToUserRelations = relations(botToUser, ({ one, many }) => ({
+export const botToUserRelations = relations(botToUser, ({ one }) => ({
 	bot: one(bots, { fields: [botToUser.a], references: [bots.id] }),
-	owners: many(users, { relationName: 'bot_owners' })
+	owner: one(users, { fields: [botToUser.b], references: [users.id] })
 }));
 
 export const ownersRelations = relations(users, ({ one }) => ({

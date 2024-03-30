@@ -38,7 +38,7 @@ export const tagsRelations = relations(tags, ({ one }) => ({
 	})
 }));
 
-export const tagToBotRelations = relations(botToTag, ({ one, many }) => ({
+export const tagToBotRelations = relations(botToTag, ({ one }) => ({
 	bot: one(bots, { fields: [botToTag.a], references: [bots.id] }),
-	tags: many(tags, { relationName: 'bot_tags' })
+	tag: one(tags, { fields: [botToTag.b], references: [tags.name] })
 }));

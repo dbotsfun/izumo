@@ -8,7 +8,7 @@ import { BotUserPermissions } from './bot.user.permissions';
 @ObjectType({
 	description: 'A bot object.'
 })
-export class BotObject implements TbotsSelect {
+export class BotObject implements Omit<TbotsSelect, 'apiKey'> {
 	/**
 	 * The unique identifier of the bot.
 	 */
@@ -135,15 +135,6 @@ export class BotObject implements TbotsSelect {
 		description: 'The number of guilds (servers) the bot is currently in.'
 	})
 	public guildCount!: number;
-
-	/**
-	 * The API key used by the bot for authentication.
-	 */
-	@Field(() => String, {
-		description: 'The API key used by the bot for authentication.',
-		nullable: true
-	})
-	public apiKey!: string | null;
 
 	/**
 	 * The source from which the bot was imported.
