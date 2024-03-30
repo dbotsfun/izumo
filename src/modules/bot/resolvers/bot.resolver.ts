@@ -1,4 +1,4 @@
-import { UsePipes } from '@nestjs/common';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { GetBotInput } from '../inputs/bot/get.input';
@@ -9,7 +9,7 @@ import { BotService } from '../services/bot.service';
  * Resolver for handling bot-related operations.
  */
 @Resolver(() => BotObject)
-@UsePipes(ValidationTypes)
+@UsePipes(ValidationTypes, ValidationPipe)
 export class BotResolver {
 	public constructor(private _botService: BotService) {}
 

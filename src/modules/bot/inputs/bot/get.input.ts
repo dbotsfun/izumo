@@ -1,5 +1,5 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsNumberString } from 'class-validator';
+import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 
 /**
  * The input type for the getBot query.
@@ -15,8 +15,8 @@ export class GetBotInput {
 	@Field(() => ID, {
 		description: 'The ID of the bot to retrieve.'
 	})
-	@IsNumberString(undefined, {
-		message: 'The ID must be a number.'
+	@IsSnowflake({
+		message: 'The bot ID must be a valid Snowflake.'
 	})
 	public id!: string;
 }
