@@ -11,6 +11,10 @@ import { BotService } from '../services/bot.service';
 @Resolver(() => BotObject)
 @UsePipes(ValidationTypes, ValidationPipe)
 export class BotResolver {
+	/**
+	 * Creates an instance of the BotResolver class.
+	 * @param _botService The bot service used by the resolver.
+	 */
 	public constructor(private _botService: BotService) {}
 
 	/**

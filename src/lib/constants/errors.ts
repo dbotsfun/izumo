@@ -16,23 +16,24 @@ export const FaceStatusCode = {
 
 export enum ErrorMessages {
 	// Bots
-	BOT_NOT_FOUND = "Bot not found",
+	BOT_NOT_FOUND = 'Bot not found',
 	BOT_NOT_FOUND_OR_UNAUTHORIZED = `${BOT_NOT_FOUND} or you can't access it`,
-	BOT_ALREADY_APPROVED = "Bot already approved",
-	BOT_ALREADY_DENIED = "Bot already denied",
-	BOT_ALREADY_SUBMITTED = "Bot already submitted",
-	BOT_PRIVATE = "Bot is private",
+	BOT_ALREADY_APPROVED = 'Bot already approved',
+	BOT_ALREADY_DENIED = 'Bot already denied',
+	BOT_ALREADY_SUBMITTED = 'Bot already submitted',
+	BOT_PRIVATE = 'Bot is private',
 
 	// Dlist (Import)
 	DLIST_BOT_UNAUTHORIZED = "You can't import this bot",
 	DLIST_BOT_HIDDEN = "You can't import hidden bots",
 
 	// Tags
-	TAGS_NOT_FOUND = "No tags found",
+	TAGS_NOT_FOUND = 'No tags found',
 
 	// Users/Owners
-	USER_NOT_FOUND = "User not found",
-	USERS_NOT_FOUND = "Users not found"
+	USER_NOT_FOUND = 'User not found',
+	USERS_NOT_FOUND = 'Users not found',
+	USER_HAS_NO_BOTS = 'User has no bots'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }

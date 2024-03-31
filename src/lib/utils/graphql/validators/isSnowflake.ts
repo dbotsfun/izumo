@@ -5,6 +5,12 @@ import {
 	registerDecorator
 } from 'class-validator';
 
+/**
+ * Decorator that validates if a value is a valid Snowflake ID.
+ *
+ * @param validationOptions - The validation options.
+ * @returns A decorator function.
+ */
 export function IsSnowflake(validationOptions?: ValidationOptions) {
 	// biome-ignore lint/complexity/noBannedTypes: <explanation>
 	return (object: Object, propertyName: string) => {
