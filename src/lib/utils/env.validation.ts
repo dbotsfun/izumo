@@ -3,11 +3,14 @@ import {
 	IsEnum,
 	IsNumber,
 	IsString,
+	IsUrl,
+	Length,
 	Matches,
 	Max,
 	Min,
 	validateSync
 } from 'class-validator';
+import { IsSnowflake } from './graphql/validators/isSnowflake';
 
 export enum Environment {
 	Development = 'development',
@@ -46,6 +49,43 @@ export class EnvironmentVariables {
 		}
 	)
 	public DATABASE_URL!: string;
+
+	/**
+	 * The secret key for the JWT (JSON Web Token) authentication.
+	 */
+	@IsString()
+	@Length(32, 32)
+	public JWT_SECRET_KEY!: string;
+
+	/**
+	 * The secret key for the JWT (JSON Web Token) refresh token.
+	 */
+	@IsString()
+	@Length(32, 32)
+	public JWT_REFRESH_SECRET_KEY!: string;
+
+	/**
+	 * The Discord client ID for the OAuth application.
+	 */
+	@IsSnowflake()
+	public DISCORD_CLIENT_ID!: string;
+
+	/**
+	 * The Discord client secret for the OAuth application.
+	 */
+	@IsUrl({
+		protocols: ['http', 'https'],
+		require_tld: false,
+		require_host: false
+	})
+	public DISCORD_REDIRECT_URI!: string;
+
+	/**
+	 * The Discord client secret for the OAuth application.
+	 */
+	@IsString()
+	@Length(32, 32)
+	public DISCORD_CLIENT_SECRET!: string;
 }
 
 /**

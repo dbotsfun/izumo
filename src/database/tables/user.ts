@@ -1,4 +1,7 @@
+import { relations } from 'drizzle-orm';
 import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+// import { bots } from './bot';
+import { sessions } from './session';
 
 export const users = pgTable('users', {
 	id: text('id').primaryKey().notNull(),
@@ -18,3 +21,9 @@ export const users = pgTable('users', {
 
 export type TuserInsert = typeof users.$inferInsert;
 export type TuserSelect = typeof users.$inferSelect;
+
+export const userRelations = relations(users, ({ many }) => ({
+	sessions: many(sessions, { relationName: 'user_sessions' })
+}));
+
+// bots: many(bots, { relationName: 'user_bots' })

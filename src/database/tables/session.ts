@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { pgTable, primaryKey, text, uniqueIndex } from 'drizzle-orm/pg-core';
 import { users } from './user';
 
@@ -28,3 +29,14 @@ export const sessions = pgTable(
 		};
 	}
 );
+
+export const IsessionsInsert = typeof sessions.$inferInsert;
+export const IsessionsSelect = typeof sessions.$inferSelect;
+
+export const sessionRelations = relations(sessions, ({ one }) => ({
+	user: one(users, {
+		relationName: 'user_sessions',
+		fields: [sessions.userId],
+		references: [users.id]
+	})
+}));

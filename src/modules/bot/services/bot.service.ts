@@ -1,4 +1,5 @@
 import { ErrorMessages } from '@constants/errors';
+import { DATABASE } from '@constants/tokens';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { BotObject } from '../objects/bot/bot.object';
@@ -12,7 +13,7 @@ export class BotService {
 	 * @param {DrizzleService} _drizzleService - The DrizzleService instance.
 	 */
 	public constructor(
-		@Inject('DATABASE') private _drizzleService: DrizzleService
+		@Inject(DATABASE) private _drizzleService: DrizzleService
 	) {}
 
 	/**

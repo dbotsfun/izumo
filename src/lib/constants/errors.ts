@@ -33,7 +33,15 @@ export enum ErrorMessages {
 	// Users/Owners
 	USER_NOT_FOUND = 'User not found',
 	USERS_NOT_FOUND = 'Users not found',
-	USER_HAS_NO_BOTS = 'User has no bots'
+	USER_HAS_NO_BOTS = 'User has no bots',
+
+	// Auth
+	AUTH_TOKEN_IS_REQUIRED = 'An authentication token is required to perform this action',
+	AUTH_INVALID_TOKEN = 'Invalid authentication token',
+	AUTH_UKNOWN_TOKEN = 'No information was found for this token',
+	AUTH_EXPIRED_TOKEN = 'Authentication token has expired',
+	AUTH_UNABLE_TO_GET_DATA = 'An error occurred while trying to get data from Discord',
+	AUTH_UNABLE_TO_GET_USER_DATA = 'An error occurred while trying to get user data from Discord, please try loggin in again'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }

@@ -2,6 +2,7 @@ import '@utils/graphql/registers/enum.register';
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { FaceStatusCode } from '@constants/errors';
+import { DATABASE } from '@constants/tokens';
 import { DrizzlePostgresModule } from '@knaadh/nestjs-drizzle-postgres';
 import { ApolloDriver, type ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { validate } from '@utils/index';
 import type { Request, Response } from 'express';
 import * as schema from './database/schema';
+import { AuthModule } from './modules/auth/auth.module';
 import { BotModule } from './modules/bot/bot.module';
 
 @Module({
@@ -87,7 +89,7 @@ import { BotModule } from './modules/bot/bot.module';
 		DrizzlePostgresModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
-			tag: 'DATABASE',
+			tag: DATABASE,
 			useFactory: async (configService: ConfigService) => ({
 				postgres: {
 					url: configService.getOrThrow('DATABASE_URL')
@@ -96,7 +98,8 @@ import { BotModule } from './modules/bot/bot.module';
 			})
 		}),
 
-		BotModule
+		BotModule,
+		AuthModule
 	],
 	controllers: [],
 	providers: []
