@@ -4,66 +4,6 @@
 	"version": "5",
 	"dialect": "pg",
 	"tables": {
-		"_prisma_migrations": {
-			"name": "_prisma_migrations",
-			"schema": "",
-			"columns": {
-				"id": {
-					"name": "id",
-					"type": "varchar(36)",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"checksum": {
-					"name": "checksum",
-					"type": "varchar(64)",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"finished_at": {
-					"name": "finished_at",
-					"type": "timestamp with time zone",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"migration_name": {
-					"name": "migration_name",
-					"type": "varchar(255)",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"logs": {
-					"name": "logs",
-					"type": "text",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"rolled_back_at": {
-					"name": "rolled_back_at",
-					"type": "timestamp with time zone",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"started_at": {
-					"name": "started_at",
-					"type": "timestamp with time zone",
-					"primaryKey": false,
-					"notNull": true,
-					"default": "now()"
-				},
-				"applied_steps_count": {
-					"name": "applied_steps_count",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": true,
-					"default": 0
-				}
-			},
-			"indexes": {},
-			"foreignKeys": {},
-			"compositePrimaryKeys": {},
-			"uniqueConstraints": {}
-		},
 		"reviews": {
 			"name": "reviews",
 			"schema": "",

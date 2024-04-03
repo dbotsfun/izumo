@@ -4,8 +4,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthResolver } from './resolvers/auth.resolver';
+import { AuthUserResolver } from './resolvers/user.resolver';
 import { AuthService } from './services/auth.service';
 import { HashService } from './services/hash.service';
+import { AuthUserService } from './services/user.service';
 import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
@@ -19,7 +21,9 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 		AuthResolver,
 		HashService,
 		JwtStrategy,
-		JwtRefreshStrategy
+		JwtRefreshStrategy,
+		AuthUserResolver,
+		AuthUserService
 	],
 	exports: [JwtModule, PassportModule],
 	imports: [

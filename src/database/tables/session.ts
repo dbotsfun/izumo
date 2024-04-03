@@ -30,8 +30,8 @@ export const sessions = pgTable(
 	}
 );
 
-export const IsessionsInsert = typeof sessions.$inferInsert;
-export const IsessionsSelect = typeof sessions.$inferSelect;
+export type TsessionsInsert = typeof sessions.$inferInsert;
+export type TsessionsSelect = typeof sessions.$inferSelect;
 
 export const sessionRelations = relations(sessions, ({ one }) => ({
 	user: one(users, {
