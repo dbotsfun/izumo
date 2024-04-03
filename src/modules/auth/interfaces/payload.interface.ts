@@ -10,3 +10,16 @@ export type JwtPayload = Partial<AuthDiscordUser> &
 		 */
 		id: string;
 	};
+
+/**
+ * Represents the payload of a JWT refresh token.
+ */
+export type JwtRefreshPayload = Pick<
+	OAuthDataDiscord,
+	'refresh_token' | 'token_type' | 'expires_in'
+> & {
+	/**
+	 * The ID of the user.
+	 */
+	id: string;
+};

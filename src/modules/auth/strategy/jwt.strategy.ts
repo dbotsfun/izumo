@@ -39,6 +39,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		} as StrategyOptions);
 	}
 
+	/**
+	 * Validates the JWT token and checks if it is valid and not expired.
+	 * Throws an error if the token is missing, invalid, or expired.
+	 *
+	 * @param request - The HTTP request object.
+	 * @param payload - The decoded JWT payload.
+	 * @returns The validated JWT payload.
+	 * @throws UnauthorizedException if the token is missing, invalid, or expired.
+	 */
 	public async validate(
 		request: Request,
 		payload: JwtPayload
@@ -73,16 +82,19 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		const sessionTokens =
 			await this._drizzleService.query.sessions.findMany({
 				where: (session, { eq, and }) =>
-					and(eq(session.userId, payload.id))
+					and(eq(session.userId, payload.id)),
+				columns: {
+					refreshToken: false // Not needed
+				}
 			});
 
-		// If the session token is not found, throw an error
+		// If session tokens are not found, throw an error
 		if (!sessionTokens.length) {
 			throw new UnauthorizedException(ErrorMessages.AUTH_UKNOWN_TOKEN);
 		}
 
 		// Check if the session token is valid
-		const isValidSession = sessionTokens.find((session) =>
+		const isValidSession = sessionTokens.some((session) =>
 			this._hashService.compare(token, session.accessToken)
 		);
 

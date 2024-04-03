@@ -1,12 +1,16 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { User } from '../decorators/user.decorator';
+import { JwtRefreshAuthGuard } from '../guards/jwt-refresh.guard';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { CreateSessionInput } from '../inputs/auth/create.input';
-import { RefreshSessionInput } from '../inputs/auth/refresh.input';
-import { JwtPayload } from '../interfaces/payload.interface';
+import {
+	JwtPayload,
+	type JwtRefreshPayload
+} from '../interfaces/payload.interface';
 import { AuthSessionObject } from '../objects/auth/sessions.object';
 import { AuthService } from '../services/auth.service';
+
 /**
  * Resolver class for handling authentication-related operations.
  */
@@ -36,12 +40,13 @@ export class AuthResolver {
 	 * @param input - The input data for refreshing a session.
 	 * @returns The refreshed session object.
 	 */
+	@UseGuards(JwtRefreshAuthGuard)
 	@Mutation(() => AuthSessionObject, {
 		name: 'refreshSession',
 		description: 'Refreshes a user session.'
 	})
-	public refresh(@Args('input') _input: RefreshSessionInput) {
-		// TODO: Implement session refreshing
+	public refresh(@User() user: JwtRefreshPayload) {
+		return this._authService.refreshSession(user);
 	}
 
 	/**

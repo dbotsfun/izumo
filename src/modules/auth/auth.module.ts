@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthResolver } from './resolvers/auth.resolver';
 import { AuthService } from './services/auth.service';
 import { HashService } from './services/hash.service';
+import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
 /**
@@ -13,7 +14,13 @@ import { JwtStrategy } from './strategy/jwt.strategy';
  * This module provides the necessary services, resolvers, and modules for authentication.
  */
 @Module({
-	providers: [AuthService, AuthResolver, HashService, JwtStrategy],
+	providers: [
+		AuthService,
+		AuthResolver,
+		HashService,
+		JwtStrategy,
+		JwtRefreshStrategy
+	],
 	exports: [JwtModule, PassportModule],
 	imports: [
 		// Import the HttpModule to allow for making HTTP requests

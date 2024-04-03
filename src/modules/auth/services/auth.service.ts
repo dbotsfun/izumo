@@ -14,6 +14,10 @@ import {
 	type AuthDiscordUser,
 	OAuthDataDiscord
 } from '../interfaces/discord.interface';
+import type {
+	JwtPayload,
+	JwtRefreshPayload
+} from '../interfaces/payload.interface';
 import { HashService } from './hash.service';
 
 /**
@@ -70,57 +74,21 @@ export class AuthService {
 		});
 
 		// Get the user data from Discord
-		const userData = await firstValueFrom(
-			this._httpService.get<AuthDiscordUser>(DiscordAuthEndpoints.USER, {
-				headers: {
-					Authorization: `Bearer ${OAuthData.data.access_token}`
-				}
-			})
-		).catch(() => {
-			// If we can't get the user data, throw an error
-			throw new BadRequestException(
-				ErrorMessages.AUTH_UNABLE_TO_GET_USER_DATA
-			);
-		});
+		const userData = await this.getAPIUserData(OAuthData.data.access_token);
 
-		// Generate a refresh token
-		const refreshToken = await this._jwtService.signAsync(
-			{
-				id: userData.data.id,
-				refresh_token: OAuthData.data.refresh_token,
-				token_type: OAuthData.data.token_type,
-				expires_in: OAuthData.data.expires_in
-			},
-			{
-				secret: this._configService.getOrThrow<string>(
-					'JWT_REFRESH_SECRET_KEY'
-				)
-			}
-		);
-
-		// Generate an access token
-		const accessToken = await this._jwtService.signAsync(
-			{
-				id: userData.data.id,
-				access_token: OAuthData.data.access_token,
-				token_type: OAuthData.data.token_type,
-				expires_in: OAuthData.data.expires_in
-			},
-			{
-				secret: this._configService.getOrThrow<string>(
-					'JWT_SECRET_KEY'
-				),
-				expiresIn: '7d' // Discord access tokens expire in 7 days
-			}
+		// Encode the tokens
+		const { accessToken, refreshToken } = await this.encodeTokens(
+			userData,
+			OAuthData.data
 		);
 
 		// Create a session in the database
 		await this._drizzleService.transaction(async (tx) => {
 			// User fields to insert or update in the database
 			const userFields: TuserInsert = {
-				id: userData.data.id,
-				username: userData.data.username,
-				avatar: userData.data.avatar,
+				id: userData.id,
+				username: userData.username,
+				avatar: userData.avatar,
 				updatedAt: new Date()
 			};
 
@@ -138,7 +106,7 @@ export class AuthService {
 			await tx.insert(sessions).values({
 				refreshToken: await this._hashService.hash(refreshToken),
 				accessToken: await this._hashService.hash(accessToken),
-				userId: userData.data.id
+				userId: userData.id
 			});
 		});
 
@@ -151,6 +119,105 @@ export class AuthService {
 	}
 
 	/**
+	 * Refreshes the user session by generating new access and refresh tokens.
+	 *
+	 * @param user - The user's JWT refresh payload.
+	 * @returns A promise that resolves to a new session object containing the new access and refresh tokens.
+	 * @throws `BadRequestException` if the session is not found or if there is an error retrieving the OAuth data.
+	 */
+	public async refreshSession(user: JwtRefreshPayload): Promise<NewSession> {
+		// Find the user in the database
+		const session = (await this.userSessions(user.id)).find((session) =>
+			this._hashService.compare(user.refresh_token, session.refreshToken)
+		);
+
+		// If the session is not found, throw an error
+		if (!session) {
+			throw new BadRequestException(
+				ErrorMessages.AUTH_INVALID_REFRESH_TOKEN
+			);
+		}
+
+		// Get the OAuth data from Discord
+		const OAuthData = await firstValueFrom(
+			this._httpService.post<OAuthDataDiscord>(
+				DiscordAuthEndpoints.TOKEN,
+				{
+					...this._parameters,
+					grant_type: 'refresh_token',
+					refresh_token: user.refresh_token
+				},
+				{
+					headers: this._headers
+				}
+			)
+		).catch(() => {
+			// If we can't get the OAuth data, throw an error
+			throw new BadRequestException(
+				ErrorMessages.AUTH_UNABLE_TO_GET_DATA
+			);
+		});
+
+		// Get the user data from Discord
+		const userData = await this.getAPIUserData(OAuthData.data.access_token);
+
+		// Encode the tokens
+		const { accessToken, refreshToken } = await this.encodeTokens(
+			userData,
+			OAuthData.data
+		);
+
+		// Update the session in the database
+		await this._drizzleService.transaction(async (tx) => {
+			// Update the user in the database
+			await tx
+				.update(users)
+				.set({
+					username: userData.username,
+					avatar: userData.avatar,
+					updatedAt: new Date()
+				})
+				.where(eq(users.id, userData.id));
+
+			// Update the session in the database
+			await tx
+				.update(sessions)
+				.set({
+					accessToken: await this._hashService.hash(accessToken),
+					refreshToken: await this._hashService.hash(refreshToken)
+				})
+				.where(eq(sessions.refreshToken, session.refreshToken));
+		});
+
+		return {
+			access_token: accessToken,
+			expires_in: Date.now() + days(7),
+			refresh_token: refreshToken
+		};
+	}
+
+	/**
+	 * Retrieves the sessions for a given user ID.
+	 *
+	 * @param id - The ID of the user.
+	 * @returns A promise that resolves to an array of sessions.
+	 * @throws BadRequestException if no sessions are found.
+	 */
+	public async userSessions(id: string) {
+		// Find the sessions in the database
+		const sessions = await this._drizzleService.query.sessions.findMany({
+			where: (session, { eq }) => eq(session.userId, id)
+		});
+
+		// If no sessions are found, throw an error
+		if (!sessions.length) {
+			throw new BadRequestException(ErrorMessages.AUTH_NO_SESSIONS_FOUND);
+		}
+
+		return sessions;
+	}
+
+	/**
 	 * Generates a hash for the given token.
 	 * @param token - The token to generate a hash for.
 	 * @returns {Promise<GeneratedHash>} A promise that resolves to an object containing the generated hash and salt.
@@ -160,6 +227,74 @@ export class AuthService {
 		const hash = await this._hashService.hash(token, salt);
 
 		return { hash, salt };
+	}
+
+	/**
+	 * Retrieves the user data from the API using the provided token.
+	 * @param token - The authentication token.
+	 * @returns A promise that resolves to the user data.
+	 * @throws BadRequestException if unable to get the user data.
+	 */
+	public async getAPIUserData(token: string) {
+		const response = await firstValueFrom(
+			this._httpService.get<AuthDiscordUser>(DiscordAuthEndpoints.USER, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			})
+		).catch(() => {
+			// If we can't get the user data, throw an error
+			throw new BadRequestException(
+				ErrorMessages.AUTH_UNABLE_TO_GET_USER_DATA
+			);
+		});
+
+		return response.data;
+	}
+
+	/**
+	 * Encodes the tokens for the authenticated user.
+	 *
+	 * @param userData - The user data.
+	 * @param authData - The authentication data.
+	 * @returns An object containing the access token and refresh token.
+	 */
+	private async encodeTokens(
+		userData: AuthDiscordUser,
+		authData: OAuthDataDiscord
+	) {
+		// Generate a refresh token
+		const refreshToken = await this._jwtService.signAsync(
+			{
+				id: userData.id,
+				refresh_token: authData.refresh_token,
+				token_type: authData.token_type,
+				expires_in: authData.expires_in
+			} as JwtRefreshPayload,
+			{
+				secret: this._configService.getOrThrow<string>(
+					'JWT_REFRESH_SECRET_KEY'
+				)
+			}
+		);
+
+		// Generate an access token
+		const accessToken = await this._jwtService.signAsync(
+			{
+				id: userData.id,
+				access_token: authData.access_token,
+				token_type: authData.token_type,
+				expires_in: authData.expires_in
+			} as JwtPayload,
+			{
+				secret: this._configService.getOrThrow<string>(
+					'JWT_SECRET_KEY'
+				),
+				expiresIn: '7d' // Discord access tokens expire in 7 days
+			}
+		);
+
+		return { accessToken, refreshToken };
 	}
 
 	/**
