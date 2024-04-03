@@ -5,6 +5,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
+import { arraySome } from '@utils/common/arraySome';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 import type { JwtPayload } from '../interfaces/payload.interface';
@@ -81,8 +82,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		// Find the session token in the database
 		const sessionTokens =
 			await this._drizzleService.query.sessions.findMany({
-				where: (session, { eq, and }) =>
-					and(eq(session.userId, payload.id)),
+				where: (session, { eq }) => eq(session.userId, payload.id),
 				columns: {
 					refreshToken: false // Not needed
 				}
@@ -94,8 +94,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		}
 
 		// Check if the session token is valid
-		const isValidSession = sessionTokens.some((session) =>
-			this._hashService.compare(token, session.accessToken)
+		const isValidSession = await arraySome(
+			sessionTokens,
+			async (session) =>
+				await this._hashService.compare(token, session.accessToken)
 		);
 
 		// If the session token is invalid, throw an error

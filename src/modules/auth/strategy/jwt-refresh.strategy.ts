@@ -5,6 +5,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
+import { arraySome } from '@utils/common/arraySome';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 import type { JwtRefreshPayload } from '../interfaces/payload.interface';
@@ -89,8 +90,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
 		}
 
 		// If the refresh token is not the same as the one in the database, throw an error
-		const isValidRefreshToken = sessionTokens.some((token) =>
-			this._hashService.compare(payload.refresh_token, token.refreshToken)
+		const isValidRefreshToken = await arraySome(
+			sessionTokens,
+			async (session) =>
+				await this._hashService.compare(token, session.refreshToken)
 		);
 
 		// If the refresh token is not valid, throw an error

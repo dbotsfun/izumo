@@ -7,6 +7,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { days } from '@nestjs/throttler';
+import { arrayFind } from '@utils/common/arrayFind';
 import { eq } from 'drizzle-orm';
 import { firstValueFrom } from 'rxjs';
 import type { GeneratedHash, NewSession } from '../interfaces/auth.interface';
@@ -127,8 +128,13 @@ export class AuthService {
 	 */
 	public async refreshSession(user: JwtRefreshPayload): Promise<NewSession> {
 		// Find the user in the database
-		const session = (await this.userSessions(user.id)).find((session) =>
-			this._hashService.compare(user.refresh_token, session.refreshToken)
+		const session = await arrayFind(
+			await this.userSessions(user.id),
+			async (session) =>
+				await this._hashService.compare(
+					user.bearer,
+					session.refreshToken
+				)
 		);
 
 		// If the session is not found, throw an error
@@ -196,6 +202,49 @@ export class AuthService {
 		};
 	}
 
+	public async revokeSession(user: JwtPayload) {
+		// Find the user in the database
+		await firstValueFrom(
+			this._httpService.post(
+				DiscordAuthEndpoints.REVOKE,
+				{
+					...this._parameters,
+					token: user.access_token
+				},
+				{
+					headers: this._headers
+				}
+			)
+		).catch(() => {
+			// If we can't revoke the token, throw an error
+			throw new BadRequestException(
+				ErrorMessages.AUTH_UNABLE_TO_REVOKE_TOKEN
+			);
+		});
+
+		// Find the session in the database
+		const session = await arrayFind(
+			await this.userSessions(user.id),
+			async (session) =>
+				await this._hashService.compare(
+					user.bearer,
+					session.accessToken
+				)
+		);
+
+		// If the session is not found, throw an error
+		if (!session) {
+			throw new BadRequestException(ErrorMessages.AUTH_INVALID_TOKEN);
+		}
+
+		// Delete the session from the database
+		await this._drizzleService
+			.delete(sessions)
+			.where(eq(sessions.accessToken, session.accessToken));
+
+		return true;
+	}
+
 	/**
 	 * Retrieves the sessions for a given user ID.
 	 *
@@ -232,10 +281,10 @@ export class AuthService {
 	/**
 	 * Retrieves the user data from the API using the provided token.
 	 * @param token - The authentication token.
-	 * @returns A promise that resolves to the user data.
+	 * @returns {Promise<AuthDiscordUser>} A promise that resolves to the user data.
 	 * @throws BadRequestException if unable to get the user data.
 	 */
-	public async getAPIUserData(token: string) {
+	public async getAPIUserData(token: string): Promise<AuthDiscordUser> {
 		const response = await firstValueFrom(
 			this._httpService.get<AuthDiscordUser>(DiscordAuthEndpoints.USER, {
 				headers: {

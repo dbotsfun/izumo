@@ -44,7 +44,8 @@ export enum ErrorMessages {
 	AUTH_EXPIRED_TOKEN = 'Authentication token has expired',
 	AUTH_UNABLE_TO_GET_DATA = 'An error occurred while trying to get data from Discord',
 	AUTH_UNABLE_TO_GET_USER_DATA = 'An error occurred while trying to get user data from Discord, please try loggin in again',
-	AUTH_NO_SESSIONS_FOUND = 'No sessions found'
+	AUTH_NO_SESSIONS_FOUND = 'No sessions found',
+	AUTH_UNABLE_TO_REVOKE_TOKEN = 'An error occurred while trying to your token, please try again'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }

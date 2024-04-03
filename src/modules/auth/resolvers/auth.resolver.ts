@@ -51,16 +51,15 @@ export class AuthResolver {
 
 	/**
 	 * Logs out the user session.
-	 * @param _user - The user's JWT payload.
+	 * @param user - The user's JWT payload.
 	 * @returns The logged out session object.
 	 */
 	@UseGuards(JwtAuthGuard)
-	@Mutation(() => AuthSessionObject, {
+	@Mutation(() => Boolean, {
 		name: 'logOut',
 		description: 'Logs out the user session.'
 	})
-	public logout(@User() _user: JwtPayload) {
-		console.log(_user);
-		// TODO: Implement session logout
+	public logout(@User() user: JwtPayload) {
+		return this._authService.revokeSession(user);
 	}
 }
