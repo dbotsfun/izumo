@@ -175,9 +175,7 @@ export class BotService {
 	}
 
 	public async updateBot(owner: JwtPayload, input: UpdateBotInput) {
-		const bot = await this.getUserBot(owner.id);
-
-		if (!bot) throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
+		await this.checkBotOwnership(owner.id);
 
 		const botApiInformation = await this.getBotApiInformation(input.id);
 
@@ -215,9 +213,7 @@ export class BotService {
 	}
 
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
-		const bot = await this.getUserBot(owner.id);
-
-		if (!bot) throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
+		await this.checkBotOwnership(owner.id);
 
 		const [deleteBot] = await this._drizzleService
 			.delete(bots)
@@ -227,12 +223,17 @@ export class BotService {
 		return deleteBot
 	}
 
-	private async getUserBot(id: string) {
-		return this._drizzleService.query.botToUser
+	private async checkBotOwnership(id: string) {
+		const userBot = await this._drizzleService.query.botToUser
 			.findFirst({
 				where: (table, { eq }) => eq(table.b, id),
 				with: { bot: true }
 			})
 			.execute();
+
+		if (!userBot)
+			throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED);
+
+		return userBot.bot
 	}
 }
