@@ -1,6 +1,11 @@
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { User } from '@modules/auth/decorators/user.decorator';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
+import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
+import { CreateBotInput } from '../inputs/bot/create.input';
+import { DeleteBotInput } from '../inputs/bot/delete.input';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotObject } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
@@ -38,8 +43,12 @@ export class BotResolver {
 		name: 'createBot',
 		description: 'Creates a new bot.'
 	})
-	public create() {
-		// Create a new bot
+	@UseGuards(JwtAuthGuard)
+	public create(
+		@User() user: JwtPayload,
+		@Args('input') input: CreateBotInput
+	) {
+		return this._botService.createBot(user, input);
 	}
 
 	/**
@@ -50,8 +59,12 @@ export class BotResolver {
 		name: 'updateBot',
 		description: 'Updates an existing bot.'
 	})
-	public update() {
-		// Update an existing bot
+	@UseGuards(JwtAuthGuard)
+	public update(
+		@User() user: JwtPayload,
+		@Args('input') input: CreateBotInput
+	) {
+		return this._botService.updateBot(user, input);
 	}
 
 	/**
@@ -62,7 +75,11 @@ export class BotResolver {
 		name: 'deleteBot',
 		description: 'Deletes an existing bot.'
 	})
-	public delete() {
-		// Delete an existing bot
+	@UseGuards(JwtAuthGuard)
+	public delete(
+		@User() user: JwtPayload,
+		@Args('input') input: DeleteBotInput
+	) {
+		return this._botService.deleteBot(user, input);
 	}
 }
