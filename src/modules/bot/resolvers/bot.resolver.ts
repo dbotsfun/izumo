@@ -2,7 +2,6 @@ import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import {
-	NotImplementedException,
 	UseGuards,
 	UsePipes,
 	ValidationPipe
@@ -10,6 +9,7 @@ import {
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
+import { DeleteBotInput } from '../inputs/bot/delete.input';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotObject } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
@@ -65,9 +65,10 @@ export class BotResolver {
 	})
 	@UseGuards(JwtAuthGuard)
 	public update(
+		@User() user: JwtPayload,
 		@Args('input') input: CreateBotInput
 	) {
-		return this._botService.updateBot(input);
+		return this._botService.updateBot(user, input);
 	}
 
 	/**
@@ -78,8 +79,10 @@ export class BotResolver {
 		name: 'deleteBot',
 		description: 'Deletes an existing bot.'
 	})
-	public delete() {
-		// Delete an existing bot
-		throw new NotImplementedException();
+	public delete(
+		@User() user: JwtPayload,
+		@Args('input') input: DeleteBotInput
+	) {
+		return this._botService.deleteBot(user, input);
 	}
 }

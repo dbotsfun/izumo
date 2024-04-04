@@ -17,6 +17,7 @@ import { AxiosError } from 'axios';
 import { eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
+import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject } from '../objects/bot/bot.object';
 
@@ -43,7 +44,7 @@ export class BotService {
 	public async getBot(id: string): Promise<BotObject> {
 		const response = await this._drizzleService.query.bots
 			.findFirst({
-				where: (bot, { eq }) => eq(bot.id, id)
+				where: (bot, { eq }) => eq(bot.id, id),
 			})
 			.execute();
 
@@ -173,10 +174,10 @@ export class BotService {
 		return bot;
 	}
 
-	public async updateBot(input: UpdateBotInput) {
-		const bot = await this.getBot(input.id);
+	public async updateBot(owner: JwtPayload, input: UpdateBotInput) {
+		const bot = await this.getUserBot(owner.id);
 
-		if (!bot) throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED);
+		if (!bot) throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
 
 		const botApiInformation = await this.getBotApiInformation(input.id);
 
@@ -211,5 +212,27 @@ export class BotService {
 			.returning(secureCols) // TODO: Better way to OMIT the "apiKey" field
 
 		return updateBot
+	}
+
+	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
+		const bot = await this.getUserBot(owner.id);
+
+		if (!bot) throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
+
+		const [deleteBot] = await this._drizzleService
+			.delete(bots)
+			.where(eq(bots.id, input.id))
+			.returning()
+
+		return deleteBot
+	}
+
+	private async getUserBot(id: string) {
+		return this._drizzleService.query.botToUser
+			.findFirst({
+				where: (table, { eq }) => eq(table.b, id),
+				with: { bot: true }
+			})
+			.execute();
 	}
 }
