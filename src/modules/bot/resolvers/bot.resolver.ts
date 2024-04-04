@@ -24,7 +24,7 @@ export class BotResolver {
 	 * Creates an instance of the BotResolver class.
 	 * @param _botService The bot service used by the resolver.
 	 */
-	public constructor(private _botService: BotService) {}
+	public constructor(private _botService: BotService) { }
 
 	/**
 	 * Retrieves information about a bot.
@@ -63,9 +63,11 @@ export class BotResolver {
 		name: 'updateBot',
 		description: 'Updates an existing bot.'
 	})
-	public update() {
-		// Update an existing bot
-		throw new NotImplementedException();
+	@UseGuards(JwtAuthGuard)
+	public update(
+		@Args('input') input: CreateBotInput
+	) {
+		return this._botService.updateBot(input);
 	}
 
 	/**

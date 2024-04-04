@@ -1,6 +1,6 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { botToUser, bots } from '@database/tables';
+import { BotStatus, botToUser, bots } from '@database/tables';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
@@ -14,8 +14,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
+import { eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
+import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject } from '../objects/bot/bot.object';
 
 /**
@@ -31,7 +33,7 @@ export class BotService {
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService
-	) {}
+	) { }
 
 	/**
 	 * Retrieves a bot by its ID.
@@ -146,6 +148,7 @@ export class BotService {
 					...input,
 					name: botApiInformation.bot.username,
 					avatar: botApiInformation.bot.avatar,
+					guildCount: botApiInformation.bot.approximate_guild_count,
 					updatedAt: new Date(),
 					userPermissions: [
 						{
@@ -156,15 +159,57 @@ export class BotService {
 				})
 				.returning();
 
-			// Insert the bot-to-user relationship into the database
-			await tx.insert(botToUser).values({
-				a: input.id,
-				b: owner.id
-			});
+			// Insert the bot-to-user relationship(s) into the database
+			for (const ownerId of [...input.owners, owner.id]) {
+				await tx.insert(botToUser).values({
+					a: input.id,
+					b: ownerId
+				});
+			}
 
 			return bot;
 		});
 
 		return bot;
+	}
+
+	public async updateBot(input: UpdateBotInput) {
+		const bot = await this.getBot(input.id);
+
+		if (!bot) throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED);
+
+		const botApiInformation = await this.getBotApiInformation(input.id);
+
+		if (!botApiInformation.application.bot_public) {
+			await this._drizzleService
+				.update(bots)
+				.set({
+					status: BotStatus.PENDING // Change bot status to PENDING if it is private, why would we have a private bot listed?
+				})
+				.where(
+					eq(bots.id, input.id)
+				)
+
+			throw new ForbiddenException(ErrorMessages.BOT_PRIVATE);
+		}
+
+		const { apiKey, ...secureCols } = getTableColumns(bots)
+
+		// Auto-update API information
+		const [updateBot] = await this._drizzleService
+			.update(bots)
+			.set({
+				...input,
+				name: botApiInformation.bot.username,
+				avatar: botApiInformation.bot.avatar,
+				guildCount: botApiInformation.bot.approximate_guild_count,
+				updatedAt: new Date(),
+			})
+			.where(
+				eq(bots.id, input.id)
+			)
+			.returning(secureCols) // TODO: Better way to OMIT the "apiKey" field
+
+		return updateBot
 	}
 }
