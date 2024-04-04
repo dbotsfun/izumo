@@ -6,6 +6,7 @@ import { ApiBot } from '@lib/types/apiBot';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { HttpService } from '@nestjs/axios';
 import {
+	BadRequestException,
 	ForbiddenException,
 	Inject,
 	Injectable,
@@ -20,6 +21,7 @@ import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject } from '../objects/bot/bot.object';
+import { BotWebhookService } from './webhook.service';
 
 /**
  * Service class for handling bot-related operations.
@@ -33,7 +35,8 @@ export class BotService {
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
-		private readonly _configService: ConfigService
+		private readonly _configService: ConfigService,
+		private readonly _webhookService: BotWebhookService
 	) {}
 
 	/**
@@ -142,6 +145,9 @@ export class BotService {
 			throw new ForbiddenException(ErrorMessages.BOT_PRIVATE);
 		}
 
+		if (input.owners.includes(owner.id)) {
+			throw new BadRequestException(ErrorMessages.BOT_COOWNERS_SAME_ID);
+		}
 		// TODO: (CHIKO) User permissions
 
 		// Create the bot
@@ -164,8 +170,7 @@ export class BotService {
 				})
 				.returning();
 
-			// Insert the bot-to-user relationship(s) into the database
-			for (const ownerId of [...input.owners, owner.id]) {
+			for (const ownerId of [owner.id, ...input.owners]) {
 				await tx.insert(botToUser).values({
 					a: input.id,
 					b: ownerId
@@ -174,6 +179,10 @@ export class BotService {
 
 			return bot;
 		});
+
+		await this._webhookService.sendDiscordMessage(
+			`🟩 <@${owner.id}> just submitted <@${input.id}>`
+		);
 
 		return bot;
 	}
@@ -220,6 +229,10 @@ export class BotService {
 			.where(eq(bots.id, input.id))
 			.returning(secureCols); // TODO: Better way to OMIT the "apiKey" field
 
+		await this._webhookService.sendDiscordMessage(
+			`🟨 <@${owner.id}> just edited <@${input.id}>`
+		);
+
 		return updateBot;
 	}
 
@@ -239,6 +252,10 @@ export class BotService {
 			.delete(bots)
 			.where(eq(bots.id, input.id))
 			.returning();
+
+		await this._webhookService.sendDiscordMessage(
+			`🟥 <@${owner.id}> just deleted <@${input.id}>`
+		);
 
 		return deleteBot;
 	}

@@ -132,7 +132,6 @@ export class CreateBotInput {
 		description: 'The list of owners that can manage the bot.'
 	})
 	@IsOptional()
-	@ArrayMinSize(1)
 	@ArrayMaxSize(5)
 	@IsSnowflake({
 		each: true,

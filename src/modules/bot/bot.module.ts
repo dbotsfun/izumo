@@ -7,6 +7,7 @@ import { BotOwnerResolver } from './resolvers/owner.resolver';
 import { BotService } from './services/bot.service';
 import { BotOwnerService } from './services/owner.service';
 import { BotTagService } from './services/tag.service';
+import { BotWebhookService } from './services/webhook.service';
 
 @Module({
 	providers: [
@@ -16,7 +17,8 @@ import { BotTagService } from './services/tag.service';
 		BotOwnerService,
 		BotOwnerResolver,
 		BotOwnerFields,
-		BotTagService
+		BotTagService,
+		BotWebhookService
 	],
 	imports: [HttpModule]
 })

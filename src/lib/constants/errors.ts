@@ -22,6 +22,7 @@ export enum ErrorMessages {
 	BOT_ALREADY_DENIED = 'Bot already denied',
 	BOT_ALREADY_SUBMITTED = 'Bot already submitted',
 	BOT_PRIVATE = 'Bot is private',
+	BOT_COOWNERS_SAME_ID = "You can't set yourself as co-owner of the bot",
 
 	// Dlist (Import)
 	DLIST_BOT_UNAUTHORIZED = "You can't import this bot",
