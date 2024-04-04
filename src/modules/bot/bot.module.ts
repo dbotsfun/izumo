@@ -22,4 +22,4 @@ import { BotWebhookService } from './services/webhook.service';
 	],
 	imports: [HttpModule]
 })
-export class BotModule { }
+export class BotModule {}

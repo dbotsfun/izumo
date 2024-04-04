@@ -75,7 +75,6 @@ export class BotResolver {
 		name: 'deleteBot',
 		description: 'Deletes an existing bot.'
 	})
-
 	@UseGuards(JwtAuthGuard)
 	public delete(
 		@User() user: JwtPayload,

@@ -37,7 +37,7 @@ export class BotService {
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
 		private readonly _webhookService: BotWebhookService
-	) { }
+	) {}
 
 	/**
 	 * Retrieves a bot by its ID.
@@ -170,7 +170,6 @@ export class BotService {
 				})
 				.returning();
 
-
 			for (const ownerId of [owner.id, ...input.owners]) {
 				await tx.insert(botToUser).values({
 					a: input.id,
@@ -181,10 +180,9 @@ export class BotService {
 			return bot;
 		});
 
-
 		await this._webhookService.sendDiscordMessage(
 			`🟩 <@${owner.id}> just submitted <@${input.id}>`
-		)
+		);
 
 		return bot;
 	}
@@ -233,7 +231,7 @@ export class BotService {
 
 		await this._webhookService.sendDiscordMessage(
 			`🟨 <@${owner.id}> just edited <@${input.id}>`
-		)
+		);
 
 		return updateBot;
 	}
@@ -257,7 +255,7 @@ export class BotService {
 
 		await this._webhookService.sendDiscordMessage(
 			`🟥 <@${owner.id}> just deleted <@${input.id}>`
-		)
+		);
 
 		return deleteBot;
 	}
