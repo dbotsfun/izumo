@@ -42,12 +42,14 @@ export class BotService {
 	 * @returns {Promise<Bot>} - A promise that resolves to the bot object.
 	 */
 	public async getBot(id: string): Promise<BotObject> {
+		// Get the bot from the database
 		const response = await this._drizzleService.query.bots
 			.findFirst({
 				where: (bot, { eq }) => eq(bot.id, id)
 			})
 			.execute();
 
+		// If the bot is not found, throw a NotFoundException
 		if (!response) {
 			throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
 		}
@@ -63,6 +65,7 @@ export class BotService {
 	 * @returns {Promise<Bot[]>} - A promise that resolves to an array of bots.
 	 */
 	public async getUserBots(id: string): Promise<BotObject[]> {
+		// Get the bots owned by the user
 		const response = await this._drizzleService.query.botToUser
 			.findMany({
 				where: (table, { eq }) => eq(table.b, id),
@@ -70,6 +73,7 @@ export class BotService {
 			})
 			.execute();
 
+		// If the user has no bots, throw a NotFoundException
 		if (!response.length) {
 			throw new NotFoundException(ErrorMessages.USER_HAS_NO_BOTS);
 		}
@@ -174,11 +178,22 @@ export class BotService {
 		return bot;
 	}
 
+	/**
+	 * Updates a bot with the provided input.
+	 * Throws a ForbiddenException if the bot is private.
+	 *
+	 * @param owner - The owner's JWT payload.
+	 * @param input - The input data for updating the bot.
+	 * @returns The updated bot.
+	 */
 	public async updateBot(owner: JwtPayload, input: UpdateBotInput) {
+		// Check if the user is the owner of the bot
 		await this.checkBotOwnership(owner.id);
 
+		// Get the bot information from the Discord API
 		const botApiInformation = await this.getBotApiInformation(input.id);
 
+		// Check if the bot is private if not set its status to pending and throw an error
 		if (!botApiInformation.application.bot_public) {
 			await this._drizzleService
 				.update(bots)
@@ -208,9 +223,18 @@ export class BotService {
 		return updateBot;
 	}
 
+	/**
+	 * Deletes a bot.
+	 *
+	 * @param owner - The owner of the bot.
+	 * @param input - The input data for deleting the bot.
+	 * @returns The deleted bot.
+	 */
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
+		// Check if the user is the owner of the bot
 		await this.checkBotOwnership(owner.id);
 
+		// Delete the bot
 		const [deleteBot] = await this._drizzleService
 			.delete(bots)
 			.where(eq(bots.id, input.id))
@@ -219,19 +243,25 @@ export class BotService {
 		return deleteBot;
 	}
 
+	/**
+	 * Checks the ownership of a bot based on its ID.
+	 * Throws a NotFoundException if the bot is not found or unauthorized.
+	 * @param id - The ID of the bot to check ownership for.
+	 * @throws NotFoundException if the bot is not found or unauthorized.
+	 */
 	private async checkBotOwnership(id: string) {
+		// Check if the user is the owner of the bot
 		const userBot = await this._drizzleService.query.botToUser
 			.findFirst({
-				where: (table, { eq }) => eq(table.b, id),
-				with: { bot: true }
+				where: (table, { eq }) => eq(table.b, id)
 			})
 			.execute();
 
-		if (!userBot)
+		// If the bot is not found, throw a NotFoundException
+		if (!userBot) {
 			throw new NotFoundException(
 				ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED
 			);
-
-		return userBot.bot;
+		}
 	}
 }
