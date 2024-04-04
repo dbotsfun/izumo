@@ -1,11 +1,7 @@
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
-import {
-	UseGuards,
-	UsePipes,
-	ValidationPipe
-} from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
@@ -24,7 +20,7 @@ export class BotResolver {
 	 * Creates an instance of the BotResolver class.
 	 * @param _botService The bot service used by the resolver.
 	 */
-	public constructor(private _botService: BotService) { }
+	public constructor(private _botService: BotService) {}
 
 	/**
 	 * Retrieves information about a bot.

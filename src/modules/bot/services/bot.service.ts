@@ -34,7 +34,7 @@ export class BotService {
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService
-	) { }
+	) {}
 
 	/**
 	 * Retrieves a bot by its ID.
@@ -44,7 +44,7 @@ export class BotService {
 	public async getBot(id: string): Promise<BotObject> {
 		const response = await this._drizzleService.query.bots
 			.findFirst({
-				where: (bot, { eq }) => eq(bot.id, id),
+				where: (bot, { eq }) => eq(bot.id, id)
 			})
 			.execute();
 
@@ -185,14 +185,12 @@ export class BotService {
 				.set({
 					status: BotStatus.PENDING // Change bot status to PENDING if it is private, why would we have a private bot listed?
 				})
-				.where(
-					eq(bots.id, input.id)
-				)
+				.where(eq(bots.id, input.id));
 
 			throw new ForbiddenException(ErrorMessages.BOT_PRIVATE);
 		}
 
-		const { apiKey, ...secureCols } = getTableColumns(bots)
+		const { apiKey, ...secureCols } = getTableColumns(bots);
 
 		// Auto-update API information
 		const [updateBot] = await this._drizzleService
@@ -202,14 +200,12 @@ export class BotService {
 				name: botApiInformation.bot.username,
 				avatar: botApiInformation.bot.avatar,
 				guildCount: botApiInformation.bot.approximate_guild_count,
-				updatedAt: new Date(),
+				updatedAt: new Date()
 			})
-			.where(
-				eq(bots.id, input.id)
-			)
-			.returning(secureCols) // TODO: Better way to OMIT the "apiKey" field
+			.where(eq(bots.id, input.id))
+			.returning(secureCols); // TODO: Better way to OMIT the "apiKey" field
 
-		return updateBot
+		return updateBot;
 	}
 
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
@@ -218,9 +214,9 @@ export class BotService {
 		const [deleteBot] = await this._drizzleService
 			.delete(bots)
 			.where(eq(bots.id, input.id))
-			.returning()
+			.returning();
 
-		return deleteBot
+		return deleteBot;
 	}
 
 	private async checkBotOwnership(id: string) {
@@ -232,8 +228,10 @@ export class BotService {
 			.execute();
 
 		if (!userBot)
-			throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED);
+			throw new NotFoundException(
+				ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED
+			);
 
-		return userBot.bot
+		return userBot.bot;
 	}
 }
