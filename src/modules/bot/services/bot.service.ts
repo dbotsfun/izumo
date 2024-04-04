@@ -158,8 +158,8 @@ export class BotService {
 
 			// Insert the bot-to-user relationship into the database
 			await tx.insert(botToUser).values({
-				a: owner.id,
-				b: input.id
+				a: input.id,
+				b: owner.id
 			});
 
 			return bot;
