@@ -9,7 +9,7 @@ import {
 } from '@nestjs/graphql';
 import { User } from '../decorators/user.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import type { AuthUserUpdate } from '../inputs/user/update.input';
+import { AuthUserUpdate } from '../inputs/user/update.input';
 import type { JwtPayload } from '../interfaces/payload.interface';
 import { AuthUserSessionObject } from '../objects/user/session.object';
 import { AuthUserObject } from '../objects/user/user.object';
