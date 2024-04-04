@@ -92,12 +92,6 @@ export class EnvironmentVariables {
 	 */
 	@IsString()
 	public DISCORD_USER_TOKEN!: string;
-
-	/**
-	 * The Discord webhook url for semi-internal logs
-	 */
-	@IsString()
-	public DISCORD_WEBHOOK_URL!: string;
 }
 
 /**
