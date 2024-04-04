@@ -1,12 +1,19 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { bots } from '@database/tables';
+import { botToUser, bots } from '@database/tables';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
+import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { HttpService } from '@nestjs/axios';
-import { ForbiddenException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+	ForbiddenException,
+	Inject,
+	Injectable,
+	InternalServerErrorException,
+	NotFoundException
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AxiosError } from "axios"
+import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { BotObject } from '../objects/bot/bot.object';
@@ -24,7 +31,7 @@ export class BotService {
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService
-	) { }
+	) {}
 
 	/**
 	 * Retrieves a bot by its ID.
@@ -67,51 +74,97 @@ export class BotService {
 		return response.map((table) => table.bot);
 	}
 
+	/**
+	 * Retrieves the API information for a bot.
+	 * @param id The ID of the bot.
+	 * @returns A Promise that resolves to an object containing the application and bot information.
+	 * @throws {NotFoundException} If the bot is not found.
+	 * @throws {InternalServerErrorException} If an internal server error occurs.
+	 */
 	public async getBotApiInformation(id: string): Promise<ApiBot> {
+		// Get the bot information from the Discord API
 		const { data } = await firstValueFrom(
-			this._httpService.get<ApiBot>(
-				`https://discord.com/api/v9/oauth2/authorize?client_id=${id}&scope=bot`,
-				{
-					headers: {
-						Authorization:
-							this._configService.getOrThrow('DISCORD_USER_TOKEN')
+			this._httpService
+				.get<ApiBot>(
+					`https://discord.com/api/v9/oauth2/authorize?client_id=${id}&scope=bot`,
+					{
+						headers: {
+							Authorization: this._configService.getOrThrow(
+								'DISCORD_USER_TOKEN' // Discord please, we're putting it to good use
+							)
+						}
 					}
-				}
-			)
+				)
 				.pipe(
 					catchError((error: AxiosError) => {
+						// If the bot is not found, throw a NotFoundException
 						if (error.response?.status === 404) {
 							throw new NotFoundException(
 								ErrorMessages.BOT_NOT_FOUND
 							);
 						}
 
+						// Otherwise, throw an InternalServerErrorException
 						throw new InternalServerErrorException(error.message);
 					})
 				)
-		)
+		);
 
-		return {
-			application: data.application,
-			bot: data.bot
-		};
+		return data;
 	}
 
-	public async createBot(input: CreateBotInput) {
-		const botAlreadyExists = await this.getBot(input.id).catch(() => false)
+	/**
+	 * Creates a new bot.
+	 * @param input - The input data for creating the bot.
+	 * @returns A promise that resolves to the newly created bot.
+	 * @throws {ForbiddenException} If the bot already exists or is private.
+	 */
+	public async createBot(owner: JwtPayload, input: CreateBotInput) {
+		// Check if the bot already exists
+		const botAlreadyExists = await this.getBot(input.id).catch(() => false);
+		// Get the bot information from the Discord API
 		const botApiInformation = await this.getBotApiInformation(input.id);
 
-		if (botAlreadyExists) throw new ForbiddenException(ErrorMessages.BOT_ALREADY_SUBMITTED)
-		if (!botApiInformation.application.bot_public) throw new ForbiddenException(ErrorMessages.BOT_PRIVATE)
+		// Check if the bot already exists or is private
+		if (botAlreadyExists) {
+			throw new ForbiddenException(ErrorMessages.BOT_ALREADY_SUBMITTED);
+		}
+
+		// Check if the bot is private
+		if (!botApiInformation.application.bot_public) {
+			throw new ForbiddenException(ErrorMessages.BOT_PRIVATE);
+		}
 
 		// TODO: (CHIKO) User permissions
 
-		return await this._drizzleService.insert(bots).values({
-			...input,
-			name: botApiInformation.bot.username,
-			avatar: botApiInformation.bot.avatar,
-			updatedAt: new Date(),
-			userPermissions: [], //todo
-		}).returning()
+		// Create the bot
+		const bot = await this._drizzleService.transaction(async (tx) => {
+			// Insert the bot into the database
+			const [bot] = await this._drizzleService
+				.insert(bots)
+				.values({
+					...input,
+					name: botApiInformation.bot.username,
+					avatar: botApiInformation.bot.avatar,
+					updatedAt: new Date(),
+					userPermissions: [
+						{
+							id: owner.id,
+							permissions: 0 // TODO: Set permissions
+						} // TODO: add co-owners
+					]
+				})
+				.returning();
+
+			// Insert the bot-to-user relationship into the database
+			await tx.insert(botToUser).values({
+				a: owner.id,
+				b: input.id
+			});
+
+			return bot;
+		});
+
+		return bot;
 	}
 }

@@ -1,6 +1,13 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
-import { ArrayMaxSize, ArrayMinSize, ArrayNotEmpty, IsOptional, IsUrl, MaxLength, MinLength } from 'class-validator';
+import {
+	ArrayMaxSize,
+	ArrayMinSize,
+	ArrayUnique,
+	IsOptional,
+	IsUrl,
+	Length
+} from 'class-validator';
 
 /**
  * The input type for the createBot mutation.
@@ -19,8 +26,6 @@ export class CreateBotInput {
 	@IsSnowflake({
 		message: 'The bot ID must be a valid Snowflake.'
 	})
-	@MaxLength(19)
-	@MinLength(18)
 	public id!: string;
 
 	/**
@@ -30,10 +35,8 @@ export class CreateBotInput {
 	@Field(() => String, {
 		description: 'The description of the bot, supports Markdown.'
 	})
-	@MinLength(100)
-	@MaxLength(5_000)
+	@Length(100, 5_000)
 	public description!: string;
-
 
 	/**
 	 * The short description of the bot.
@@ -42,8 +45,7 @@ export class CreateBotInput {
 	@Field(() => String, {
 		description: 'The short description of the bot.'
 	})
-	@MinLength(25)
-	@MaxLength(100)
+	@Length(25, 100)
 	public shortDescription!: string;
 
 	/**
@@ -51,12 +53,12 @@ export class CreateBotInput {
 	 * @type {string}
 	 */
 	@Field(() => String, {
-		description: 'The prefix of the bot, if not provided slash commands will be the prefix.',
+		description:
+			'The prefix of the bot, if not provided slash commands will be the prefix.',
 		nullable: true
 	})
 	@IsOptional()
-	@MinLength(1)
-	@MaxLength(10)
+	@Length(1, 10)
 	public prefix!: string | null;
 
 	/**
@@ -104,7 +106,10 @@ export class CreateBotInput {
 		nullable: true
 	})
 	@IsOptional()
-	@IsUrl({ host_whitelist: ['github.com', 'gitlab.com'], require_protocol: true })
+	@IsUrl({
+		host_whitelist: ['github.com', 'gitlab.com'],
+		require_protocol: true
+	})
 	public github!: string | null;
 
 	/**
@@ -114,9 +119,9 @@ export class CreateBotInput {
 	@Field(() => [String], {
 		description: 'The bot tags, up to 7.'
 	})
-	@ArrayNotEmpty()
 	@ArrayMinSize(1)
 	@ArrayMaxSize(7)
+	@ArrayUnique()
 	public tags!: string[];
 
 	/**
@@ -124,10 +129,17 @@ export class CreateBotInput {
 	 * @type {string[]}
 	 */
 	@Field(() => [String], {
-		description: 'The list of owners that can manage the bot.',
+		description: 'The list of owners that can manage the bot.'
 	})
 	@IsOptional()
 	@ArrayMinSize(1)
 	@ArrayMaxSize(5)
+	@IsSnowflake({
+		each: true,
+		message: 'Each owner ID must be a valid Snowflake.'
+	})
+	@ArrayUnique({
+		message: 'Owner IDs must be unique.'
+	})
 	public owners!: string[];
 }

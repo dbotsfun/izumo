@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { BotResolver } from './resolvers/bot.resolver';
 import { BotFields } from './resolvers/fields/bot.fields';
@@ -16,6 +17,7 @@ import { BotTagService } from './services/tag.service';
 		BotOwnerResolver,
 		BotOwnerFields,
 		BotTagService
-	]
+	],
+	imports: [HttpModule]
 })
-export class BotModule { }
+export class BotModule {}
