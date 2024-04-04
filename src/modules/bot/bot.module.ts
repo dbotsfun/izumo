@@ -18,4 +18,4 @@ import { BotTagService } from './services/tag.service';
 		BotTagService
 	]
 })
-export class BotModule {}
+export class BotModule { }

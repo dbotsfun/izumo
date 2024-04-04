@@ -86,6 +86,12 @@ export class EnvironmentVariables {
 	@IsString()
 	@Length(32, 32)
 	public DISCORD_CLIENT_SECRET!: string;
+
+	/**
+	 * The Discord user token for elevated API requests
+	 */
+	@IsString()
+	public DISCORD_USER_TOKEN!: string;
 }
 
 /**
