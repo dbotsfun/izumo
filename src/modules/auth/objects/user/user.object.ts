@@ -17,7 +17,8 @@ export class AuthUserObject implements TuserSelect {
 	 * The biography of the user.
 	 */
 	@Field(() => String, {
-		description: 'The biography of the user'
+		description: 'The biography of the user',
+		nullable: true
 	})
 	public bio!: string | null;
 
