@@ -1,3 +1,5 @@
+import type { TbotsInsert } from '@database/tables';
+import type { OmitType } from '@lib/types/utils';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 import {
@@ -15,7 +17,21 @@ import {
 @InputType({
 	description: 'The input type for the createBot mutation.'
 })
-export class CreateBotInput {
+export class CreateBotInput
+	implements
+		OmitType<
+			TbotsInsert,
+			| 'name'
+			| 'avatar'
+			| 'apiKey'
+			| 'status'
+			| 'certified'
+			| 'createdAt'
+			| 'updatedAt'
+			| 'importedFrom'
+			| 'userPermissions'
+		>
+{
 	/**
 	 * The ID of the bot to create.
 	 * @type {string}
@@ -129,9 +145,11 @@ export class CreateBotInput {
 	 * @type {string[]}
 	 */
 	@Field(() => [String], {
-		description: 'The list of owners that can manage the bot.'
+		description: 'The list of owners that can manage the bot.',
+		nullable: true
 	})
 	@IsOptional()
+	@ArrayMinSize(1)
 	@ArrayMaxSize(5)
 	@IsSnowflake({
 		each: true,
@@ -140,5 +158,5 @@ export class CreateBotInput {
 	@ArrayUnique({
 		message: 'Owner IDs must be unique.'
 	})
-	public owners!: string[];
+	public owners!: string[] | null | undefined;
 }

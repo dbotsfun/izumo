@@ -1,3 +1,4 @@
+import { onUpdate } from '@database/common/onUpdate';
 import {
 	integer,
 	pgTable,
@@ -27,13 +28,15 @@ export const reviews = pgTable(
 			}),
 		content: text('content').notNull(),
 		rating: integer('rating').default(1).notNull(),
-		createdAt: timestamp('created_at', { precision: 3, mode: 'string' })
+		createdAt: timestamp('created_at', { precision: 3, mode: 'date' })
 			.defaultNow()
 			.notNull(),
 		updatedAt: timestamp('updated_at', {
 			precision: 3,
-			mode: 'string'
-		}).notNull()
+			mode: 'date'
+		})
+			.notNull()
+			.$onUpdate(onUpdate)
 	},
 	(table) => {
 		return {

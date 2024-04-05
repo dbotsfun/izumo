@@ -1,3 +1,4 @@
+import { onUpdate } from '@database/common/onUpdate';
 import { relations } from 'drizzle-orm';
 import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 // import { bots } from './bot';
@@ -15,7 +16,9 @@ export const users = pgTable('users', {
 	updatedAt: timestamp('updated_at', {
 		precision: 3,
 		mode: 'date'
-	}).notNull(),
+	})
+		.notNull()
+		.$onUpdate(onUpdate),
 	permissions: integer('permissions')
 });
 

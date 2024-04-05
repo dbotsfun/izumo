@@ -89,8 +89,7 @@ export class AuthService {
 			const userFields: TuserInsert = {
 				id: userData.id,
 				username: userData.username,
-				avatar: userData.avatar,
-				updatedAt: new Date()
+				avatar: userData.avatar
 			};
 
 			// Insert or update the user in the database
@@ -180,8 +179,7 @@ export class AuthService {
 				.update(users)
 				.set({
 					username: userData.username,
-					avatar: userData.avatar,
-					updatedAt: new Date()
+					avatar: userData.avatar
 				})
 				.where(eq(users.id, userData.id));
 

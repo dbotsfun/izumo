@@ -1,3 +1,4 @@
+import { onUpdate } from '@database/common/onUpdate';
 import { cast } from '@utils/common/cast';
 import { enumToArray } from '@utils/common/enumToArray';
 import { relations } from 'drizzle-orm';
@@ -47,7 +48,9 @@ export const bots = pgTable(
 		updatedAt: timestamp('updated_at', {
 			precision: 3,
 			mode: 'date'
-		}).notNull(),
+		})
+			.notNull()
+			.$onUpdate(onUpdate),
 		github: text('github'),
 		inviteLink: text('invite_link'),
 		supportServer: text('support_server'),

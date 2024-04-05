@@ -145,7 +145,8 @@ export class BotService {
 			throw new ForbiddenException(ErrorMessages.BOT_PRIVATE);
 		}
 
-		if (input.owners.includes(owner.id)) {
+		const coOwners = input.owners || [];
+		if (coOwners.includes(owner.id)) {
 			throw new BadRequestException(ErrorMessages.BOT_COOWNERS_SAME_ID);
 		}
 		// TODO: (CHIKO) User permissions
@@ -160,7 +161,6 @@ export class BotService {
 					name: botApiInformation.bot.username,
 					avatar: botApiInformation.bot.avatar,
 					guildCount: botApiInformation.bot.approximate_guild_count,
-					updatedAt: new Date(),
 					userPermissions: [
 						{
 							id: owner.id,
@@ -170,7 +170,7 @@ export class BotService {
 				})
 				.returning();
 
-			for (const ownerId of [owner.id, ...input.owners]) {
+			for (const ownerId of [owner.id, ...coOwners]) {
 				await tx.insert(botToUser).values({
 					a: input.id,
 					b: ownerId
@@ -223,8 +223,7 @@ export class BotService {
 				...input,
 				name: botApiInformation.bot.username,
 				avatar: botApiInformation.bot.avatar,
-				guildCount: botApiInformation.bot.approximate_guild_count,
-				updatedAt: new Date()
+				guildCount: botApiInformation.bot.approximate_guild_count
 			})
 			.where(eq(bots.id, input.id))
 			.returning(secureCols); // TODO: Better way to OMIT the "apiKey" field
