@@ -6,8 +6,9 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
+import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
-import { BotObject } from '../objects/bot/bot.object';
+import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
 
 /**
@@ -20,7 +21,21 @@ export class BotResolver {
 	 * Creates an instance of the BotResolver class.
 	 * @param _botService The bot service used by the resolver.
 	 */
-	public constructor(private _botService: BotService) {}
+	public constructor(private _botService: BotService) { }
+
+	/**
+	 * Public query to retrieve a list of paginated bots
+	 * @param input The filters for pagination
+	 * @returns The paginated bots
+	 */
+	@Query(() => BotsConnection, {
+		name: 'bots',
+		description: 'Gives a list of bots'
+	})
+	//! Current code does not work bc of this query, chiko should fix it since i don't fucking know how to properly implement pagination types. - simxnet
+	public bots(@Args('input') input: FiltersBotInput) {
+		return this._botService.paginateBots(input);
+	}
 
 	/**
 	 * Retrieves information about a bot.

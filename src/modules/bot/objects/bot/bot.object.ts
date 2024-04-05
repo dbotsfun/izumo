@@ -1,5 +1,6 @@
 import { BotStatus, type TbotsSelect } from '@database/tables';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Paginated } from '@utils/graphql/pagination';
 import { BotUserPermissions } from './bot.user.permissions';
 
 /**
@@ -154,3 +155,6 @@ export class BotObject implements Omit<TbotsSelect, 'apiKey'> {
 	})
 	public userPermissions!: BotUserPermissions[];
 }
+
+@ObjectType()
+export class BotsConnection extends Paginated(BotObject) { }

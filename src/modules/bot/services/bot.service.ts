@@ -16,9 +16,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
 import { eq, getTableColumns } from 'drizzle-orm';
+import { withCursorPagination } from 'drizzle-pagination';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
+import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject } from '../objects/bot/bot.object';
 import { BotWebhookService } from './webhook.service';
@@ -37,7 +39,25 @@ export class BotService {
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
 		private readonly _webhookService: BotWebhookService
-	) {}
+	) { }
+
+	/**
+	 * Retrieves a list of bots following certain pagination filters
+	 */
+	public async paginateBots(input: FiltersBotInput): Promise<BotObject[]> {
+		return this._drizzleService.query.bots.findMany(
+			withCursorPagination({
+				where: eq(bots.status, input.status),
+				limit: 10, //todo
+				cursors: [
+					[
+						bots.id,
+						"desc"
+					]
+				]
+			})
+		)
+	}
 
 	/**
 	 * Retrieves a bot by its ID.
