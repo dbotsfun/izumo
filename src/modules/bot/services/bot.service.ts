@@ -1,5 +1,6 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
+import { botsCursor } from '@database/cursors';
 import { BotStatus, botToUser, bots } from '@database/tables';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
@@ -16,13 +17,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
 import { eq, getTableColumns } from 'drizzle-orm';
-import { withCursorPagination } from 'drizzle-pagination';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
-import { BotObject } from '../objects/bot/bot.object';
+import { BotObject, type BotsConnection } from '../objects/bot/bot.object';
 import { BotWebhookService } from './webhook.service';
 
 /**
@@ -39,24 +39,34 @@ export class BotService {
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
 		private readonly _webhookService: BotWebhookService
-	) { }
+	) {}
 
 	/**
 	 * Retrieves a list of bots following certain pagination filters
 	 */
-	public async paginateBots(input: FiltersBotInput): Promise<BotObject[]> {
-		return this._drizzleService.query.bots.findMany(
-			withCursorPagination({
-				where: eq(bots.status, input.status),
-				limit: 10, //todo
-				cursors: [
-					[
-						bots.id,
-						"desc"
-					]
-				]
-			})
-		)
+	public async paginateBots(input: FiltersBotInput): Promise<BotsConnection> {
+		const bots = await this._drizzleService.query.bots.findMany({
+			where: (bot, { eq }) => eq(bot.status, input.status), // TODO: Filter by status (input.status
+			orderBy: botsCursor.orderBy,
+			limit: 2 // TODO: Limit by input.limit
+		});
+
+		const lastToken = botsCursor.serialize(bots.at(-1));
+
+		return {
+			edges: bots.map((bot) => ({
+				cursor: botsCursor.serialize(bot),
+				node: bot
+			})),
+			nodes: bots,
+			totalCount: bots.length,
+			pageInfo: {
+				hasNextPage: true,
+				hasPreviousPage: false,
+				startCursor: botsCursor.serialize(bots[0]),
+				endCursor: lastToken
+			}
+		};
 	}
 
 	/**

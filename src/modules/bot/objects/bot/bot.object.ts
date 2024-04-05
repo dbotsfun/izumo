@@ -155,6 +155,10 @@ export class BotObject implements Omit<TbotsSelect, 'apiKey'> {
 	})
 	public userPermissions!: BotUserPermissions[];
 }
-
-@ObjectType()
-export class BotsConnection extends Paginated(BotObject) { }
+/**
+ * A paginated list of bot objects.
+ */
+@ObjectType({
+	description: 'A paginated list of bot objects.'
+})
+export class BotsConnection extends Paginated(BotObject) {}

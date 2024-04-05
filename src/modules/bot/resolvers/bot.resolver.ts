@@ -6,7 +6,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
-import type { FiltersBotInput } from '../inputs/bot/filters.input';
+import { FiltersBotInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
@@ -21,7 +21,7 @@ export class BotResolver {
 	 * Creates an instance of the BotResolver class.
 	 * @param _botService The bot service used by the resolver.
 	 */
-	public constructor(private _botService: BotService) { }
+	public constructor(private _botService: BotService) {}
 
 	/**
 	 * Public query to retrieve a list of paginated bots
