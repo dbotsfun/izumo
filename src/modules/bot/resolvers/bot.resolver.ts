@@ -1,12 +1,14 @@
+import { BotStatus } from '@database/tables';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { PaginationArgs } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
-import { FiltersBotInput } from '../inputs/bot/filters.input';
+import { FiltersBotInput, SafeFiltersInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
@@ -21,7 +23,7 @@ export class BotResolver {
 	 * Creates an instance of the BotResolver class.
 	 * @param _botService The bot service used by the resolver.
 	 */
-	public constructor(private _botService: BotService) {}
+	public constructor(private _botService: BotService) { }
 
 	/**
 	 * Public query to retrieve a list of paginated bots
@@ -32,9 +34,31 @@ export class BotResolver {
 		name: 'bots',
 		description: 'Gives a list of bots'
 	})
-	//! Current code does not work bc of this query, chiko should fix it since i don't fucking know how to properly implement pagination types. - simxnet
-	public bots(@Args('input') input: FiltersBotInput) {
-		return this._botService.paginateBots(input);
+	public bots(
+		@Args() pagination: PaginationArgs,
+		@Args('input', { nullable: true }) input: SafeFiltersInput
+	) {
+		return this._botService.paginateBots(pagination, {
+			...input,
+			status: BotStatus.PENDING
+		});
+	}
+
+	/**
+	 * Same as bots query but this time is private and user can access every fields
+	 * @param input The filters for pagination
+	 * @returns The paginated bots
+	 */
+	@Query(() => BotsConnection, {
+		name: 'panelBots',
+		description: 'Gives a list of bots'
+	})
+	@UseGuards(JwtAuthGuard) // TODO: Change this Guard to a elevated permissions Guard, since the query IS private
+	public panelBots(
+		@Args() pagination: PaginationArgs,
+		@Args('input', { nullable: true }) input: FiltersBotInput
+	) {
+		return this._botService.paginateBots(pagination, input);
 	}
 
 	/**

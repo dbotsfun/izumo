@@ -15,6 +15,7 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { PaginationArgs } from '@utils/graphql/pagination';
 import { AxiosError } from 'axios';
 import { eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
@@ -39,17 +40,20 @@ export class BotService {
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
 		private readonly _webhookService: BotWebhookService
-	) {}
+	) { }
 
 	/**
 	 * Retrieves a list of bots following certain pagination filters
 	 */
-	public async paginateBots(input: FiltersBotInput): Promise<BotsConnection> {
+	public async paginateBots(pagination: PaginationArgs, input: FiltersBotInput): Promise<BotsConnection> {
 		const bots = await this._drizzleService.query.bots.findMany({
-			where: (bot, { eq }) => eq(bot.status, input.status), // TODO: Filter by status (input.status
+			where: (bot, { eq, like, and }) => and(
+				eq(bot.status, input.status),
+				input.query ? like(bot.name, input.query) : undefined // TODO: Make a less specific search query logic
+			),
 			orderBy: botsCursor.orderBy,
-			limit: 2 // TODO: Limit by input.limit
-		});
+			limit: pagination.first ?? 10, // TODO: implement all pagination arguments
+		})
 
 		const lastToken = botsCursor.serialize(bots.at(-1));
 
@@ -272,7 +276,7 @@ export class BotService {
 	 * @param input - The input data for deleting the bot.
 	 * @returns The deleted bot.
 	 */
-	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
+	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) { // TODO: Let reviewers delete bots too.
 		// Check if the user is the owner of the bot
 		await this.checkBotOwnership(owner.id);
 
@@ -288,6 +292,13 @@ export class BotService {
 
 		return deleteBot;
 	}
+
+	// TODO: Below. Create the reviewers functions
+	/**
+	 * * Approve, Deny
+	 * * On deny let reviewer specify a reason, there should be some reason presets on dbotslist/elyam
+	 * * On any reviewer action trigger the webhook logs
+	 */
 
 	/**
 	 * Checks the ownership of a bot based on its ID.
