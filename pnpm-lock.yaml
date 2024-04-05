@@ -62,6 +62,9 @@ dependencies:
   drizzle-orm:
     specifier: ^0.30.6
     version: 0.30.6(postgres@3.4.4)
+  drizzle-pagination:
+    specifier: ^1.0.10
+    version: 1.0.10(drizzle-orm@0.30.6)
   graphql:
     specifier: ^16.8.1
     version: 16.8.1
@@ -3596,6 +3599,14 @@ packages:
         optional: true
     dependencies:
       postgres: 3.4.4
+    dev: false
+
+  /drizzle-pagination@1.0.10(drizzle-orm@0.30.6):
+    resolution: {integrity: sha512-4n811FkmQukhDs9y91sK5nRNPnK1cH+soLmw84rwpJHPJjkFr6zD/f8+UHRv9mldoA/mq1JihMpE3/Lz6h6INA==}
+    peerDependencies:
+      drizzle-orm: '>=0.27.2 <1.0.0'
+    dependencies:
+      drizzle-orm: 0.30.6(postgres@3.4.4)
     dev: false
 
   /dset@3.1.3:

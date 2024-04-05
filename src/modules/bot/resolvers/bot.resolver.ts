@@ -1,3 +1,4 @@
+import { BotStatus } from '@database/tables';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
@@ -7,6 +8,7 @@ import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
 import { GetBotInput } from '../inputs/bot/get.input';
+import type { PaginateBotsInput } from '../inputs/bot/paginate.input';
 import { BotObject } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
 
@@ -20,7 +22,23 @@ export class BotResolver {
 	 * Creates an instance of the BotResolver class.
 	 * @param _botService The bot service used by the resolver.
 	 */
-	public constructor(private _botService: BotService) {}
+	public constructor(private _botService: BotService) { }
+
+	/**
+	 * Retrieves a list of bots.
+	 */
+	@Query(() => [BotObject], {
+		name: 'bots',
+		description: 'Retrieves a list of bots.'
+	})
+	//! IMPORTANT: This query makes API unavailable because of the query return type, this should be fixed by chiko
+	// TODO: Make BotsConnection objects
+	public bots(@Args('input') input: Omit<PaginateBotsInput, "status">) {
+		return this._botService.paginateBots({
+			...input,
+			status: BotStatus.APPROVED // This query is made for end users, who mostly can't access denied/pending bots
+		});
+	}
 
 	/**
 	 * Retrieves information about a bot.
