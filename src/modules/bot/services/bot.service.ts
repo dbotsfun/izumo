@@ -40,20 +40,24 @@ export class BotService {
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
 		private readonly _webhookService: BotWebhookService
-	) { }
+	) {}
 
 	/**
 	 * Retrieves a list of bots following certain pagination filters
 	 */
-	public async paginateBots(pagination: PaginationArgs, input: FiltersBotInput): Promise<BotsConnection> {
+	public async paginateBots(
+		pagination: PaginationArgs,
+		input: FiltersBotInput
+	): Promise<BotsConnection> {
 		const bots = await this._drizzleService.query.bots.findMany({
-			where: (bot, { eq, like, and }) => and(
-				eq(bot.status, input.status),
-				input.query ? like(bot.name, input.query) : undefined // TODO: Make a less specific search query logic
-			),
+			where: (bot, { eq, like, and }) =>
+				and(
+					eq(bot.status, input.status),
+					input.query ? like(bot.name, input.query) : undefined // TODO: Make a less specific search query logic
+				),
 			orderBy: botsCursor.orderBy,
-			limit: pagination.first ?? 10, // TODO: implement all pagination arguments
-		})
+			limit: pagination.first ?? 10 // TODO: implement all pagination arguments
+		});
 
 		const lastToken = botsCursor.serialize(bots.at(-1));
 
@@ -276,7 +280,8 @@ export class BotService {
 	 * @param input - The input data for deleting the bot.
 	 * @returns The deleted bot.
 	 */
-	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) { // TODO: Let reviewers delete bots too.
+	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
+		// TODO: Let reviewers delete bots too.
 		// Check if the user is the owner of the bot
 		await this.checkBotOwnership(owner.id);
 

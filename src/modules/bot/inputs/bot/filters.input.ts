@@ -34,6 +34,9 @@ export class FiltersBotInput {
  * FiltersBotInput but skipping certain fields who users simply can't access.
  */
 @InputType({
-	description: 'FiltersBotInput but skipping certain fields who users simply can\'t access.'
+	description:
+		"FiltersBotInput but skipping certain fields who users simply can't access."
 })
-export class SafeFiltersInput extends OmitType(FiltersBotInput, ['status'] as const) { }
+export class SafeFiltersInput extends OmitType(FiltersBotInput, [
+	'status'
+] as const) {}
