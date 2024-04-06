@@ -6,7 +6,7 @@ import {
 	type PaginationInput,
 	SortOrder
 } from '@utils/graphql/pagination';
-import { type SQL, asc, desc } from 'drizzle-orm';
+import { type SQL, asc, count, desc } from 'drizzle-orm';
 import type { PgTableWithColumns, TableConfig } from 'drizzle-orm/pg-core';
 
 /**
@@ -74,13 +74,19 @@ export class PaginatorService {
 			query.orderBy(order(sort));
 		}
 
+		const [{ count: totalEntries }] = await this._drizzleService
+			.select({ count: count() })
+			.from(schema)
+			.where(where)
+			.execute();
+
 		// Get the paginated data
 		const entries = (await query.execute()) as S['$inferSelect'][];
 
 		return {
 			nodes: entries,
-			totalCount: entries.length,
-			totalPages: Math.ceil(entries.length / limit),
+			totalCount: totalEntries,
+			totalPages: Math.ceil(totalEntries / limit),
 			pageInfo: {
 				hasNextPage: entries.length === limit,
 				hasPreviousPage: page > 1
