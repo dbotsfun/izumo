@@ -1,3 +1,4 @@
+import { PaginatorService } from '@/services/paginator.service';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { BotResolver } from './resolvers/bot.resolver';
@@ -18,7 +19,8 @@ import { BotWebhookService } from './services/webhook.service';
 		BotOwnerResolver,
 		BotOwnerFields,
 		BotTagService,
-		BotWebhookService
+		BotWebhookService,
+		PaginatorService
 	],
 	imports: [HttpModule]
 })

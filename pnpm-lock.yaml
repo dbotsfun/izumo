@@ -50,9 +50,6 @@ dependencies:
   class-validator:
     specifier: ^0.14.1
     version: 0.14.1
-  drizzle-cursor:
-    specifier: ^0.4.0
-    version: 0.4.0(drizzle-orm@0.30.6)
   drizzle-kit:
     specifier: ^0.20.14
     version: 0.20.14
@@ -3859,14 +3856,6 @@ packages:
     engines: {node: '>=0.4.0'}
     dependencies:
       wordwrap: 1.0.0
-    dev: false
-
-  /drizzle-cursor@0.4.0(drizzle-orm@0.30.6):
-    resolution: {integrity: sha512-NKcl7o3EcvVKxsBP1q3wNttglNumHV+aef2vTlIKeLshkvNAs9ZUNAYpYsd6iBbLA1CowRpX0f/9VWPbUExgUQ==}
-    peerDependencies:
-      drizzle-orm: ^0.29.3
-    dependencies:
-      drizzle-orm: 0.30.6(postgres@3.4.4)
     dev: false
 
   /drizzle-kit@0.20.14:
