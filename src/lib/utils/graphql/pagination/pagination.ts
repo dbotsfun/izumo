@@ -2,12 +2,26 @@ import type { Type } from '@nestjs/common';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { PageInfo } from './page-info.object';
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export type PaginatedItems<TItem = any> = {
+/**
+ * The paginated items.
+ */
+export type PaginatedItems<TItem = unknown> = {
 	// edges: Array<{ cursor: string | null; node: TItem }>;
+	/**
+	 * The paginated items.
+	 */
 	nodes: Array<TItem>;
+	/**
+	 * The page information.
+	 */
 	pageInfo: PageInfo;
+	/**
+	 * The total count of items.
+	 */
 	totalCount: number;
+	/**
+	 * The total amount of pages.
+	 */
 	totalPages: number;
 };
 
@@ -32,16 +46,25 @@ export function Paginated<TItem>(TItemClass: Type<TItem>) {
 		// @Field(() => [EdgeType], { nullable: true })
 		// public edges!: Array<EdgeType>;
 
-		@Field(() => [TItemClass], { nullable: true })
+		@Field(() => [TItemClass], {
+			nullable: true,
+			description: 'The paginated items.'
+		})
 		public nodes!: Array<TItem>;
 
-		@Field(() => PageInfo)
+		@Field(() => PageInfo, {
+			description: 'The page information.'
+		})
 		public pageInfo!: PageInfo;
 
-		@Field(() => Int)
+		@Field(() => Int, {
+			description: 'The total count of items.'
+		})
 		public totalCount!: number;
 
-		@Field(() => Int)
+		@Field(() => Int, {
+			description: 'The total amount of pages.'
+		})
 		public totalPages!: number;
 	}
 

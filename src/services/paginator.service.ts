@@ -48,7 +48,7 @@ export class PaginatorService {
 	public async paginate<
 		O extends TableConfig,
 		S extends PgTableWithColumns<O>
-	>(options: PageOptions<O, S>): Promise<PaginatedItems> {
+	>(options: PageOptions<O, S>): Promise<PaginatedItems<S['$inferSelect']>> {
 		const {
 			page = 1,
 			size: limit = 10,
@@ -75,7 +75,7 @@ export class PaginatorService {
 		}
 
 		// Get the paginated data
-		const entries = await query.execute();
+		const entries = (await query.execute()) as S['$inferSelect'][];
 
 		return {
 			nodes: entries,

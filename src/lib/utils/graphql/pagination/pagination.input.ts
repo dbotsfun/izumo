@@ -1,10 +1,14 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
+/**
+ * The sort order for sorting items.
+ */
 export enum SortOrder {
 	ASC = 'ASC',
 	DESC = 'DESC'
 }
+
 /**
  * The input type for pagination.
  */
