@@ -9,18 +9,42 @@ import {
 import { type SQL, asc, desc } from 'drizzle-orm';
 import type { PgTableWithColumns, TableConfig } from 'drizzle-orm/pg-core';
 
+/**
+ * The options for paginating data from a database table.
+ */
 type PageOptions<O extends TableConfig, S extends PgTableWithColumns<O>> = {
+	/**
+	 * The pagination options.
+	 */
 	pagination: PaginationInput;
+	/**
+	 * The schema of the table to paginate.
+	 */
 	schema: S;
+	/**
+	 * The where clause to filter the data.
+	 */
 	where?: SQL;
 };
 
+/**
+ * Service for paginating data from a database table.
+ */
 @Injectable()
 export class PaginatorService {
+	/**
+	 * Creates an instance of PaginatorService.
+	 * @param _drizzleService - The DrizzleService instance.
+	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService
 	) {}
 
+	/**
+	 * Paginates data from a database table based on the provided options.
+	 * @param options - The pagination options.
+	 * @returns A promise that resolves to the paginated items.
+	 */
 	public async paginate<
 		O extends TableConfig,
 		S extends PgTableWithColumns<O>
