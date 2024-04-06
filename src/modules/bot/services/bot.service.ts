@@ -1,3 +1,4 @@
+import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { BotStatus, botToUser, bots } from '@database/tables';
@@ -14,13 +15,15 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { type PaginationInput } from '@utils/graphql/pagination';
 import { AxiosError } from 'axios';
-import { eq, getTableColumns } from 'drizzle-orm';
+import { and, eq, getTableColumns, like } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
+import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
-import { BotObject } from '../objects/bot/bot.object';
+import { BotObject, type BotsConnection } from '../objects/bot/bot.object';
 import { BotWebhookService } from './webhook.service';
 
 /**
@@ -36,8 +39,32 @@ export class BotService {
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
-		private readonly _webhookService: BotWebhookService
+		private readonly _webhookService: BotWebhookService,
+		private readonly _paginatorService: PaginatorService
 	) {}
+
+	/**
+	 * Retrieves a list of bots following certain pagination filters
+	 * @param {PaginationInput} pagination - The pagination filters.
+	 * @param {FiltersBotInput} input - The filters for the bots.
+	 * @returns {Promise<BotsConnection>} - A promise that resolves to a paginated list of bots.
+	 */
+	public async paginateBots(
+		input?: FiltersBotInput,
+		pagination: PaginationInput = {}
+	): Promise<BotsConnection> {
+		return this._paginatorService.paginate<
+			typeof bots._.config,
+			typeof bots
+		>({
+			pagination,
+			schema: bots,
+			where: and(
+				eq(bots.status, input?.status || BotStatus.APPROVED),
+				input?.query ? like(bots.name, input.query) : undefined // TODO: Make a less specific search query logic
+			)
+		});
+	}
 
 	/**
 	 * Retrieves a bot by its ID.
@@ -243,6 +270,7 @@ export class BotService {
 	 * @returns The deleted bot.
 	 */
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
+		// TODO: Let reviewers delete bots too.
 		// Check if the user is the owner of the bot
 		await this.checkBotOwnership(owner.id);
 
@@ -258,6 +286,13 @@ export class BotService {
 
 		return deleteBot;
 	}
+
+	// TODO: Below. Create the reviewers functions
+	/**
+	 * * Approve, Deny
+	 * * On deny let reviewer specify a reason, there should be some reason presets on dbotslist/elyam
+	 * * On any reviewer action trigger the webhook logs
+	 */
 
 	/**
 	 * Checks the ownership of a bot based on its ID.

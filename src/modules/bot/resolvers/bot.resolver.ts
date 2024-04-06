@@ -1,13 +1,16 @@
+import { BotStatus } from '@database/tables';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
+import { FiltersBotInput, SafeFiltersInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
-import { BotObject } from '../objects/bot/bot.object';
+import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotService } from '../services/bot.service';
 
 /**
@@ -21,6 +24,47 @@ export class BotResolver {
 	 * @param _botService The bot service used by the resolver.
 	 */
 	public constructor(private _botService: BotService) {}
+
+	/**
+	 * Public query to retrieve a list of paginated bots
+	 * @param pagination - The filters for pagination
+	 * @param input - The filters for pagination
+	 * @returns The paginated bots
+	 */
+	@Query(() => BotsConnection, {
+		name: 'bots',
+		description: 'Gives a list of bots'
+	})
+	public bots(
+		@Args('pagination', { nullable: true }) pagination: PaginationInput,
+		@Args('input', { nullable: true }) input: SafeFiltersInput
+	) {
+		return this._botService.paginateBots(
+			{
+				...input,
+				status: BotStatus.PENDING
+			},
+			pagination
+		);
+	}
+
+	/**
+	 * Same as bots query but this time is private and user can access every fields
+	 * @param pagination - The filters for pagination
+	 * @param input - The filters for pagination
+	 * @returns The paginated bots
+	 */
+	@Query(() => BotsConnection, {
+		name: 'panelBots',
+		description: 'Gives a list of bots'
+	})
+	@UseGuards(JwtAuthGuard) // TODO: Change this Guard to a elevated permissions Guard, since the query IS private
+	public panelBots(
+		@Args('pagination', { nullable: true }) pagination: PaginationInput,
+		@Args('input', { nullable: true }) input: FiltersBotInput
+	) {
+		return this._botService.paginateBots(input, pagination);
+	}
 
 	/**
 	 * Retrieves information about a bot.
@@ -37,6 +81,8 @@ export class BotResolver {
 
 	/**
 	 * Creates a new bot.
+	 * @param user - The user creating the bot.
+	 * @param input - The input object containing the bot information.
 	 * @returns The newly created bot object.
 	 */
 	@Mutation(() => BotObject, {
@@ -53,6 +99,8 @@ export class BotResolver {
 
 	/**
 	 * Updates an existing bot.
+	 * @param user - The user updating the bot.
+	 * @param input - The input object containing the updated bot information.
 	 * @returns The updated bot object.
 	 */
 	@Mutation(() => BotObject, {
@@ -69,6 +117,8 @@ export class BotResolver {
 
 	/**
 	 * Deletes an existing bot.
+	 * @param user - The user deleting the bot.
+	 * @param input - The input object containing the bot ID.
 	 * @returns The deleted bot object.
 	 */
 	@Mutation(() => BotObject, {
