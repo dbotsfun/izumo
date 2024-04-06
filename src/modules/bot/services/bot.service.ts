@@ -1,7 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { botsCursor } from '@database/cursors';
-import { BotStatus, botToUser, bots } from '@database/tables';
+import { BotStatus, type TbotsSelect, botToUser, bots } from '@database/tables';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
@@ -15,9 +15,9 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { PaginationArgs } from '@utils/graphql/pagination';
+import { type PaginationInput, SortOrder } from '@utils/graphql/pagination';
 import { AxiosError } from 'axios';
-import { eq, getTableColumns } from 'drizzle-orm';
+import { asc, desc, eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
@@ -44,34 +44,48 @@ export class BotService {
 
 	/**
 	 * Retrieves a list of bots following certain pagination filters
+	 * @param {PaginationInput} pagination - The pagination filters.
+	 * @param {FiltersBotInput} input - The filters for the bots.
+	 * @returns {Promise<BotsConnection>} - A promise that resolves to a paginated list of bots.
 	 */
 	public async paginateBots(
-		pagination: PaginationArgs,
-		input: FiltersBotInput
+		input?: FiltersBotInput,
+		pagination: PaginationInput = {}
 	): Promise<BotsConnection> {
-		const bots = await this._drizzleService.query.bots.findMany({
+		const pageLimit = pagination.size || 10;
+		const page = pagination.page || 1;
+		const orderBy = pagination.sortBy
+			? bots[pagination.sortBy as keyof TbotsSelect]
+			: bots.id;
+		const sortOrder = pagination.sortOrder === SortOrder.ASC ? asc : desc;
+
+		// Get the bots from the database
+		const botEntries = await this._drizzleService.query.bots.findMany({
 			where: (bot, { eq, like, and }) =>
 				and(
-					eq(bot.status, input.status),
-					input.query ? like(bot.name, input.query) : undefined // TODO: Make a less specific search query logic
+					eq(bot.status, input?.status || BotStatus.APPROVED),
+					input?.query ? like(bot.name, input.query) : undefined // TODO: Make a less specific search query logic
 				),
-			orderBy: botsCursor.orderBy,
-			limit: pagination.first ?? 10 // TODO: implement all pagination arguments
+			orderBy: sortOrder(orderBy),
+			limit: pageLimit, // TODO: implement all pagination arguments
+			offset: (page - 1) * pageLimit
 		});
 
-		const lastToken = botsCursor.serialize(bots.at(-1));
+		// Get the end cursor
+		const lastToken = botsCursor.serialize(botEntries.at(-1));
 
+		// Return the paginated list of bots
 		return {
-			edges: bots.map((bot) => ({
+			edges: botEntries.map((bot) => ({
 				cursor: botsCursor.serialize(bot),
 				node: bot
 			})),
-			nodes: bots,
-			totalCount: bots.length,
+			nodes: botEntries,
+			totalCount: botEntries.length,
 			pageInfo: {
 				hasNextPage: true,
 				hasPreviousPage: false,
-				startCursor: botsCursor.serialize(bots[0]),
+				startCursor: botsCursor.serialize(botEntries[0]),
 				endCursor: lastToken
 			}
 		};

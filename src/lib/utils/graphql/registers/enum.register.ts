@@ -1,5 +1,6 @@
 import { BotStatus } from '@database/tables';
 import { registerEnumType } from '@nestjs/graphql';
+import { SortOrder } from '../pagination';
 
 registerEnumType(BotStatus, {
 	name: 'BotStatus',
@@ -13,6 +14,19 @@ registerEnumType(BotStatus, {
 		},
 		PENDING: {
 			description: 'The bot is awaiting approval from the platform.'
+		}
+	}
+});
+
+registerEnumType(SortOrder, {
+	name: 'SortOrder',
+	description: 'The order in which to sort the items.',
+	valuesMap: {
+		ASC: {
+			description: 'Sort the items in ascending order.'
+		},
+		DESC: {
+			description: 'Sort the items in descending order.'
 		}
 	}
 });

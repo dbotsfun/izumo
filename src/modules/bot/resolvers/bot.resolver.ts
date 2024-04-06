@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { PaginationArgs } from '@utils/graphql/pagination';
+import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
@@ -27,7 +27,8 @@ export class BotResolver {
 
 	/**
 	 * Public query to retrieve a list of paginated bots
-	 * @param input The filters for pagination
+	 * @param pagination - The filters for pagination
+	 * @param input - The filters for pagination
 	 * @returns The paginated bots
 	 */
 	@Query(() => BotsConnection, {
@@ -35,18 +36,22 @@ export class BotResolver {
 		description: 'Gives a list of bots'
 	})
 	public bots(
-		@Args() pagination: PaginationArgs,
+		@Args('pagination', { nullable: true }) pagination: PaginationInput,
 		@Args('input', { nullable: true }) input: SafeFiltersInput
 	) {
-		return this._botService.paginateBots(pagination, {
-			...input,
-			status: BotStatus.PENDING
-		});
+		return this._botService.paginateBots(
+			{
+				...input,
+				status: BotStatus.PENDING
+			},
+			pagination
+		);
 	}
 
 	/**
 	 * Same as bots query but this time is private and user can access every fields
-	 * @param input The filters for pagination
+	 * @param pagination - The filters for pagination
+	 * @param input - The filters for pagination
 	 * @returns The paginated bots
 	 */
 	@Query(() => BotsConnection, {
@@ -55,10 +60,10 @@ export class BotResolver {
 	})
 	@UseGuards(JwtAuthGuard) // TODO: Change this Guard to a elevated permissions Guard, since the query IS private
 	public panelBots(
-		@Args() pagination: PaginationArgs,
+		@Args('pagination', { nullable: true }) pagination: PaginationInput,
 		@Args('input', { nullable: true }) input: FiltersBotInput
 	) {
-		return this._botService.paginateBots(pagination, input);
+		return this._botService.paginateBots(input, pagination);
 	}
 
 	/**
@@ -76,6 +81,8 @@ export class BotResolver {
 
 	/**
 	 * Creates a new bot.
+	 * @param user - The user creating the bot.
+	 * @param input - The input object containing the bot information.
 	 * @returns The newly created bot object.
 	 */
 	@Mutation(() => BotObject, {
@@ -92,6 +99,8 @@ export class BotResolver {
 
 	/**
 	 * Updates an existing bot.
+	 * @param user - The user updating the bot.
+	 * @param input - The input object containing the updated bot information.
 	 * @returns The updated bot object.
 	 */
 	@Mutation(() => BotObject, {
@@ -108,6 +117,8 @@ export class BotResolver {
 
 	/**
 	 * Deletes an existing bot.
+	 * @param user - The user deleting the bot.
+	 * @param input - The input object containing the bot ID.
 	 * @returns The deleted bot object.
 	 */
 	@Mutation(() => BotObject, {
