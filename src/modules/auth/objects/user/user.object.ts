@@ -60,16 +60,16 @@ export class AuthUserObject implements TuserSelect {
 	/**
 	 * The creation date of the user.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The creation date of the user'
 	})
-	public createdAt!: Date;
+	public createdAt!: string;
 
 	/**
 	 * The last update date of the user.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The last update date of the user'
 	})
-	public updatedAt!: Date;
+	public updatedAt!: string;
 }

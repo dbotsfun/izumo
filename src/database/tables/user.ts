@@ -10,12 +10,11 @@ export const users = pgTable('users', {
 	username: text('username').notNull(),
 	avatar: text('avatar'),
 	banner: text('banner'),
-	createdAt: timestamp('created_at', { precision: 3, mode: 'date' })
+	createdAt: timestamp('created_at', { mode: 'string' })
 		.defaultNow()
 		.notNull(),
 	updatedAt: timestamp('updated_at', {
-		precision: 3,
-		mode: 'date'
+		mode: 'string',
 	})
 		.notNull()
 		.$onUpdate(onUpdate),
