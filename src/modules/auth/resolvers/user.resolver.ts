@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
 	Args,
 	Mutation,
@@ -7,6 +7,7 @@ import {
 	ResolveField,
 	Resolver
 } from '@nestjs/graphql';
+import { ValidationTypes } from 'class-validator';
 import { User } from '../decorators/user.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { AuthUserUpdate } from '../inputs/user/update.input';
@@ -20,6 +21,7 @@ import { AuthUserService } from '../services/user.service';
  * Resolver for user-related operations.
  */
 @Resolver(() => AuthUserObject)
+@UsePipes(ValidationTypes, ValidationPipe)
 export class AuthUserResolver {
 	/**
 	 * Creates an instance of UserResolver.

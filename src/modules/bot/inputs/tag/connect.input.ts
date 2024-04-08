@@ -1,6 +1,9 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 
-@InputType()
+@InputType({
+	description: 'The input type for connecting tags to a bot.'
+})
 export class ConnectBotTagsToBotInput {
 	/**
 	 * The ID of the bot.
@@ -8,6 +11,7 @@ export class ConnectBotTagsToBotInput {
 	@Field(() => String, {
 		description: 'The ID of the bot.'
 	})
+	@IsSnowflake()
 	public botId!: string;
 
 	/**

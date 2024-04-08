@@ -1,5 +1,6 @@
 import type { ItagsSelect } from '@database/tables';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Paginated } from '@utils/graphql/pagination';
 
 /**
  * Represents a tag object.
@@ -24,3 +25,8 @@ export class BotTagObject implements ItagsSelect {
 	})
 	public displayName!: string;
 }
+
+@ObjectType({
+	description: 'A connection of tags.'
+})
+export class BotTagsConnection extends Paginated(BotTagObject) {}

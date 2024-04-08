@@ -1,3 +1,4 @@
+import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { botToTag, tags } from '@database/tables';
@@ -9,8 +10,11 @@ import {
 	type OnModuleInit
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import type { PaginationInput } from '@utils/graphql/pagination';
+import { eq, ilike, or } from 'drizzle-orm';
 import type { ConnectBotTagsToBotInput } from '../inputs/tag/connect.input';
 import type { CreateBotTagInput } from '../inputs/tag/create.input';
+import type { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import type { BotTagObject } from '../objects/tag/tag.object';
 import { BotService } from './bot.service';
 
@@ -31,7 +35,8 @@ export class BotTagService implements OnModuleInit {
 	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
-		private _moduleRef: ModuleRef
+		private _moduleRef: ModuleRef,
+		private _paginatorService: PaginatorService
 	) {}
 
 	/**
@@ -64,6 +69,31 @@ export class BotTagService implements OnModuleInit {
 			});
 
 		return tag;
+	}
+
+	/**
+	 * Paginates tags based on the provided input and pagination options.
+	 * @param input - The filters for the tags.
+	 * @param pagination - The pagination options.
+	 * @returns A paginated list of tags.
+	 */
+	public async paginateTags(
+		input?: FiltersBotTagInput,
+		pagination: PaginationInput = {}
+	) {
+		return this._paginatorService.paginate<
+			typeof tags._.config,
+			typeof tags
+		>({
+			pagination,
+			schema: tags,
+			where: input?.query
+				? or(
+						eq(tags.name, this.formatTagName(input.query)),
+						ilike(tags.displayName, input.query)
+					)
+				: undefined
+		});
 	}
 
 	/**
@@ -115,7 +145,7 @@ export class BotTagService implements OnModuleInit {
 	 * @returns A promise that resolves to an array of BotTagObject.
 	 * @throws NotFoundException if no tags are found.
 	 */
-	public async getTags(names: string[]): Promise<BotTagObject[]> {
+	public async getTagsByName(names: string[]): Promise<BotTagObject[]> {
 		names = names.map((name) => this.formatTagName(name));
 		const tags = await this._drizzleService.query.tags.findMany({
 			where: (table, { inArray }) => inArray(table.name, names)
@@ -137,7 +167,11 @@ export class BotTagService implements OnModuleInit {
 	public async getTag(name: string): Promise<BotTagObject> {
 		// Format the tag name.
 		const tag = await this._drizzleService.query.tags.findFirst({
-			where: (table, { eq }) => eq(table.name, name)
+			where: (table, { or, eq, ilike }) =>
+				or(
+					eq(table.name, this.formatTagName(name)),
+					ilike(table.displayName, name)
+				)
 		});
 
 		// If the tag does not exist, throw an error.
@@ -156,7 +190,7 @@ export class BotTagService implements OnModuleInit {
 	 * @returns A promise that resolves to an array of `BotTagObject` representing the existing or newly created tags.
 	 */
 	public async ensureTagsExists(names: string[]): Promise<BotTagObject[]> {
-		return this.getTags(names).catch(async () => {
+		return this.getTagsByName(names).catch(async () => {
 			const tags = [];
 			for (const tag of names) {
 				const actualTag = await this.createTag({ name: tag }).catch(
@@ -177,7 +211,7 @@ export class BotTagService implements OnModuleInit {
 	 * - All characters that are not alphanumeric or hyphen are removed.
 	 * - The tag name is truncated to 20 characters.
 	 * @param name - The name of the tag to format.
-	 * @returns
+	 * @returns The formatted tag name.
 	 */
 	private formatTagName(name: string): string {
 		return name
