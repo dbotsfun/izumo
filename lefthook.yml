@@ -4,6 +4,6 @@ pre-commit:
       run: pnpm lint-staged
 
 commit-msg:
-  commands:
-    "lint commit message":
-      run: pnpm commitlint --edit ${1}
+  scripts:
+    "commitlint.sh":
+      runner: bash
