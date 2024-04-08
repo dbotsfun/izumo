@@ -14,7 +14,7 @@ export const users = pgTable('users', {
 		.defaultNow()
 		.notNull(),
 	updatedAt: timestamp('updated_at', {
-		mode: 'string',
+		mode: 'string'
 	})
 		.notNull()
 		.$onUpdate(onUpdate),
