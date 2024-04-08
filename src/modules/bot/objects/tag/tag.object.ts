@@ -15,4 +15,12 @@ export class BotTagObject implements ItagsSelect {
 		description: 'The name of the tag.'
 	})
 	public name!: string;
+
+	/**
+	 * The display name of the tag.
+	 */
+	@Field({
+		description: 'The display name of the tag.'
+	})
+	public displayName!: string;
 }

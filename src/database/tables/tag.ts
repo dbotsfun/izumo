@@ -3,7 +3,8 @@ import { index, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
 import { bots } from './bot';
 
 export const tags = pgTable('tags', {
-	name: text('name').primaryKey().notNull()
+	name: text('name').primaryKey().notNull(),
+	displayName: text('display_name').notNull()
 });
 
 export const botToTag = pgTable(
