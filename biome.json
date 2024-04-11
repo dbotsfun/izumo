@@ -6,7 +6,8 @@
 			"dist",
 			"./.github/workflows",
 			"./pnpm-lock.yaml",
-			"./src/metadata.ts"
+			"./src/metadata.ts",
+			"./src/database/meta"
 		],
 		"ignoreUnknown": true
 	},

@@ -1,5 +1,6 @@
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { ValidationTypes } from 'class-validator';
 import { User } from '../decorators/user.decorator';
 import { JwtRefreshAuthGuard } from '../guards/jwt-refresh.guard';
 import { JwtAuthGuard } from '../guards/jwt.guard';
@@ -15,6 +16,7 @@ import { AuthService } from '../services/auth.service';
  * Resolver class for handling authentication-related operations.
  */
 @Resolver()
+@UsePipes(ValidationTypes, ValidationPipe)
 export class AuthResolver {
 	/**
 	 * AuthResolver constructor.

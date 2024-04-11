@@ -41,6 +41,6 @@ export class BotFields {
 		description: 'The tags associated with the bot.'
 	})
 	public tags(@Parent() bot: BotObject) {
-		return this._botTagService.getTags(bot.id);
+		return this._botTagService.getBotTags(bot.id);
 	}
 }

@@ -46,7 +46,11 @@ export enum ErrorMessages {
 	AUTH_UNABLE_TO_GET_DATA = 'An error occurred while trying to get data from Discord',
 	AUTH_UNABLE_TO_GET_USER_DATA = 'An error occurred while trying to get user data from Discord, please try loggin in again',
 	AUTH_NO_SESSIONS_FOUND = 'No sessions found',
-	AUTH_UNABLE_TO_REVOKE_TOKEN = 'An error occurred while trying to your token, please try again'
+	AUTH_UNABLE_TO_REVOKE_TOKEN = 'An error occurred while trying to your token, please try again',
+
+	// Tags
+	TAG_ALREADY_EXISTS = 'Tag already exists',
+	TAG_NOT_FOUND = 'Tag not found'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }

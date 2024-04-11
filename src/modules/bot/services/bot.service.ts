@@ -12,9 +12,11 @@ import {
 	Inject,
 	Injectable,
 	InternalServerErrorException,
-	NotFoundException
+	NotFoundException,
+	type OnModuleInit
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ModuleRef } from '@nestjs/core';
 import { type PaginationInput } from '@utils/graphql/pagination';
 import { AxiosError } from 'axios';
 import { and, eq, getTableColumns, like } from 'drizzle-orm';
@@ -24,24 +26,45 @@ import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject, type BotsConnection } from '../objects/bot/bot.object';
+import { BotTagService } from './tag.service';
 import { BotWebhookService } from './webhook.service';
 
 /**
  * Service class for handling bot-related operations.
  */
 @Injectable()
-export class BotService {
+export class BotService implements OnModuleInit {
+	/**
+	 * The injected BotTagService instance.
+	 */
+	private _tagService!: BotTagService;
+
 	/**
 	 * Creates an instance of BotService.
 	 * @param {DrizzleService} _drizzleService - The DrizzleService instance.
+	 * @param {HttpService} _httpService - The HttpService instance.
+	 * @param {ConfigService} _configService - The ConfigService instance.
+	 * @param {BotWebhookService} _webhookService - The BotWebhookService instance.
+	 * @param {PaginatorService} _paginatorService - The PaginatorService instance.
+	 * @param {ModuleRef} _moduleRef - The ModuleRef instance.
 	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
 		private readonly _webhookService: BotWebhookService,
-		private readonly _paginatorService: PaginatorService
+		private readonly _paginatorService: PaginatorService,
+		private readonly _moduleRef: ModuleRef
 	) {}
+
+	/**
+	 * Lifecycle hook that runs after the module has been initialized.
+	 */
+	public onModuleInit() {
+		this._tagService = this._moduleRef.get(BotTagService, {
+			strict: false
+		});
+	}
 
 	/**
 	 * Retrieves a list of bots following certain pagination filters
@@ -197,6 +220,13 @@ export class BotService {
 				})
 				.returning();
 
+			// Assign tags to the bot
+			await this._tagService.assignTagsToBot({
+				botId: bot.id,
+				tagNames: input.tags
+			});
+
+			// Insert the bot into the botToUser table
 			for (const ownerId of [owner.id, ...coOwners]) {
 				await tx.insert(botToUser).values({
 					a: input.id,
