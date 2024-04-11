@@ -2,7 +2,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
-import type { CreateBotTagInput } from '../inputs/tag/create.input';
+import { CreateBotTagInput } from '../inputs/tag/create.input';
 import { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import { GetBotTagInput } from '../inputs/tag/get.input';
 import { BotTagObject, BotTagsConnection } from '../objects/tag/tag.object';
