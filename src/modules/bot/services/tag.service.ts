@@ -121,12 +121,15 @@ export class BotTagService implements OnModuleInit {
 		await this._botService.getBot(input.botId);
 
 		// Assign the tags to the bot.
-		for (const tag of tags) {
-			await this._drizzleService.insert(botToTag).values({
-				a: input.botId,
-				b: tag.name
-			});
-		}
+		await this._drizzleService
+			.insert(botToTag)
+			.values(
+				tags.map((tag) => ({
+					a: input.botId,
+					b: tag.name
+				}))
+			)
+			.execute();
 
 		return tags;
 	}
@@ -203,16 +206,24 @@ export class BotTagService implements OnModuleInit {
 	 * @returns A promise that resolves to an array of `BotTagObject` representing the existing or newly created tags.
 	 */
 	public async ensureTagsExists(names: string[]): Promise<BotTagObject[]> {
-		return this.getTagsByName(names).catch(async () => {
-			const tags = [];
+		// Get the existing tags.
+		const tags = await this.getTagsByName(names);
+
+		// If the number of currente tags if not equal to the number of names, create the missing tags.
+		if (tags.length === names.length) {
 			for (const tag of names) {
+				// Check if the tag already exists.
+				if (tags.find((t) => t.name === tag)) continue;
+
+				// Create the tag if it does not exist.
 				const actualTag = await this.createTag(tag).catch(() => null);
 
+				// If the tag was created, add it to the tags array.
 				if (actualTag) tags.push(actualTag);
 			}
+		}
 
-			return tags;
-		});
+		return tags;
 	}
 
 	/**
