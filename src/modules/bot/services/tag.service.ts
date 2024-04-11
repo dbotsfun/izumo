@@ -13,7 +13,6 @@ import { ModuleRef } from '@nestjs/core';
 import type { PaginationInput } from '@utils/graphql/pagination';
 import { eq, ilike, or } from 'drizzle-orm';
 import type { ConnectBotTagsToBotInput } from '../inputs/tag/connect.input';
-import type { CreateBotTagInput } from '../inputs/tag/create.input';
 import type { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import type { BotsConnection } from '../objects/bot/bot.object';
 import type { BotTagObject } from '../objects/tag/tag.object';
