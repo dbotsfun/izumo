@@ -1,5 +1,6 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
+import { MAX_TAGS_PER_BOT } from '@constants/limits';
 import { DATABASE } from '@constants/tokens';
 import { BotStatus, botToUser, bots } from '@database/tables';
 import { DrizzleService } from '@lib/types';
@@ -227,12 +228,12 @@ export class BotService implements OnModuleInit {
 			});
 
 			// Insert the bot into the botToUser table
-			for (const ownerId of [owner.id, ...coOwners]) {
-				await tx.insert(botToUser).values({
-					a: input.id,
-					b: ownerId
-				});
-			}
+			await tx.insert(botToUser).values(
+				[owner.id, ...coOwners].map((userId) => ({
+					a: bot.id,
+					b: userId
+				}))
+			);
 
 			return bot;
 		});
@@ -272,6 +273,48 @@ export class BotService implements OnModuleInit {
 		}
 
 		const { apiKey, ...secureCols } = getTableColumns(bots);
+
+		// If tags are provided in the input
+		if (input.tags) {
+			// Get the current tags of the bot
+			const currentTags = await this._tagService.getBotTags(input.id);
+			// Get the tags that were removed
+			const removedTags = currentTags.filter(
+				(tag) => !input.tags.includes(tag.name)
+			);
+			// Get the tags that were added
+			const addedTags = input.tags.filter(
+				(tag) => !currentTags.map((t) => t.name).includes(tag)
+			);
+
+			// Check if the bot has more than the allowed tags
+			if (
+				currentTags.length + addedTags.length - removedTags.length >
+				MAX_TAGS_PER_BOT
+			) {
+				throw new BadRequestException(
+					ErrorMessages.BOT_TAGS_LIMIT_EXCEEDED
+				);
+			}
+
+			// If there are tags to add
+			if (addedTags.length) {
+				// Assign the tags that were added
+				await this._tagService.assignTagsToBot({
+					botId: input.id,
+					tagNames: addedTags
+				});
+			}
+
+			// If there are tags to remove
+			if (removedTags.length) {
+				// Remove the tags that were removed
+				await this._tagService.removeTagsFromBot({
+					botId: input.id,
+					tagNames: removedTags.map((tag) => tag.name)
+				});
+			}
+		}
 
 		// Auto-update API information
 		const [updateBot] = await this._drizzleService

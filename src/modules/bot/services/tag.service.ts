@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import type { PaginationInput } from '@utils/graphql/pagination';
-import { eq, ilike, or } from 'drizzle-orm';
+import { and, eq, ilike, inArray, or } from 'drizzle-orm';
 import type { ConnectBotTagsToBotInput } from '../inputs/tag/connect.input';
 import type { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import type { BotsConnection } from '../objects/bot/bot.object';
@@ -32,6 +32,7 @@ export class BotTagService implements OnModuleInit {
 	 * Constructs a new instance of the BotTagService class.
 	 * @param _drizzleService The injected DrizzleService instance.
 	 * @param _moduleRef The injected ModuleRef instance.
+	 * @param _paginatorService The injected PaginatorService instance.
 	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
@@ -210,7 +211,7 @@ export class BotTagService implements OnModuleInit {
 		const tags = await this.getTagsByName(names);
 
 		// If the number of currente tags if not equal to the number of names, create the missing tags.
-		if (tags.length === names.length) {
+		if (tags.length !== names.length) {
 			for (const tag of names) {
 				// Check if the tag already exists.
 				if (tags.find((t) => t.name === tag)) continue;
@@ -224,6 +225,22 @@ export class BotTagService implements OnModuleInit {
 		}
 
 		return tags;
+	}
+
+	/**
+	 * Removes tags from a bot.
+	 *
+	 * @param botId - The ID of the bot.
+	 * @param tagNames - An array of tag names to be removed.
+	 * @returns A promise that resolves when the tags are successfully removed.
+	 */
+	public async removeTagsFromBot({
+		botId,
+		tagNames
+	}: ConnectBotTagsToBotInput) {
+		return this._drizzleService
+			.delete(botToTag)
+			.where(and(inArray(botToTag.b, tagNames), eq(botToTag.a, botId)));
 	}
 
 	/**

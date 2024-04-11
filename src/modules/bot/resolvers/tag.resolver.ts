@@ -1,4 +1,5 @@
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
@@ -59,6 +60,7 @@ export class TagResolver {
 		name: 'createTag',
 		description: 'Creates a new tag.'
 	})
+	@UseGuards(JwtAuthGuard)
 	public async create(@Args('input') input: CreateBotTagInput) {
 		return this._tagService.createTag(input.name);
 	}
