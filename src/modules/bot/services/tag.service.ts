@@ -240,7 +240,9 @@ export class BotTagService implements OnModuleInit {
 	}: ConnectBotTagsToBotInput) {
 		return this._drizzleService
 			.delete(botToTag)
-			.where(and(inArray(botToTag.b, tagNames), eq(botToTag.a, botId)));
+			.where(and(inArray(botToTag.b, tagNames), eq(botToTag.a, botId)))
+			.returning()
+			.execute();
 	}
 
 	/**
