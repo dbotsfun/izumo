@@ -15,6 +15,7 @@ import { eq, ilike, or } from 'drizzle-orm';
 import type { ConnectBotTagsToBotInput } from '../inputs/tag/connect.input';
 import type { CreateBotTagInput } from '../inputs/tag/create.input';
 import type { FiltersBotTagInput } from '../inputs/tag/filters.input';
+import type { BotsConnection } from '../objects/bot/bot.object';
 import type { BotTagObject } from '../objects/tag/tag.object';
 import { BotService } from './bot.service';
 
@@ -94,6 +95,19 @@ export class BotTagService implements OnModuleInit {
 					)
 				: undefined
 		});
+	}
+
+	/**
+	 * Paginates bot tags based on the provided query and pagination options.
+	 * @param query - The query string to filter the bot tags.
+	 * @param pagination - The pagination options.
+	 * @returns A Promise that resolves to a BotsConnection object representing the paginated bot tags.
+	 */
+	public async paginateBotTags(
+		query: string,
+		pagination: PaginationInput = {}
+	): Promise<BotsConnection> {
+		return this._paginatorService.paginateBotTags(query, pagination);
 	}
 
 	/**

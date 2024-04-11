@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { BotResolver } from './resolvers/bot.resolver';
 import { BotFields } from './resolvers/fields/bot.fields';
 import { BotOwnerFields } from './resolvers/fields/owner.fields';
+import { BotTagFields } from './resolvers/fields/tag.fields';
 import { BotOwnerResolver } from './resolvers/owner.resolver';
 import { TagResolver } from './resolvers/tag.resolver';
 import { BotService } from './services/bot.service';
@@ -20,6 +21,7 @@ import { BotWebhookService } from './services/webhook.service';
 		BotOwnerResolver,
 		BotOwnerFields,
 		BotTagService,
+		BotTagFields,
 		BotWebhookService,
 		PaginatorService,
 		TagResolver

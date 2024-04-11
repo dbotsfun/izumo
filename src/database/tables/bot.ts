@@ -13,7 +13,7 @@ import {
 	timestamp,
 	uniqueIndex
 } from 'drizzle-orm/pg-core';
-import { tags } from './tag';
+import { botToTag } from './tag';
 import { users } from './user';
 
 export enum BotStatus {
@@ -105,7 +105,7 @@ export const botToUser = pgTable(
 
 export const botsRelations = relations(bots, ({ many }) => ({
 	owners: many(users, { relationName: 'bot_owners' }),
-	tags: many(tags, { relationName: 'bot_tags' })
+	tags: many(botToTag)
 }));
 
 export const botToUserRelations = relations(botToUser, ({ one }) => ({

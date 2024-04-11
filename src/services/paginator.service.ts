@@ -1,4 +1,5 @@
 import { DATABASE } from '@constants/tokens';
+import { botToTag, bots } from '@database/tables';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable } from '@nestjs/common';
 import {
@@ -6,7 +7,16 @@ import {
 	type PaginationInput,
 	SortOrder
 } from '@utils/graphql/pagination';
-import { type SQL, asc, count, desc } from 'drizzle-orm';
+import {
+	type Operators,
+	type SQL,
+	type Simplify,
+	asc,
+	count,
+	desc,
+	eq,
+	getOperators
+} from 'drizzle-orm';
 import type { PgTableWithColumns, TableConfig } from 'drizzle-orm/pg-core';
 
 /**
@@ -24,7 +34,16 @@ type PageOptions<O extends TableConfig, S extends PgTableWithColumns<O>> = {
 	/**
 	 * The where clause to filter the data.
 	 */
-	where?: SQL;
+	where?:
+		| SQL
+		| undefined
+		| ((
+				fields: Simplify<
+					// biome-ignore lint/complexity/noBannedTypes: <explanation>
+					[O['columns']] extends [never] ? {} : O['columns']
+				>,
+				operators: Operators
+		  ) => SQL | undefined);
 };
 
 /**
@@ -55,7 +74,12 @@ export class PaginatorService {
 			sortBy,
 			sortOrder = SortOrder.ASC
 		} = options.pagination;
-		const { where, schema } = options;
+		const { where: whereFnOrSQL, schema } = options;
+
+		const where =
+			typeof whereFnOrSQL === 'function'
+				? whereFnOrSQL(schema, getOperators())
+				: whereFnOrSQL;
 
 		const offset = (page - 1) * limit;
 		const sort = sortBy ? schema[sortBy] : undefined;
@@ -85,6 +109,57 @@ export class PaginatorService {
 
 		return {
 			nodes: entries,
+			totalCount: totalEntries,
+			totalPages: Math.ceil(totalEntries / limit),
+			pageInfo: {
+				hasNextPage: entries.length === limit,
+				hasPreviousPage: page > 1
+			}
+		};
+	}
+
+	/**
+	 * Retrieves paginated bot tags based on the provided tag and pagination options.
+	 *
+	 * @param tag - The tag to filter the bot tags by.
+	 * @param pagination - The pagination options (page, size, sortOrder) for the query. Default is an empty object.
+	 * @returns An object containing the paginated bot tags.
+	 */
+	public async paginateBotTags(
+		tag: string,
+		pagination: PaginationInput = {}
+	) {
+		const {
+			page = 1,
+			size: limit = 10,
+			sortOrder = SortOrder.ASC
+		} = pagination;
+
+		const offset = (page - 1) * limit;
+		const order = sortOrder === SortOrder.ASC ? asc : desc;
+
+		// Prepare the query to fetch the paginated data
+		const query = this._drizzleService
+			.select({ bots })
+			.from(botToTag)
+			.where(eq(botToTag.b, tag))
+			.leftJoin(bots, eq(botToTag.a, bots.id)) // join the bots table
+			.orderBy(order(bots.id))
+			.limit(limit)
+			.offset(offset);
+
+		// Get the total count of entries
+		const [{ count: totalEntries }] = await this._drizzleService
+			.select({ count: count() })
+			.from(botToTag)
+			.where(eq(botToTag.b, tag))
+			.execute();
+
+		const entries = await query.execute();
+
+		return {
+			// biome-ignore lint/style/noNonNullAssertion: yeah, I know
+			nodes: entries.map((entry) => entry.bots!),
 			totalCount: totalEntries,
 			totalPages: Math.ceil(totalEntries / limit),
 			pageInfo: {

@@ -34,15 +34,19 @@ export const botToTag = pgTable(
 export type ItagsInsert = typeof tags.$inferInsert;
 export type ItagsSelect = typeof tags.$inferSelect;
 
-export const tagsRelations = relations(tags, ({ one }) => ({
-	bots: one(botToTag, {
-		fields: [tags.name],
-		references: [botToTag.b],
-		relationName: 'bot_tags'
-	})
+export const tagsRelations = relations(tags, ({ many }) => ({
+	bots: many(botToTag)
 }));
 
-export const tagToBotRelations = relations(botToTag, ({ one }) => ({
+// export const tagsRelations = relations(tags, ({ one }) => ({
+// 	bots: one(botToTag, {
+// 		fields: [tags.name],
+// 		references: [botToTag.b],
+// 		relationName: 'bot_tags'
+// 	})
+// }));
+
+export const botToTagRelations = relations(botToTag, ({ one }) => ({
 	bot: one(bots, { fields: [botToTag.a], references: [bots.id] }),
 	tag: one(tags, { fields: [botToTag.b], references: [tags.name] })
 }));
