@@ -53,15 +53,15 @@ export class BotTagService implements OnModuleInit {
 	 * @returns A promise that resolves to the created tag object.
 	 * @throws NotFoundException if the tag already exists.
 	 */
-	public async createTag(input: CreateBotTagInput): Promise<BotTagObject> {
+	public async createTag(query: string): Promise<BotTagObject> {
 		// Format the tag name.
-		const name = this.formatTagName(input.name);
+		const name = this.formatTagName(query);
 		// Create the tag if it does exist throws an error.
 		const [tag] = await this._drizzleService
 			.insert(tags)
 			.values({
 				name,
-				displayName: input.name
+				displayName: query
 			})
 			.returning()
 			.catch(() => {
@@ -207,9 +207,7 @@ export class BotTagService implements OnModuleInit {
 		return this.getTagsByName(names).catch(async () => {
 			const tags = [];
 			for (const tag of names) {
-				const actualTag = await this.createTag({ name: tag }).catch(
-					() => null
-				);
+				const actualTag = await this.createTag(tag).catch(() => null);
 
 				if (actualTag) tags.push(actualTag);
 			}

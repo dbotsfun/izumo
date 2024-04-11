@@ -1,7 +1,8 @@
 import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
+import type { CreateBotTagInput } from '../inputs/tag/create.input';
 import { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import { GetBotTagInput } from '../inputs/tag/get.input';
 import { BotTagObject, BotTagsConnection } from '../objects/tag/tag.object';
@@ -27,7 +28,6 @@ export class TagResolver {
 	 * @returns A paginated list of tags.
 	 */
 	@Query(() => BotTagsConnection, {
-		name: 'tags',
 		description: 'Fetches a list of tags.'
 	})
 	public async tags(
@@ -48,5 +48,18 @@ export class TagResolver {
 	})
 	public async get(@Args('input') input: GetBotTagInput) {
 		return this._tagService.getTag(input.name);
+	}
+
+	/**
+	 * Creates a new bot tag.
+	 * @param input - The input data for creating the bot tag.
+	 * @returns A Promise that resolves to the created bot tag.
+	 */
+	@Mutation(() => BotTagObject, {
+		name: 'createTag',
+		description: 'Creates a new tag.'
+	})
+	public async create(@Args('input') input: CreateBotTagInput) {
+		return this._tagService.createTag(input.name);
 	}
 }

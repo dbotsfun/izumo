@@ -1,13 +1,16 @@
 import { BotsConnection } from '@modules/bot/objects/bot/bot.object';
 import { BotTagObject } from '@modules/bot/objects/tag/tag.object';
 import { BotTagService } from '@modules/bot/services/tag.service';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { PaginationInput } from '@utils/graphql/pagination';
+import { ValidationTypes } from 'class-validator';
 
 /**
  * Represents the fields resolver for the BotTagObject.
  */
 @Resolver(() => BotTagObject)
+@UsePipes(ValidationTypes, ValidationPipe)
 export class BotTagFields {
 	/**
 	 * Constructs a new instance of the BotTagFields class.
