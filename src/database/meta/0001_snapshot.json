@@ -1,6 +1,6 @@
 {
-	"id": "067b4f0a-aa65-4ad0-9e4c-15df85d15783",
-	"prevId": "00000000-0000-0000-0000-000000000000",
+	"id": "6815911b-ac23-4165-b47e-e5738c73fadd",
+	"prevId": "5a6c1bc3-225b-490a-8b4c-9632699dfe0b",
 	"version": "5",
 	"dialect": "pg",
 	"tables": {
@@ -646,6 +646,40 @@
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
+		"vanities": {
+			"name": "vanities",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"target_id": {
+					"name": "target_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"type": {
+					"name": "type",
+					"type": "VanityType",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
 		"sessions": {
 			"name": "sessions",
 			"schema": "",
@@ -714,6 +748,13 @@
 				"DENIED": "DENIED",
 				"PENDING": "PENDING",
 				"APPROVED": "APPROVED"
+			}
+		},
+		"VanityType": {
+			"name": "VanityType",
+			"values": {
+				"USER": "USER",
+				"BOT": "BOT"
 			}
 		}
 	},

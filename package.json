@@ -21,7 +21,7 @@
 		"test:e2e": "jest --config ./test/jest-e2e.json",
 		"update:i": "pnpm up --interactive",
 		"update:f": "pnpm up --latest",
-		"db:drop": "pnpm drizzle-kit drop:pg",
+		"db:drop": "pnpm drizzle-kit drop",
 		"db:push": "pnpm drizzle-kit push:pg",
 		"db:generate": "pnpm drizzle-kit generate:pg",
 		"postinstall": "pnpm lefthook install"
