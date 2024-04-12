@@ -1,4 +1,6 @@
 import { onUpdate } from '@database/common/onUpdate';
+import type { ArrayEnum } from '@lib/types';
+import type { BotUserPermissions } from '@modules/bot/objects/bot/bot.user.permissions';
 import { cast } from '@utils/common/cast';
 import { enumToArray } from '@utils/common/enumToArray';
 import { relations } from 'drizzle-orm';
@@ -24,7 +26,7 @@ export enum BotStatus {
 
 export const botStatus = pgEnum(
 	'BotStatus',
-	cast<[string, ...[string]]>(enumToArray(BotStatus))
+	cast<ArrayEnum>(enumToArray(BotStatus))
 );
 export const botListSource = pgEnum('BotListSource', ['DISCORD_LIST']);
 
@@ -61,12 +63,7 @@ export const bots = pgTable(
 		// TODO: failed to parse database type 'jsonb[]'
 		userPermissions: json('user_permissions')
 			.array()
-			.$type<
-				{
-					id: string;
-					permissions: number;
-				}[]
-			>()
+			.$type<BotUserPermissions[]>()
 			.notNull()
 	},
 	(table) => {

@@ -26,6 +26,13 @@ import { BotWebhookService } from './services/webhook.service';
 		PaginatorService,
 		TagResolver
 	],
-	imports: [HttpModule]
+	imports: [HttpModule],
+	exports: [
+		BotService,
+		BotOwnerService,
+		BotTagService,
+		BotWebhookService,
+		PaginatorService
+	]
 })
 export class BotModule {}

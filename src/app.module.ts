@@ -13,6 +13,7 @@ import type { Request, Response } from 'express';
 import * as schema from './database/schema';
 import { AuthModule } from './modules/auth/auth.module';
 import { BotModule } from './modules/bot/bot.module';
+import { VanityModule } from './modules/vanity/vanity.module';
 
 @Module({
 	imports: [
@@ -99,7 +100,8 @@ import { BotModule } from './modules/bot/bot.module';
 		}),
 
 		BotModule,
-		AuthModule
+		AuthModule,
+		VanityModule
 	],
 	controllers: [],
 	providers: []

@@ -52,7 +52,11 @@ export enum ErrorMessages {
 
 	// Tags
 	TAG_ALREADY_EXISTS = 'Tag already exists',
-	TAG_NOT_FOUND = 'Tag not found'
+	TAG_NOT_FOUND = 'Tag not found',
+
+	// Vanity
+	VANITY_NOT_FOUND = 'Vanity not found',
+	VANITY_ALREADY_EXISTS = 'Vanity already exists'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }

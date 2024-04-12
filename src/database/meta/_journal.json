@@ -15,6 +15,13 @@
 			"when": 1712496706986,
 			"tag": "0001_far_bishop",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "5",
+			"when": 1712880717379,
+			"tag": "0002_dazzling_shooting_star",
+			"breakpoints": true
 		}
 	]
 }

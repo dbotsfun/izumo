@@ -1,4 +1,4 @@
-import { BotStatus } from '@database/tables';
+import { BotStatus, VanityType } from '@database/tables';
 import { registerEnumType } from '@nestjs/graphql';
 import { SortOrder } from '../pagination';
 
@@ -27,6 +27,19 @@ registerEnumType(SortOrder, {
 		},
 		DESC: {
 			description: 'Sort the items in descending order.'
+		}
+	}
+});
+
+registerEnumType(VanityType, {
+	name: 'VanityType',
+	description: 'The type of vanity URL.',
+	valuesMap: {
+		USER: {
+			description: 'The vanity URL is for a user.'
+		},
+		BOT: {
+			description: 'The vanity URL is for a bot.'
 		}
 	}
 });

@@ -6,4 +6,5 @@ export * from './review_reply';
 export * from './review';
 export * from './webhook';
 export * from './vote';
+export * from './vanity';
 export * from './session';
