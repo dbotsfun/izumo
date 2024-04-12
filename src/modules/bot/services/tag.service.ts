@@ -208,7 +208,9 @@ export class BotTagService implements OnModuleInit {
 	 */
 	public async ensureTagsExists(names: string[]): Promise<BotTagObject[]> {
 		// Get the existing tags.
-		const tags = await this.getTagsByName(names);
+		const tags: BotTagObject[] = await this.getTagsByName(names).catch(
+			() => []
+		);
 
 		// If the number of currente tags if not equal to the number of names, create the missing tags.
 		if (tags.length !== names.length) {
