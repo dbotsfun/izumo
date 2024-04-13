@@ -13,6 +13,7 @@ import { ModuleRef } from '@nestjs/core';
 import { hours } from '@nestjs/throttler';
 import type { PaginationInput } from '@utils/graphql/pagination';
 import { and, eq, gt } from 'drizzle-orm';
+import type { BotCanVoteObject } from '../objects/vote/can-vote.object';
 import { BotService } from './bot.service';
 
 /**
@@ -96,9 +97,12 @@ export class BotVoteService implements OnModuleInit {
 	 * Checks if a user can vote for a bot.
 	 * @param botId - The ID of the bot.
 	 * @param userId - The ID of the user.
-	 * @returns A Promise that resolves to a boolean indicating if the user can vote.
+	 * @returns A Promise that resolves to a BotCanVoteObject indicating if the user can vote and expiry date.
 	 */
-	public async canVote(botId: string, userId: string): Promise<boolean> {
+	public async canVote(
+		botId: string,
+		userId: string
+	): Promise<BotCanVoteObject> {
 		const userVotes = await this._drizzleService
 			.select()
 			.from(votes)
@@ -112,6 +116,9 @@ export class BotVoteService implements OnModuleInit {
 			.limit(1)
 			.execute();
 
-		return !userVotes.length;
+		return {
+			canVote: !userVotes.length,
+			expires: userVotes[0].expires ?? null
+		};
 	}
 }
