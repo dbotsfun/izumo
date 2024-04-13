@@ -2,9 +2,10 @@ import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { BotVoteCreateInput } from '../inputs/vote/create.input';
+import { BotVoteGetInput } from '../inputs/vote/get.input';
 import { BotVoteObject } from '../objects/vote/vote.object';
 import { BotVoteService } from '../services/vote.service';
 
@@ -19,6 +20,22 @@ export class BotVoteResolver {
 	 * @param voteService - The vote service.
 	 */
 	public constructor(private readonly voteService: BotVoteService) {}
+
+	/**
+	 * Checks if an user is able to vote a bot.
+	 *
+	 * @param input - The input data for checking the vote.
+	 * @param user - The authenticated user making the vote.
+	 * @returns A Promise that resolves to the checked vote.
+	 */
+	@Query(() => Boolean)
+	@UseGuards(JwtAuthGuard)
+	public async checkVote(
+		@Args('input') input: BotVoteGetInput,
+		@User() user: JwtPayload
+	) {
+		return this.voteService.canVote(input.botId, user.id);
+	}
 
 	/**
 	 * Creates a vote for a bot.
