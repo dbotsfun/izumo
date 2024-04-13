@@ -19,3 +19,6 @@ export const votes = pgTable('votes', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
 	expires: bigint('expires', { mode: 'number' }).notNull()
 });
+
+export type TvotesInsert = typeof votes.$inferInsert;
+export type TvotesSelect = typeof votes.$inferSelect;

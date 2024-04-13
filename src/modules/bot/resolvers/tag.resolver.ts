@@ -14,7 +14,7 @@ import { BotTagService } from '../services/tag.service';
  */
 @Resolver(() => BotTagObject)
 @UsePipes(ValidationTypes, ValidationPipe)
-export class TagResolver {
+export class BotTagResolver {
 	/**
 	 * Constructs a new instance of the TagResolver class.
 	 * @param _tagService The BotTagService instance to be injected.

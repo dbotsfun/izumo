@@ -6,10 +6,12 @@ import { BotFields } from './resolvers/fields/bot.fields';
 import { BotOwnerFields } from './resolvers/fields/owner.fields';
 import { BotTagFields } from './resolvers/fields/tag.fields';
 import { BotOwnerResolver } from './resolvers/owner.resolver';
-import { TagResolver } from './resolvers/tag.resolver';
+import { BotTagResolver } from './resolvers/tag.resolver';
+import { BotVoteResolver } from './resolvers/vote.resolver';
 import { BotService } from './services/bot.service';
 import { BotOwnerService } from './services/owner.service';
 import { BotTagService } from './services/tag.service';
+import { BotVoteService } from './services/vote.service';
 import { BotWebhookService } from './services/webhook.service';
 
 @Module({
@@ -24,7 +26,9 @@ import { BotWebhookService } from './services/webhook.service';
 		BotTagFields,
 		BotWebhookService,
 		PaginatorService,
-		TagResolver
+		BotTagResolver,
+		BotVoteResolver,
+		BotVoteService
 	],
 	imports: [HttpModule],
 	exports: [

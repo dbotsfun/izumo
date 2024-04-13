@@ -56,7 +56,10 @@ export enum ErrorMessages {
 
 	// Vanity
 	VANITY_NOT_FOUND = 'Vanity not found',
-	VANITY_ALREADY_EXISTS = 'Vanity already exists'
+	VANITY_ALREADY_EXISTS = 'Vanity already exists',
+
+	// Votes
+	VOTE_USER_ALREADY_VOTED = 'You have already voted for this bot'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }
