@@ -118,7 +118,7 @@ export class BotVoteService implements OnModuleInit {
 
 		return {
 			canVote: !userVotes.length,
-			expires: userVotes[0].expires ?? null
+			expires: userVotes[0]?.expires
 		};
 	}
 }
