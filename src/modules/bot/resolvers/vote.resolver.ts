@@ -5,6 +5,7 @@ import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { BotVoteCreateInput } from '../inputs/vote/create.input';
+import { BotCanVoteObject } from '../objects/vote/can-vote.object';
 import { BotVoteObject } from '../objects/vote/vote.object';
 import { BotVoteService } from '../services/vote.service';
 
@@ -27,7 +28,7 @@ export class BotVoteResolver {
 	 * @param user - The authenticated user making the vote.
 	 * @returns A Promise that resolves to the checked vote.
 	 */
-	@Query(() => Boolean)
+	@Query(() => BotCanVoteObject)
 	@UseGuards(JwtAuthGuard)
 	public async canVote(
 		@Args('input') input: BotVoteCreateInput,

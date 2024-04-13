@@ -60,7 +60,7 @@ export class BotFields {
 	})
 	public votes(
 		@Parent() bot: BotObject,
-		@Args('pagination') pagination: PaginationInput
+		@Args('pagination', { nullable: true }) pagination: PaginationInput
 	) {
 		return this._botVoteService.paginateVotes(bot.id, pagination);
 	}
