@@ -56,7 +56,7 @@ export class BotVoteService implements OnModuleInit {
 		await this._botService.getBot(botId);
 
 		// Check if the user has already voted.
-		if (!(await this.canVote(botId, userId))) {
+		if (!(await this.canVote(botId, userId)).canVote) {
 			throw new ForbiddenException(ErrorMessages.VOTE_USER_ALREADY_VOTED);
 		}
 
