@@ -30,7 +30,8 @@ export class CreateWebhookInput implements TwebhooksInsert {
 		description: 'The webhook URL'
 	})
 	@IsUrl({
-		host_blacklist: ['discord.com', 'discordapp.com']
+		host_blacklist: ['discord.com', 'discordapp.com'],
+		protocols: ['https']
 	})
 	public url!: string;
 

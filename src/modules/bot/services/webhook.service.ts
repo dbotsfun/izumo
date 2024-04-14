@@ -1,8 +1,14 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, WebhookEvent, webhooks } from '@database/schema';
+import {
+	BotStatus,
+	WebhookEvent,
+	WebhookPayloadField,
+	webhooks
+} from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
+import { HttpService } from '@nestjs/axios';
 import {
 	ForbiddenException,
 	Inject,
@@ -11,10 +17,14 @@ import {
 	type OnModuleInit
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { seconds } from '@nestjs/throttler';
 import { arrayDedupe } from '@utils/common/arrayDedupe';
+import { cast } from '@utils/common/cast';
 import { eq } from 'drizzle-orm';
+import { firstValueFrom } from 'rxjs';
 import type { CreateWebhookInput } from '../inputs/webhook/create.input';
 import type { UpdateWebhookInput } from '../inputs/webhook/update.input';
+import type { WebhookPayloadInterface } from '../interfaces/webhook.interface';
 import { BotService } from './bot.service';
 
 /**
@@ -34,7 +44,8 @@ export class BotWebhookService implements OnModuleInit {
 	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
-		private _moduleRef: ModuleRef
+		private _moduleRef: ModuleRef,
+		private _httpService: HttpService
 	) {}
 
 	/**
@@ -160,6 +171,57 @@ export class BotWebhookService implements OnModuleInit {
 			.execute();
 
 		return webhook;
+	}
+
+	/**
+	 * Sends a webhook payload to the specified webhook ID.
+	 * @param id - The ID of the webhook.
+	 * @param payload - The payload to be sent.
+	 * @throws NotFoundException if the webhook with the specified ID is not found.
+	 */
+	public async sendWebhook(id: string, payload: WebhookPayloadInterface) {
+		// Retrieve the webhook by its ID
+		const webhook = await this._drizzleService.query.webhooks.findFirst({
+			where: (table, { eq }) => eq(table.id, id)
+		});
+
+		// Check if the webhook exists
+		if (!webhook) {
+			throw new NotFoundException(ErrorMessages.WEBHOOK_NOT_FOUND);
+		}
+
+		// Check if the event is included in the webhook
+		if (!webhook.events?.includes(payload[WebhookPayloadField.TYPE])) {
+			return;
+		}
+
+		// Check if the payload fields are included in the webhook
+		const actualPayload = cast<Array<WebhookPayloadField>>(
+			Object.keys(payload)
+		).map((key) => {
+			if (webhook.payloadFields?.includes(key)) {
+				return {
+					[key]: payload[key]
+				};
+			}
+		});
+
+		// Send the webhook payload
+		await firstValueFrom(
+			this._httpService.post(
+				webhook.url,
+				{
+					...actualPayload,
+					secret: webhook.secret
+				},
+				{
+					timeout: seconds(5), // If the webhook does not respond within 5 seconds, cancel the request
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}
+			)
+		).catch(() => null);
 	}
 
 	/**
