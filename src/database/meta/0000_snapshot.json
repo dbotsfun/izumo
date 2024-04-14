@@ -1,5 +1,5 @@
 {
-	"id": "5a6c1bc3-225b-490a-8b4c-9632699dfe0b",
+	"id": "9003fa25-0376-45a1-a7d7-6ef66b5ab1b5",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "5",
 	"dialect": "pg",
@@ -74,14 +74,14 @@
 				},
 				"created_at": {
 					"name": "created_at",
-					"type": "timestamp (3)",
+					"type": "timestamp(3)",
 					"primaryKey": false,
 					"notNull": true,
 					"default": "now()"
 				},
 				"updated_at": {
 					"name": "updated_at",
-					"type": "timestamp (3)",
+					"type": "timestamp(3)",
 					"primaryKey": false,
 					"notNull": true
 				}
@@ -199,14 +199,14 @@
 				},
 				"created_at": {
 					"name": "created_at",
-					"type": "timestamp (3)",
+					"type": "timestamp(3)",
 					"primaryKey": false,
 					"notNull": true,
 					"default": "now()"
 				},
 				"updated_at": {
 					"name": "updated_at",
-					"type": "timestamp (3)",
+					"type": "timestamp(3)",
 					"primaryKey": false,
 					"notNull": true
 				},
@@ -513,14 +513,14 @@
 				},
 				"created_at": {
 					"name": "created_at",
-					"type": "timestamp (3)",
+					"type": "timestamp(3)",
 					"primaryKey": false,
 					"notNull": true,
 					"default": "now()"
 				},
 				"updated_at": {
 					"name": "updated_at",
-					"type": "timestamp (3)",
+					"type": "timestamp(3)",
 					"primaryKey": false,
 					"notNull": true
 				}
@@ -547,44 +547,6 @@
 					"tableFrom": "reviews",
 					"tableTo": "users",
 					"columnsFrom": ["user_id"],
-					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
-				}
-			},
-			"compositePrimaryKeys": {},
-			"uniqueConstraints": {}
-		},
-		"webhooks": {
-			"name": "webhooks",
-			"schema": "",
-			"columns": {
-				"id": {
-					"name": "id",
-					"type": "text",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"url": {
-					"name": "url",
-					"type": "text",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"secret": {
-					"name": "secret",
-					"type": "text",
-					"primaryKey": false,
-					"notNull": true
-				}
-			},
-			"indexes": {},
-			"foreignKeys": {
-				"webhooks_id_bots_id_fk": {
-					"name": "webhooks_id_bots_id_fk",
-					"tableFrom": "webhooks",
-					"tableTo": "bots",
-					"columnsFrom": ["id"],
 					"columnsTo": ["id"],
 					"onDelete": "cascade",
 					"onUpdate": "cascade"

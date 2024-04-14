@@ -25,6 +25,7 @@ export enum ErrorMessages {
 	BOT_PRIVATE = 'Bot is private',
 	BOT_COOWNERS_SAME_ID = "You can't set yourself as co-owner of the bot",
 	BOT_TAGS_LIMIT_EXCEEDED = `You can only have ${MAX_TAGS_PER_BOT} tags per bot`,
+	BOT_NOT_APPROVED = 'Your bot has not been approved yet',
 
 	// Dlist (Import)
 	DLIST_BOT_UNAUTHORIZED = "You can't import this bot",
@@ -59,7 +60,11 @@ export enum ErrorMessages {
 	VANITY_ALREADY_EXISTS = 'Vanity already exists',
 
 	// Votes
-	VOTE_USER_ALREADY_VOTED = 'You have already voted for this bot'
+	VOTE_USER_ALREADY_VOTED = 'You have already voted for this bot',
+
+	// Webhooks
+	WEBHOOK_NOT_FOUND = 'I could not find a webhook for this bot',
+	WEBHOOK_ALREADY_EXISTS = 'This bot already has a webhook'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }

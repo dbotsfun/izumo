@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS "_BadgeToUser" (
 CREATE TABLE IF NOT EXISTS "badges" (
 	"id" text PRIMARY KEY NOT NULL,
 	"description" text NOT NULL,
-	"created_at" timestamp (3) DEFAULT now() NOT NULL,
-	"updated_at" timestamp (3) NOT NULL
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "_BotToUser" (
@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS "bots" (
 	"description" text NOT NULL,
 	"short_description" text NOT NULL,
 	"prefix" text,
-	"created_at" timestamp (3) DEFAULT now() NOT NULL,
-	"updated_at" timestamp (3) NOT NULL,
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3) NOT NULL,
 	"github" text,
 	"invite_link" text,
 	"support_server" text,
@@ -84,14 +84,8 @@ CREATE TABLE IF NOT EXISTS "reviews" (
 	"user_id" text NOT NULL,
 	"content" text NOT NULL,
 	"rating" integer DEFAULT 1 NOT NULL,
-	"created_at" timestamp (3) DEFAULT now() NOT NULL,
-	"updated_at" timestamp (3) NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "webhooks" (
-	"id" text PRIMARY KEY NOT NULL,
-	"url" text NOT NULL,
-	"secret" text NOT NULL
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "votes" (
@@ -175,12 +169,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "reviews" ADD CONSTRAINT "reviews_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE cascade;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "webhooks" ADD CONSTRAINT "webhooks_id_bots_id_fk" FOREIGN KEY ("id") REFERENCES "bots"("id") ON DELETE cascade ON UPDATE cascade;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

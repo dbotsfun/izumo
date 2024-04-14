@@ -1,7 +1,7 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { votes } from '@database/schema';
+import { BotStatus, votes } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import {
 	ForbiddenException,
@@ -53,7 +53,12 @@ export class BotVoteService implements OnModuleInit {
 	 */
 	public async createVote(botId: string, userId: string) {
 		// Check if the bot exists.
-		await this._botService.getBot(botId);
+		const bot = await this._botService.getBot(botId);
+
+		// Check if the bot is approved.
+		if (bot.status !== BotStatus.APPROVED) {
+			throw new ForbiddenException(ErrorMessages.BOT_NOT_APPROVED);
+		}
 
 		// Check if the user has already voted.
 		if (!(await this.canVote(botId, userId)).canVote) {

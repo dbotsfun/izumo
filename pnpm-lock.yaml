@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  drizzle-orm@0.30.8:
+    hash: bs3xxjjhtcfcsm56zfrheqqtru
+    path: patches/drizzle-orm@0.30.8.patch
+
 dependencies:
   '@apollo/server':
     specifier: ^4.10.2
@@ -55,7 +60,7 @@ dependencies:
     version: 0.20.14
   drizzle-orm:
     specifier: ^0.30.8
-    version: 0.30.8(postgres@3.4.4)
+    version: 0.30.8(patch_hash=bs3xxjjhtcfcsm56zfrheqqtru)(postgres@3.4.4)
   graphql:
     specifier: ^16.8.1
     version: 16.8.1
@@ -1782,7 +1787,7 @@ packages:
       postgres: '>=3'
     dependencies:
       '@nestjs/common': 10.3.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
-      drizzle-orm: 0.30.8(postgres@3.4.4)
+      drizzle-orm: 0.30.8(patch_hash=bs3xxjjhtcfcsm56zfrheqqtru)(postgres@3.4.4)
       postgres: 3.4.4
       tslib: 2.6.2
     dev: false
@@ -3921,7 +3926,7 @@ packages:
       - supports-color
     dev: false
 
-  /drizzle-orm@0.30.8(postgres@3.4.4):
+  /drizzle-orm@0.30.8(patch_hash=bs3xxjjhtcfcsm56zfrheqqtru)(postgres@3.4.4):
     resolution: {integrity: sha512-9pBJA0IjnpPpzZ6s9jlS1CQAbKoBmbn2GJesPhXaVblAA/joOJ4AWWevYcqvLGj9SvThBAl7WscN8Zwgg5mnTw==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -4003,6 +4008,7 @@ packages:
     dependencies:
       postgres: 3.4.4
     dev: false
+    patched: true
 
   /dset@3.1.3:
     resolution: {integrity: sha512-20TuZZHCEZ2O71q9/+8BwKwZ0QtD9D8ObhrihJPr+vLLYlSuAU3/zL4cSlgbfeoGHTjCSJBa7NGcrF9/Bx/WJQ==}

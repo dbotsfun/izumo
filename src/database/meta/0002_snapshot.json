@@ -1,6 +1,6 @@
 {
-	"id": "81baee54-ae4e-47af-9558-5fb1dceb6294",
-	"prevId": "9003fa25-0376-45a1-a7d7-6ef66b5ab1b5",
+	"id": "cd604798-c2f3-4a9f-855e-5c85441b1395",
+	"prevId": "81baee54-ae4e-47af-9558-5fb1dceb6294",
 	"version": "5",
 	"dialect": "pg",
 	"tables": {
@@ -547,6 +547,56 @@
 					"tableFrom": "reviews",
 					"tableTo": "users",
 					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"webhooks": {
+			"name": "webhooks",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"url": {
+					"name": "url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"secret": {
+					"name": "secret",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"events": {
+					"name": "events",
+					"type": "text[]",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"payload_fields": {
+					"name": "payload_fields",
+					"type": "text[]",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"webhooks_id_bots_id_fk": {
+					"name": "webhooks_id_bots_id_fk",
+					"tableFrom": "webhooks",
+					"tableTo": "bots",
+					"columnsFrom": ["id"],
 					"columnsTo": ["id"],
 					"onDelete": "cascade",
 					"onUpdate": "cascade"

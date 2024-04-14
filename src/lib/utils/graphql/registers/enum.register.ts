@@ -1,4 +1,9 @@
-import { BotStatus, VanityType } from '@database/tables';
+import {
+	BotStatus,
+	VanityType,
+	WebhookEvent,
+	WebhookPayloadField
+} from '@database/tables';
 import { registerEnumType } from '@nestjs/graphql';
 import { SortOrder } from '../pagination';
 
@@ -42,4 +47,14 @@ registerEnumType(VanityType, {
 			description: 'The vanity URL is for a bot.'
 		}
 	}
+});
+
+registerEnumType(WebhookPayloadField, {
+	name: 'WebhookPayloadField',
+	description: 'owo'
+});
+
+registerEnumType(WebhookEvent, {
+	name: 'WebhookEvent',
+	description: 'owo'
 });
