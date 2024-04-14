@@ -1,4 +1,9 @@
-import { BotStatus, VanityType } from '@database/tables';
+import {
+	BotStatus,
+	VanityType,
+	WebhookEvent,
+	WebhookPayloadField
+} from '@database/tables';
 import { registerEnumType } from '@nestjs/graphql';
 import { SortOrder } from '../pagination';
 
@@ -40,6 +45,44 @@ registerEnumType(VanityType, {
 		},
 		BOT: {
 			description: 'The vanity URL is for a bot.'
+		}
+	}
+});
+
+registerEnumType(WebhookPayloadField, {
+	name: 'WebhookPayloadField',
+	description: 'The field in the webhook payload.',
+	valuesMap: {
+		USER: {
+			description: 'Discord ID of the user who triggered the webhook.'
+		},
+		BOT: {
+			description: 'Discord ID of the bot that the webhook is for.'
+		},
+		QUERY: {
+			description: 'Query string parameters found on the URL.'
+		},
+		TYPE: {
+			description: 'The type of webhook event.'
+		}
+	}
+});
+
+registerEnumType(WebhookEvent, {
+	name: 'WebhookEvent',
+	description: 'The type of webhook event.',
+	valuesMap: {
+		ALL_EVENTS: {
+			description: 'All events.'
+		},
+		NEW_REVIEW: {
+			description: 'A new review has been created.'
+		},
+		NEW_VOTE: {
+			description: 'A new vote has been created.'
+		},
+		STATUS_CHANGE: {
+			description: 'The status of a bot has changed.'
 		}
 	}
 });

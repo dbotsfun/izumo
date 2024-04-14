@@ -22,13 +22,13 @@ import { type PaginationInput } from '@utils/graphql/pagination';
 import { AxiosError } from 'axios';
 import { and, eq, getTableColumns, like } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
+import { WebhookService } from '../../../services/webhook.service';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject, type BotsConnection } from '../objects/bot/bot.object';
 import { BotTagService } from './tag.service';
-import { BotWebhookService } from './webhook.service';
 
 /**
  * Service class for handling bot-related operations.
@@ -45,7 +45,7 @@ export class BotService implements OnModuleInit {
 	 * @param {DrizzleService} _drizzleService - The DrizzleService instance.
 	 * @param {HttpService} _httpService - The HttpService instance.
 	 * @param {ConfigService} _configService - The ConfigService instance.
-	 * @param {BotWebhookService} _webhookService - The BotWebhookService instance.
+	 * @param {WebhookService} _webhookService - The BotWebhookService instance.
 	 * @param {PaginatorService} _paginatorService - The PaginatorService instance.
 	 * @param {ModuleRef} _moduleRef - The ModuleRef instance.
 	 */
@@ -53,7 +53,7 @@ export class BotService implements OnModuleInit {
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private readonly _httpService: HttpService,
 		private readonly _configService: ConfigService,
-		private readonly _webhookService: BotWebhookService,
+		private readonly _webhookService: WebhookService,
 		private readonly _paginatorService: PaginatorService,
 		private readonly _moduleRef: ModuleRef
 	) {}
@@ -371,13 +371,15 @@ export class BotService implements OnModuleInit {
 	 * Checks the ownership of a bot based on its ID.
 	 * Throws a NotFoundException if the bot is not found or unauthorized.
 	 * @param id - The ID of the bot to check ownership for.
+	 * @returns The bot object.
 	 * @throws NotFoundException if the bot is not found or unauthorized.
 	 */
-	private async checkBotOwnership(id: string) {
+	public async checkBotOwnership(id: string) {
 		// Check if the user is the owner of the bot
 		const userBot = await this._drizzleService.query.botToUser
 			.findFirst({
-				where: (table, { eq }) => eq(table.b, id)
+				where: (table, { eq }) => eq(table.b, id),
+				with: { bot: true }
 			})
 			.execute();
 
@@ -387,5 +389,7 @@ export class BotService implements OnModuleInit {
 				ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED
 			);
 		}
+
+		return userBot.bot;
 	}
 }

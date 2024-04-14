@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
 import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
@@ -18,6 +19,7 @@ import { BotService } from '../services/bot.service';
  */
 @Resolver(() => BotObject)
 @UsePipes(ValidationTypes, ValidationPipe)
+@UseGuards(JwtAuthGuard)
 export class BotResolver {
 	/**
 	 * Creates an instance of the BotResolver class.
@@ -35,6 +37,7 @@ export class BotResolver {
 		name: 'bots',
 		description: 'Gives a list of bots'
 	})
+	@OmitGuards([JwtAuthGuard])
 	public bots(
 		@Args('pagination', { nullable: true }) pagination: PaginationInput,
 		@Args('input', { nullable: true }) input: SafeFiltersInput
@@ -58,7 +61,7 @@ export class BotResolver {
 		name: 'panelBots',
 		description: 'Gives a list of bots'
 	})
-	@UseGuards(JwtAuthGuard) // TODO: Change this Guard to a elevated permissions Guard, since the query IS private
+	// TODO: Change this Guard to a elevated permissions Guard, since the query IS private
 	public panelBots(
 		@Args('pagination', { nullable: true }) pagination: PaginationInput,
 		@Args('input', { nullable: true }) input: FiltersBotInput
@@ -75,6 +78,7 @@ export class BotResolver {
 		name: 'getBot',
 		description: 'Gives the information about a bot.'
 	})
+	@OmitGuards([JwtAuthGuard])
 	public get(@Args('input') input: GetBotInput) {
 		return this._botService.getBot(input.id);
 	}
@@ -89,7 +93,6 @@ export class BotResolver {
 		name: 'createBot',
 		description: 'Creates a new bot.'
 	})
-	@UseGuards(JwtAuthGuard)
 	public create(
 		@User() user: JwtPayload,
 		@Args('input') input: CreateBotInput
@@ -107,7 +110,6 @@ export class BotResolver {
 		name: 'updateBot',
 		description: 'Updates an existing bot.'
 	})
-	@UseGuards(JwtAuthGuard)
 	public update(
 		@User() user: JwtPayload,
 		@Args('input') input: CreateBotInput
@@ -125,7 +127,6 @@ export class BotResolver {
 		name: 'deleteBot',
 		description: 'Deletes an existing bot.'
 	})
-	@UseGuards(JwtAuthGuard)
 	public delete(
 		@User() user: JwtPayload,
 		@Args('input') input: DeleteBotInput

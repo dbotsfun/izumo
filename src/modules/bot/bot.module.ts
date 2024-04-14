@@ -1,4 +1,5 @@
 import { PaginatorService } from '@/services/paginator.service';
+import { WebhookService } from '@/services/webhook.service';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { BotResolver } from './resolvers/bot.resolver';
@@ -8,6 +9,7 @@ import { BotTagFields } from './resolvers/fields/tag.fields';
 import { BotOwnerResolver } from './resolvers/owner.resolver';
 import { BotTagResolver } from './resolvers/tag.resolver';
 import { BotVoteResolver } from './resolvers/vote.resolver';
+import { BotWebhookResolver } from './resolvers/webhook.resolver';
 import { BotService } from './services/bot.service';
 import { BotOwnerService } from './services/owner.service';
 import { BotTagService } from './services/tag.service';
@@ -24,18 +26,20 @@ import { BotWebhookService } from './services/webhook.service';
 		BotOwnerFields,
 		BotTagService,
 		BotTagFields,
-		BotWebhookService,
+		WebhookService,
 		PaginatorService,
 		BotTagResolver,
 		BotVoteResolver,
-		BotVoteService
+		BotVoteService,
+		BotWebhookService,
+		BotWebhookResolver
 	],
 	imports: [HttpModule],
 	exports: [
 		BotService,
 		BotOwnerService,
 		BotTagService,
-		BotWebhookService,
+		WebhookService,
 		PaginatorService
 	]
 })

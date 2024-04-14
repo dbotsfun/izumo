@@ -100,5 +100,10 @@
 			"biome check --apply-unsafe",
 			"biome format --write"
 		]
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"drizzle-orm@0.30.8": "patches/drizzle-orm@0.30.8.patch"
+		}
 	}
 }

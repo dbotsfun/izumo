@@ -1,10 +1,16 @@
+import { User } from '@modules/auth/decorators/user.decorator';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
+import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { BotObject } from '@modules/bot/objects/bot/bot.object';
 import { BotOwnerObject } from '@modules/bot/objects/owner/owner.object';
 import { BotTagObject } from '@modules/bot/objects/tag/tag.object';
 import { BotVoteObjectConnection } from '@modules/bot/objects/vote/vote.object';
+import { WebhookObject } from '@modules/bot/objects/webhook/webhook.object';
 import { BotOwnerService } from '@modules/bot/services/owner.service';
 import { BotTagService } from '@modules/bot/services/tag.service';
 import { BotVoteService } from '@modules/bot/services/vote.service';
+import { BotWebhookService } from '@modules/bot/services/webhook.service';
+import { UseGuards } from '@nestjs/common';
 import { Args, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { PaginationInput } from '@utils/graphql/pagination';
 
@@ -18,11 +24,13 @@ export class BotFields {
 	 * @param _botOwnerService The BotOwnerService instance.
 	 * @param _botTagService The BotTagService instance.
 	 * @param _botVoteService The BotVoteService instance.
+	 * @param _botWebhookService The BotWebhookService instance.
 	 */
 	public constructor(
 		private _botOwnerService: BotOwnerService,
 		private _botTagService: BotTagService,
-		private _botVoteService: BotVoteService
+		private _botVoteService: BotVoteService,
+		private _botWebhookService: BotWebhookService
 	) {}
 
 	/**
@@ -63,5 +71,19 @@ export class BotFields {
 		@Args('pagination', { nullable: true }) pagination: PaginationInput
 	) {
 		return this._botVoteService.paginateVotes(bot.id, pagination);
+	}
+
+	/**
+	 * Retrieves the webhook for a bot.
+	 * @param bot - The bot object.
+	 * @param user - The user object.
+	 * @returns The webhook for the bot.
+	 */
+	@ResolveField(() => WebhookObject, {
+		description: 'The webhook for the bot.'
+	})
+	@UseGuards(JwtAuthGuard)
+	public webhook(@Parent() bot: BotObject, @User() user: JwtPayload) {
+		return this._botWebhookService.getWebhook(bot.id, user);
 	}
 }
