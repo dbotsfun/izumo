@@ -2,6 +2,7 @@ import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { botToTag, tags } from '@database/tables';
+import type { PaginationInput } from '@gql/pagination';
 import type { DrizzleService } from '@lib/types';
 import {
 	Inject,
@@ -10,7 +11,6 @@ import {
 	type OnModuleInit
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import type { PaginationInput } from '@utils/graphql/pagination';
 import { and, eq, ilike, inArray, or } from 'drizzle-orm';
 import type { ConnectBotTagsToBotInput } from '../inputs/tag/connect.input';
 import type { FiltersBotTagInput } from '../inputs/tag/filters.input';

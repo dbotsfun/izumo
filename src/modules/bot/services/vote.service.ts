@@ -2,6 +2,7 @@ import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { BotStatus, votes } from '@database/schema';
+import type { PaginationInput } from '@gql/pagination';
 import type { DrizzleService } from '@lib/types';
 import {
 	ForbiddenException,
@@ -11,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { hours } from '@nestjs/throttler';
-import type { PaginationInput } from '@utils/graphql/pagination';
 import { and, eq, gt } from 'drizzle-orm';
 import type { BotCanVoteObject } from '../objects/vote/can-vote.object';
 import { BotService } from './bot.service';

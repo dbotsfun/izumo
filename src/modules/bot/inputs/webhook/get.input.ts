@@ -1,5 +1,5 @@
+import { IsSnowflake } from '@gql/validators/isSnowflake';
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 
 @InputType({
 	description: 'The input to get the webhook'

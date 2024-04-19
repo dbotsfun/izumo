@@ -1,5 +1,5 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsOptional } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 /**
  * Represents the input for filtering bot tags.
@@ -17,5 +17,6 @@ export class FiltersBotTagInput {
 		description: 'The name of the tag.',
 		nullable: true
 	})
-	public query!: string | undefined;
+	@IsString()
+	public query?: string | undefined;
 }

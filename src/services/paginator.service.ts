@@ -1,12 +1,12 @@
 import { DATABASE } from '@constants/tokens';
 import { botToTag, bots } from '@database/tables';
-import type { DrizzleService } from '@lib/types';
-import { Inject, Injectable } from '@nestjs/common';
 import {
 	type PaginatedItems,
 	type PaginationInput,
 	SortOrder
-} from '@utils/graphql/pagination';
+} from '@gql/pagination';
+import type { DrizzleService } from '@lib/types';
+import { Inject, Injectable } from '@nestjs/common';
 import {
 	type Operators,
 	type SQL,

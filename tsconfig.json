@@ -32,6 +32,7 @@
 
 		"paths": {
 			"@utils/*": ["src/lib/utils/*"],
+			"@gql/*": ["src/lib/utils/graphql/*"],
 			"@constants/*": ["src/lib/constants/*"],
 			"@modules/*": ["src/modules/*"],
 			"@database/*": ["src/database/*"],

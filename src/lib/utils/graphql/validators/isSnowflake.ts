@@ -28,9 +28,6 @@ export function IsSnowflake(validationOptions?: ValidationOptions) {
 export class IsSnowflakeConstraint implements ValidatorConstraintInterface {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	validate(value: any) {
-		return (
-			typeof value === 'string' &&
-			(value.length === 18 || value.length === 19)
-		);
+		return typeof value === 'string' && /^\d{18,19}$/.test(value);
 	}
 }

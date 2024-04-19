@@ -1,8 +1,7 @@
+import { PaginationInput } from '@gql/pagination';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { PaginationInput } from '@utils/graphql/pagination';
-import { ValidationTypes } from 'class-validator';
 import { CreateBotTagInput } from '../inputs/tag/create.input';
 import { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import { GetBotTagInput } from '../inputs/tag/get.input';
@@ -13,7 +12,7 @@ import { BotTagService } from '../services/tag.service';
  * Resolver class for handling tag-related operations.
  */
 @Resolver(() => BotTagObject)
-@UsePipes(ValidationTypes, ValidationPipe)
+@UsePipes(ValidationPipe)
 export class BotTagResolver {
 	/**
 	 * Constructs a new instance of the TagResolver class.
@@ -48,6 +47,7 @@ export class BotTagResolver {
 		description: 'Fetches a tag by name.'
 	})
 	public async get(@Args('input') input: GetBotTagInput) {
+		console.log('input', input);
 		return this._tagService.getTag(input.name);
 	}
 

@@ -1,6 +1,6 @@
 import type { ItagsSelect } from '@database/tables';
+import { Paginated } from '@gql/pagination';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Paginated } from '@utils/graphql/pagination';
 
 /**
  * Represents a tag object.

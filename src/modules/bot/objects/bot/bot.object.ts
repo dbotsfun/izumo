@@ -1,6 +1,6 @@
 import { BotStatus, type TbotsSelect } from '@database/tables';
+import { Paginated } from '@gql/pagination';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
-import { Paginated } from '@utils/graphql/pagination';
 import { BotUserPermissions } from './bot.user.permissions';
 
 /**

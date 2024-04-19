@@ -1,7 +1,7 @@
 import { type TvanitiesInsert, VanityType } from '@database/schema';
+import { IsSnowflake } from '@gql/validators/isSnowflake';
 import type { OmitType } from '@lib/types/utils';
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 import { IsEnum, Length } from 'class-validator';
 
 @InputType({

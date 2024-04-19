@@ -3,6 +3,7 @@ import { ErrorMessages } from '@constants/errors';
 import { MAX_TAGS_PER_BOT } from '@constants/limits';
 import { DATABASE } from '@constants/tokens';
 import { BotStatus, botToUser, bots } from '@database/tables';
+import { type PaginationInput } from '@gql/pagination';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
@@ -18,7 +19,6 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
-import { type PaginationInput } from '@utils/graphql/pagination';
 import { AxiosError } from 'axios';
 import { and, eq, getTableColumns, like } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';

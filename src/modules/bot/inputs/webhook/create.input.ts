@@ -3,8 +3,8 @@ import {
 	WebhookEvent,
 	WebhookPayloadField
 } from '@database/schema';
+import { IsSnowflake } from '@gql/validators/isSnowflake';
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 import { ArrayUnique, IsEnum, IsOptional, IsUrl } from 'class-validator';
 
 /**

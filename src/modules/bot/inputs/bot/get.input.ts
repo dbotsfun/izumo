@@ -1,5 +1,5 @@
+import { IsSnowflake } from '@gql/validators/isSnowflake';
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 
 /**
  * The input type for the getBot query.

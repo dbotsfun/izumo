@@ -1,6 +1,6 @@
 import type { TvotesSelect } from '@database/schema';
+import { Paginated } from '@gql/pagination';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Paginated } from '@utils/graphql/pagination';
 
 /**
  * Represents a vote object for a bot.

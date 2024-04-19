@@ -1,7 +1,7 @@
 import type { TbotsInsert } from '@database/tables';
+import { IsSnowflake } from '@gql/validators/isSnowflake';
 import type { OmitType } from '@lib/types/utils';
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 import {
 	ArrayMaxSize,
 	ArrayMinSize,

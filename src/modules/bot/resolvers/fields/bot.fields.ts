@@ -1,3 +1,4 @@
+import { PaginationInput } from '@gql/pagination';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
@@ -12,7 +13,6 @@ import { BotVoteService } from '@modules/bot/services/vote.service';
 import { BotWebhookService } from '@modules/bot/services/webhook.service';
 import { UseGuards } from '@nestjs/common';
 import { Args, Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { PaginationInput } from '@utils/graphql/pagination';
 
 /**
  * Represents the fields resolver for the Bot object.

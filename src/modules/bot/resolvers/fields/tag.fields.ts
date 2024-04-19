@@ -1,9 +1,9 @@
+import { PaginationInput } from '@gql/pagination';
 import { BotsConnection } from '@modules/bot/objects/bot/bot.object';
 import { BotTagObject } from '@modules/bot/objects/tag/tag.object';
 import { BotTagService } from '@modules/bot/services/tag.service';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
 
 /**

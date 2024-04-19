@@ -1,18 +1,25 @@
 import { HttpStatus } from '@nestjs/common';
 import { MAX_TAGS_PER_BOT } from './limits';
 
-export const FaceStatusCode = {
-	[HttpStatus.NOT_FOUND]: '(´･ω･`)',
-	[HttpStatus.FORBIDDEN]: '(ಥ﹏ಥ)',
-	[HttpStatus.INTERNAL_SERVER_ERROR]: '(╯°□°）╯︵ ┻━┻',
-	[HttpStatus.UNAUTHORIZED]: '(¬_¬)',
-	[HttpStatus.BAD_GATEWAY]: '(ノಠ益ಠ)ノ彡┻━┻',
-	[HttpStatus.SERVICE_UNAVAILABLE]: '(╯°□°)╯︵ ┻━┻',
-	[HttpStatus.BAD_REQUEST]: '(ノಠ益ಠ)ノ彡┻━┻',
-	[HttpStatus.GATEWAY_TIMEOUT]: '┻━┻ミ＼(≧ﾛ≦＼)',
-	[HttpStatus.REQUEST_TIMEOUT]: '(；￣Д￣)',
-	[HttpStatus.TOO_MANY_REQUESTS]: '(⊙_☉)',
-	[HttpStatus.UNPROCESSABLE_ENTITY]: '(╯°□°）╯︵ ┻━┻'
+export const ErrorHttpStatusCode = {
+	[HttpStatus.NOT_FOUND]: ['NOT_FOUND', '(´･ω･`)'],
+	[HttpStatus.FORBIDDEN]: ['FORBIDDEN', '(ಥ﹏ಥ)'],
+	[HttpStatus.INTERNAL_SERVER_ERROR]: [
+		'INTERNAL_SERVER_ERROR',
+		'(╯°□°）╯︵ ┻━┻'
+	],
+	[HttpStatus.UNAUTHORIZED]: ['UNAUTHORIZED', '(¬_¬)'],
+	[HttpStatus.BAD_GATEWAY]: ['BAD_GATEWAY', '(ノಠ益ಠ)ノ彡┻━┻'],
+	[HttpStatus.SERVICE_UNAVAILABLE]: ['SERVICE_UNAVAILABLE', '(╯°□°)╯︵ ┻━┻'],
+	[HttpStatus.BAD_REQUEST]: ['BAD_REQUEST', '(ノಠ益ಠ)ノ彡┻━┻'],
+	[HttpStatus.GATEWAY_TIMEOUT]: ['GATEWAY_TIMEOUT', '┻━┻ミ＼(≧ﾛ≦＼)'],
+	[HttpStatus.REQUEST_TIMEOUT]: ['REQUEST_TIMEOUT', '(；￣Д￣)'],
+	[HttpStatus.TOO_MANY_REQUESTS]: ['TOO_MANY_REQUESTS', '(⊙_☉)'],
+	[HttpStatus.UNPROCESSABLE_ENTITY]: [
+		'UNPROCESSABLE_ENTITY',
+		'(╯°□°）╯︵ ┻━┻'
+	],
+	BAD_USER_INPUT: ['BAD_USER_INPUT', '(¬_¬)']
 };
 
 export enum ErrorMessages {

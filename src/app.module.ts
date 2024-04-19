@@ -1,7 +1,7 @@
-import '@utils/graphql/registers/enum.register';
+import '@gql/registers/enum.register';
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { FaceStatusCode } from '@constants/errors';
+import { ErrorHttpStatusCode } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { DrizzlePostgresModule } from '@knaadh/nestjs-drizzle-postgres';
 import { ApolloDriver, type ApolloDriverConfig } from '@nestjs/apollo';
@@ -43,7 +43,7 @@ import { VanityModule } from './modules/vanity/vanity.module';
 					| string[];
 				const isProd = process.env.NODE_ENV === 'production';
 
-				const commonErrors = {
+				const commonErrors: Record<string, string> = {
 					BAD_USER_INPUT: 'Invalid input provided. Please try again.',
 					INTERNAL_SERVER_ERROR:
 						'An internal server error occurred. Please try again later.',
@@ -51,35 +51,40 @@ import { VanityModule } from './modules/vanity/vanity.module';
 						'You are not authenticated to perform this action.'
 				};
 
+				const {
+					stacktrace,
+					status,
+					code: _code = commonErrors.INTERNAL_SERVER_ERROR
+				}: {
+					stacktrace?: string;
+					status?: keyof typeof ErrorHttpStatusCode;
+					code?: string | number;
+				} = error.extensions || {};
+
 				if (typeof originalError === 'string') {
 					errorMessage = originalError;
-				}
-
-				if (typeof originalError === 'object') {
+				} else if (typeof originalError === 'object') {
 					errorMessage = Object.values(originalError)[0];
 				}
 
-				const commonError =
-					commonErrors[
-						error.extensions?.code as keyof typeof commonErrors
-					];
+				const commonError = commonErrors[_code];
 
 				if (commonError) {
 					errorMessage = commonError;
 				}
 
+				const [code, face] =
+					ErrorHttpStatusCode[
+						status || (_code as keyof typeof ErrorHttpStatusCode)
+					];
+
 				return {
 					extensions: {
-						code: error.extensions?.code,
-						face: FaceStatusCode[
-							error.extensions
-								?.status as keyof typeof FaceStatusCode
-						],
-						originalError: error.extensions?.originalError,
-						stacktrace: !isProd
-							? error.extensions?.stacktrace
-							: undefined,
-						status: error.extensions?.status
+						code,
+						face,
+						originalError,
+						stacktrace: !isProd ? stacktrace : undefined,
+						status
 					},
 					message: errorMessage
 				};

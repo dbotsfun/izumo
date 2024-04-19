@@ -1,11 +1,11 @@
 import { BotStatus } from '@database/tables';
+import { PaginationInput } from '@gql/pagination';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
-import { PaginationInput } from '@utils/graphql/pagination';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
