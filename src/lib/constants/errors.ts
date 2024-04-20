@@ -108,7 +108,8 @@ export enum ErrorMessages {
 	WEBHOOK_ALREADY_EXISTS = 'This bot already has a webhook',
 
 	// ApiKeys
-	INVALID_API_KEY = 'Invalid API key'
+	API_KEY_INVALID = 'Invalid API key',
+	API_KEY_IS_REQUIRED = 'An API key is required to perform this action'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }
