@@ -5,6 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ApiKeyResolver } from './resolvers/apikey.resolver';
 import { BotResolver } from './resolvers/bot.resolver';
 import { BotFields } from './resolvers/fields/bot.fields';
 import { BotOwnerFields } from './resolvers/fields/owner.fields';
@@ -13,7 +14,7 @@ import { BotOwnerResolver } from './resolvers/owner.resolver';
 import { BotTagResolver } from './resolvers/tag.resolver';
 import { BotVoteResolver } from './resolvers/vote.resolver';
 import { BotWebhookResolver } from './resolvers/webhook.resolver';
-import { ApikeyService } from './services/apikey.service';
+import { ApiKeyService } from './services/apikey.service';
 import { BotService } from './services/bot.service';
 import { BotOwnerService } from './services/owner.service';
 import { BotTagService } from './services/tag.service';
@@ -39,7 +40,8 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 		BotWebhookService,
 		BotWebhookResolver,
 		HashService,
-		ApikeyService,
+		ApiKeyService,
+		ApiKeyResolver,
 		JwtApikeyStrategy
 	],
 	imports: [

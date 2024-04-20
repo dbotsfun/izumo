@@ -19,7 +19,7 @@ import { BotService } from './bot.service';
  * The API key service.
  */
 @Injectable()
-export class ApikeyService implements OnModuleInit {
+export class ApiKeyService implements OnModuleInit {
 	/**
 	 * The hash service used for hashing passwords.
 	 */

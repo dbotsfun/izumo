@@ -44,12 +44,12 @@ export const bots = pgTable(
 		description: text('description').notNull(),
 		shortDescription: text('short_description').notNull(),
 		prefix: text('prefix'),
-		createdAt: timestamp('created_at', { precision: 3, mode: 'date' })
+		createdAt: timestamp('created_at', { precision: 3, mode: 'string' })
 			.defaultNow()
 			.notNull(),
 		updatedAt: timestamp('updated_at', {
 			precision: 3,
-			mode: 'date'
+			mode: 'string'
 		})
 			.notNull()
 			.$onUpdate(onUpdate),
