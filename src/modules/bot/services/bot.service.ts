@@ -2,7 +2,7 @@ import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { MAX_TAGS_PER_BOT } from '@constants/limits';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, type TbotsSelect, botToUser, bots } from '@database/tables';
+import { BotStatus, botToUser, bots } from '@database/tables';
 import { type PaginationInput } from '@gql/pagination';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
