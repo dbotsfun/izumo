@@ -2,7 +2,7 @@ import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { MAX_TAGS_PER_BOT } from '@constants/limits';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, botToUser, bots } from '@database/tables';
+import { BotStatus, type TbotsSelect, botToUser, bots } from '@database/tables';
 import { type PaginationInput } from '@gql/pagination';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
@@ -99,7 +99,10 @@ export class BotService implements OnModuleInit {
 		// Get the bot from the database
 		const response = await this._drizzleService.query.bots
 			.findFirst({
-				where: (bot, { eq }) => eq(bot.id, id)
+				where: (bot, { eq }) => eq(bot.id, id),
+				columns: {
+					apiKey: false
+				}
 			})
 			.execute();
 
@@ -123,7 +126,7 @@ export class BotService implements OnModuleInit {
 		const response = await this._drizzleService.query.botToUser
 			.findMany({
 				where: (table, { eq }) => eq(table.b, id),
-				with: { bot: true }
+				with: { bot: { columns: { apiKey: false } } }
 			})
 			.execute();
 

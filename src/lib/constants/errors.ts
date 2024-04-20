@@ -105,7 +105,10 @@ export enum ErrorMessages {
 
 	// Webhooks
 	WEBHOOK_NOT_FOUND = 'I could not find a webhook for this bot',
-	WEBHOOK_ALREADY_EXISTS = 'This bot already has a webhook'
+	WEBHOOK_ALREADY_EXISTS = 'This bot already has a webhook',
+
+	// ApiKeys
+	INVALID_API_KEY = 'Invalid API key'
 
 	// TODO: (Chiko/Simxnet) Implement custom errors for Mutations
 }
