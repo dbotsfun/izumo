@@ -19,7 +19,8 @@ export const ErrorHttpStatusCode = {
 		'UNPROCESSABLE_ENTITY',
 		'(╯°□°）╯︵ ┻━┻'
 	],
-	BAD_USER_INPUT: ['BAD_USER_INPUT', '(¬_¬)']
+	BAD_USER_INPUT: ['BAD_USER_INPUT', '(¬_¬)'],
+	UNAUTHENTICATED: ['UNAUTHENTICATED', '(⊙_⊙;)']
 };
 
 export enum ErrorMessages {
