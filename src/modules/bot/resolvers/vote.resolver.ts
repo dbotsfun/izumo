@@ -34,7 +34,7 @@ export class BotVoteResolver {
 		@Args('input') input: BotVoteCreateInput,
 		@User() user: JwtPayload
 	) {
-		return this.voteService.canVote(input.botId, user.id);
+		return this.voteService.canVote(input.id, user.id);
 	}
 
 	/**
@@ -50,6 +50,6 @@ export class BotVoteResolver {
 		@Args('input') input: BotVoteCreateInput,
 		@User() user: JwtPayload
 	) {
-		return this.voteService.createVote(input.botId, user.id);
+		return this.voteService.createVote(input.id, user.id);
 	}
 }
