@@ -67,11 +67,12 @@ export class ApiKeyService implements OnModuleInit {
 		}
 
 		// Encode the bot ID and user ID to generate the API key.
-		const apiKey = await this._hashService.hash(
-			this._jwtService.sign({
-				botId,
-				userId
-			} satisfies JwtApikeyPayload),
+		const apiKey = this._jwtService.sign({
+			botId,
+			userId
+		} satisfies JwtApikeyPayload);
+		const hash = await this._hashService.hash(
+			apiKey,
 			await this._hashService.genSalt()
 		);
 
@@ -79,7 +80,7 @@ export class ApiKeyService implements OnModuleInit {
 		await this._drizzleService
 			.update(bots)
 			.set({
-				apiKey
+				apiKey: hash
 			})
 			.where(eq(bots.id, botId));
 
