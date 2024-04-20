@@ -23,6 +23,39 @@ export const ErrorHttpStatusCode = {
 	UNAUTHENTICATED: ['UNAUTHENTICATED', '(⊙_⊙;)']
 };
 
+export function getErrorStatus(status: number | string) {
+	switch (status) {
+		case HttpStatus.NOT_FOUND || 'NOT_FOUND':
+			return ErrorHttpStatusCode[HttpStatus.NOT_FOUND];
+		case HttpStatus.FORBIDDEN || 'FORBIDDEN':
+			return ErrorHttpStatusCode[HttpStatus.FORBIDDEN];
+		case HttpStatus.INTERNAL_SERVER_ERROR || 'INTERNAL_SERVER_ERROR':
+			return ErrorHttpStatusCode[HttpStatus.INTERNAL_SERVER_ERROR];
+		case HttpStatus.UNAUTHORIZED || 'UNAUTHORIZED':
+			return ErrorHttpStatusCode[HttpStatus.UNAUTHORIZED];
+		case HttpStatus.BAD_GATEWAY || 'BAD_GATEWAY':
+			return ErrorHttpStatusCode[HttpStatus.BAD_GATEWAY];
+		case HttpStatus.SERVICE_UNAVAILABLE || 'SERVICE_UNAVAILABLE':
+			return ErrorHttpStatusCode[HttpStatus.SERVICE_UNAVAILABLE];
+		case HttpStatus.BAD_REQUEST || 'BAD_REQUEST':
+			return ErrorHttpStatusCode[HttpStatus.BAD_REQUEST];
+		case HttpStatus.GATEWAY_TIMEOUT || 'GATEWAY_TIMEOUT':
+			return ErrorHttpStatusCode[HttpStatus.GATEWAY_TIMEOUT];
+		case HttpStatus.REQUEST_TIMEOUT || 'REQUEST_TIMEOUT':
+			return ErrorHttpStatusCode[HttpStatus.REQUEST_TIMEOUT];
+		case HttpStatus.TOO_MANY_REQUESTS || 'TOO_MANY_REQUESTS':
+			return ErrorHttpStatusCode[HttpStatus.TOO_MANY_REQUESTS];
+		case HttpStatus.UNPROCESSABLE_ENTITY || 'UNPROCESSABLE_ENTITY':
+			return ErrorHttpStatusCode[HttpStatus.UNPROCESSABLE_ENTITY];
+		case 'BAD_USER_INPUT':
+			return ErrorHttpStatusCode.BAD_USER_INPUT;
+		case 'UNAUTHENTICATED':
+			return ErrorHttpStatusCode.UNAUTHENTICATED;
+		default:
+			return ErrorHttpStatusCode[HttpStatus.INTERNAL_SERVER_ERROR];
+	}
+}
+
 export enum ErrorMessages {
 	// Bots
 	BOT_NOT_FOUND = 'Bot not found',

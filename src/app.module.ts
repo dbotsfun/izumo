@@ -1,7 +1,7 @@
 import '@gql/registers/enum.register';
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { ErrorHttpStatusCode } from '@constants/errors';
+import { ErrorHttpStatusCode, getErrorStatus } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { DrizzlePostgresModule } from '@knaadh/nestjs-drizzle-postgres';
 import { ApolloDriver, type ApolloDriverConfig } from '@nestjs/apollo';
@@ -73,20 +73,17 @@ import { VanityModule } from './modules/vanity/vanity.module';
 					errorMessage = commonError;
 				}
 
-				const [code, face] =
-					ErrorHttpStatusCode[
-						status || (_code as keyof typeof ErrorHttpStatusCode)
-					];
+				const [code, face] = getErrorStatus(status || _code);
 
 				return {
+					message: errorMessage,
 					extensions: {
 						code,
 						face,
 						originalError,
 						stacktrace: !isProd ? stacktrace : undefined,
 						status
-					},
-					message: errorMessage
+					}
 				};
 			},
 			plugins: [ApolloServerPluginLandingPageLocalDefault()]

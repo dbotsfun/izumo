@@ -5,25 +5,23 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
 import type { Request } from 'express';
 
+export type BaseGuardType = typeof BaseGuard;
+
 @Injectable()
 export abstract class BaseGuard {
 	public reflector!: Reflector;
 
 	public abstract run(context: GqlExecutionContext): Awaitable<Request>;
 
-	protected getContext(context: ExecutionContext): GqlExecutionContext {
+	public getContext(context: ExecutionContext): GqlExecutionContext {
 		return GqlExecutionContext.create(context);
 	}
 
 	protected getRequest(context: ExecutionContext): Awaitable<Request> {
-		const ctx = this.getContext(context);
-
-		if (this.isOmited(ctx)) return this.run(ctx);
-
-		return ctx.getContext().req;
+		return this.run(this.getContext(context));
 	}
 
-	protected isOmited(context: GqlExecutionContext) {
+	public isOmited(context: GqlExecutionContext) {
 		const isOmited = this.reflector.get(OmitGuards, context.getHandler());
 
 		return (
