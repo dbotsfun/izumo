@@ -65,6 +65,13 @@ export class EnvironmentVariables {
 	public JWT_REFRESH_SECRET_KEY!: string;
 
 	/**
+	 * The secret key for the JWT (JSON Web Token) apikey token.
+	 */
+	@IsString()
+	@Length(32, 32)
+	public JWT_APIKEY_SECRET_KEY!: string;
+
+	/**
 	 * The Discord client ID for the OAuth application.
 	 */
 	@IsSnowflake()
@@ -92,6 +99,12 @@ export class EnvironmentVariables {
 	 */
 	@IsString()
 	public DISCORD_USER_TOKEN!: string;
+
+	/**
+	 * Internal API key for elevated API requests
+	 */
+	@IsString()
+	public INTERNAL_KEY!: string;
 }
 
 /**

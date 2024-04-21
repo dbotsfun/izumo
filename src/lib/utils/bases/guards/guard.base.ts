@@ -22,11 +22,11 @@ export abstract class BaseGuard {
 	}
 
 	public isOmited(context: GqlExecutionContext) {
-		const isOmited = this.reflector.get(OmitGuards, context.getHandler());
+		const isOmited =
+			this.reflector.get(OmitGuards, context.getHandler()) || [];
 
 		return (
-			// biome-ignore lint/complexity/useOptionalChain: <explanation>
-			isOmited &&
+			Boolean(isOmited.length) &&
 			isOmited.some((guard) => guard.name === this.constructor.name)
 		);
 	}

@@ -1,10 +1,12 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { WebhookService } from '@/services/webhook.service';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import { HashService } from '@modules/auth/services/hash.service';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { InternalGuard } from '@utils/guards/internal.guard';
 import { ApiKeyResolver } from './resolvers/apikey.resolver';
 import { BotResolver } from './resolvers/bot.resolver';
 import { BotFields } from './resolvers/fields/bot.fields';
@@ -42,7 +44,9 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 		HashService,
 		ApiKeyService,
 		ApiKeyResolver,
-		JwtApikeyStrategy
+		JwtApikeyStrategy,
+		InternalGuard,
+		JwtAuthGuard
 	],
 	imports: [
 		HttpModule,
@@ -50,7 +54,9 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => ({
-				secret: configService.get<string>('JWT_APIKEY_SECRET_KEY')
+				secret: configService.getOrThrow<string>(
+					'JWT_APIKEY_SECRET_KEY'
+				)
 			})
 		})
 	],

@@ -3,9 +3,11 @@ import { PaginationInput } from '@gql/pagination';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
+import { OrGuard } from '@nest-lab/or-guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
+import { InternalGuard } from '@utils/guards/internal.guard';
 import { ValidationTypes } from 'class-validator';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
@@ -61,7 +63,10 @@ export class BotResolver {
 		name: 'panelBots',
 		description: 'Gives a list of bots'
 	})
-	// TODO: Change this Guard to a elevated permissions Guard, since the query IS private
+	@UseGuards(
+		// TODO: Change this Guard to a elevated permissions Guard, since the query IS private
+		OrGuard([InternalGuard, JwtAuthGuard], { throwOnFirstError: true })
+	)
 	public panelBots(
 		@Args('pagination', { nullable: true }) pagination: PaginationInput,
 		@Args('input', { nullable: true }) input: FiltersBotInput
