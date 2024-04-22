@@ -71,6 +71,8 @@ export class ApiKeyService implements OnModuleInit {
 			botId,
 			userId
 		} satisfies JwtApikeyPayload);
+
+		// Hash the API key to ensure security.
 		const hash = await this._hashService.hash(
 			apiKey,
 			await this._hashService.genSalt()

@@ -1,6 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import type { DrizzleService } from '@lib/types';
+import { BotOwnerPermissionsBitField } from '@modules/bot/permissions/owner.permissions';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -118,7 +119,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		return {
 			...payload,
 			permissionsBitfield: permissions,
-			permissions: []
+			permissions: BotOwnerPermissionsBitField.toArray(permissions)
 		};
 	}
 }
