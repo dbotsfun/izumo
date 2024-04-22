@@ -15,7 +15,7 @@ export class BaseGuard {
 		return GqlExecutionContext.create(context);
 	}
 
-	protected getRequest(context: ExecutionContext): Request {
+	public getRequest(context: ExecutionContext): Request {
 		const ctx = GqlExecutionContext.create(context);
 
 		return ctx.getContext<GQLExecutionContext>().req;

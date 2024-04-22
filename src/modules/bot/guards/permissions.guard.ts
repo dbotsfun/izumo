@@ -4,7 +4,7 @@ import {
 	Injectable,
 	type OnModuleInit
 } from '@nestjs/common';
-import type { ModuleRef, Reflector } from '@nestjs/core';
+import { ModuleRef, Reflector } from '@nestjs/core';
 import { BaseGuard } from '@utils/bases';
 import { JsonFind } from '@utils/common';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
