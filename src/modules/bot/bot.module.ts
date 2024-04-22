@@ -1,12 +1,14 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { WebhookService } from '@/services/webhook.service';
+import { AUTH_AND_OWNER_PERMISSIONS } from '@constants/tokens';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
-import { HashService } from '@modules/auth/services/hash.service';
+import { AndGuard } from '@nest-lab/or-guard';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { InternalGuard } from '@utils/guards/internal.guard';
+import { BotOwnerPermissionsGuards } from './guards/permissions.guard';
 import { ApiKeyResolver } from './resolvers/apikey.resolver';
 import { BotResolver } from './resolvers/bot.resolver';
 import { BotFields } from './resolvers/fields/bot.fields';
@@ -41,12 +43,15 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 		BotVoteService,
 		BotWebhookService,
 		BotWebhookResolver,
-		HashService,
 		ApiKeyService,
 		ApiKeyResolver,
 		JwtApikeyStrategy,
 		InternalGuard,
-		JwtAuthGuard
+		JwtAuthGuard,
+		{
+			provide: AUTH_AND_OWNER_PERMISSIONS,
+			useClass: AndGuard([JwtAuthGuard, BotOwnerPermissionsGuards])
+		}
 	],
 	imports: [
 		HttpModule,
