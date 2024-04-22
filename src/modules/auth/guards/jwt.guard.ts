@@ -1,9 +1,6 @@
-import type { GQLExecutionContext } from '@lib/types';
 import { Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { GqlExecutionContext } from '@nestjs/graphql';
-import { BaseAuthGuard } from '@utils/bases/guards/authguard.base';
-import type { Request } from 'express';
+import { BaseAuthGuard } from '@utils/bases';
 
 /**
  * Custom JWT authentication guard.
@@ -17,14 +14,5 @@ export class JwtAuthGuard extends BaseAuthGuard('jwt') {
 	 */
 	public constructor(public override reflector: Reflector) {
 		super();
-	}
-
-	/**
-	 * Retrieves the request object from the GraphQL execution context.
-	 * @param context - The GraphQL execution context.
-	 * @returns A boolean indicating whether the user is authenticated.
-	 */
-	public run(context: GqlExecutionContext): Request {
-		return context.getContext<GQLExecutionContext>().req;
 	}
 }

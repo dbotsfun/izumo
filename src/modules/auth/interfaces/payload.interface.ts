@@ -17,7 +17,12 @@ interface BasePayload {
  */
 export type JwtPayload = Partial<AuthDiscordUser> &
 	Pick<OAuthDataDiscord, 'access_token' | 'token_type' | 'expires_in'> &
-	BasePayload;
+	BasePayload & {
+		/**
+		 * The permissions of the user.
+		 */
+		permissions: number;
+	};
 
 /**
  * Represents the payload of a JWT refresh token.

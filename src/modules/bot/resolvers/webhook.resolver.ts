@@ -4,17 +4,20 @@ import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
+import { BotOwnerPermissions } from '../decorators/permissions.decorator';
+import { BotOwnerPermissionsGuards } from '../guards/permissions.guard';
 import { CreateWebhookInput } from '../inputs/webhook/create.input';
 import { GetWebhookInput } from '../inputs/webhook/get.input';
 import { UpdateWebhookInput } from '../inputs/webhook/update.input';
 import { WebhookObject } from '../objects/webhook/webhook.object';
+import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotWebhookService } from '../services/webhook.service';
 
 /**
  * Resolver for managing webhooks of the bot.
  */
 @Resolver(() => WebhookObject)
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, BotOwnerPermissionsGuards)
 @UsePipes(ValidationTypes, ValidationPipe)
 export class BotWebhookResolver {
 	/**
@@ -33,6 +36,7 @@ export class BotWebhookResolver {
 		name: 'getWebhook',
 		description: 'Get the webhook of the bot'
 	})
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageWebhook])
 	public async get(
 		@Args('input') input: GetWebhookInput,
 		@User() user: JwtPayload
@@ -51,6 +55,7 @@ export class BotWebhookResolver {
 		name: 'createWebhook',
 		description: 'Create a webhook for the bot'
 	})
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageWebhook])
 	public async create(
 		@Args('input') input: CreateWebhookInput,
 		@User() user: JwtPayload
@@ -68,6 +73,7 @@ export class BotWebhookResolver {
 		name: 'updateWebhook',
 		description: 'Update the webhook of the bot'
 	})
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageWebhook])
 	public async update(
 		@Args('input') input: UpdateWebhookInput,
 		@User() user: JwtPayload
@@ -85,6 +91,7 @@ export class BotWebhookResolver {
 		name: 'deleteWebhook',
 		description: 'Delete the webhook of the bot'
 	})
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageWebhook])
 	public async delete(
 		@Args('input') input: GetWebhookInput,
 		user: JwtPayload

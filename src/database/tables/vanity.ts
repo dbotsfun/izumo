@@ -1,6 +1,5 @@
 import type { ArrayEnum } from '@lib/types';
-import { cast } from '@utils/common/cast';
-import { enumToArray } from '@utils/common/enumToArray';
+import { cast, enumToArray } from '@utils/common';
 import { pgEnum, pgTable, text } from 'drizzle-orm/pg-core';
 
 export enum VanityType {

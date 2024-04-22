@@ -28,6 +28,7 @@ import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
 import { BotObject, type BotsConnection } from '../objects/bot/bot.object';
+import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotTagService } from './tag.service';
 
 /**
@@ -99,7 +100,10 @@ export class BotService implements OnModuleInit {
 		// Get the bot from the database
 		const response = await this._drizzleService.query.bots
 			.findFirst({
-				where: (bot, { eq }) => eq(bot.id, id)
+				where: (bot, { eq }) => eq(bot.id, id),
+				columns: {
+					apiKey: false
+				}
 			})
 			.execute();
 
@@ -123,7 +127,7 @@ export class BotService implements OnModuleInit {
 		const response = await this._drizzleService.query.botToUser
 			.findMany({
 				where: (table, { eq }) => eq(table.b, id),
-				with: { bot: true }
+				with: { bot: { columns: { apiKey: false } } }
 			})
 			.execute();
 
@@ -200,7 +204,6 @@ export class BotService implements OnModuleInit {
 		if (coOwners.includes(owner.id)) {
 			throw new BadRequestException(ErrorMessages.BOT_COOWNERS_SAME_ID);
 		}
-		// TODO: (CHIKO) User permissions
 
 		// Create the bot
 		const bot = await this._drizzleService.transaction(async (tx) => {
@@ -215,8 +218,12 @@ export class BotService implements OnModuleInit {
 					userPermissions: [
 						{
 							id: owner.id,
-							permissions: 0 // TODO: Set permissions
-						} // TODO: add co-owners
+							permissions: BotOwnerPermissionsFlag.Admin
+						},
+						...coOwners.map((userId) => ({
+							id: userId,
+							permissions: 0 // Let the owner assign permissions
+						}))
 					]
 				})
 				.returning();
@@ -324,6 +331,7 @@ export class BotService implements OnModuleInit {
 				name: botApiInformation.bot.username,
 				avatar: botApiInformation.bot.avatar,
 				guildCount: botApiInformation.bot.approximate_guild_count
+				// TODO: owners permissions
 			})
 			.where(eq(bots.id, input.id))
 			.returning(secureCols); // TODO: Better way to OMIT the "apiKey" field
@@ -343,7 +351,6 @@ export class BotService implements OnModuleInit {
 	 * @returns The deleted bot.
 	 */
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
-		// TODO: Let reviewers delete bots too.
 		// Check if the user is the owner of the bot
 		await this.checkBotOwnership(owner.id);
 
@@ -360,7 +367,6 @@ export class BotService implements OnModuleInit {
 		return deleteBot;
 	}
 
-	// TODO: Below. Create the reviewers functions
 	/**
 	 * * Approve, Deny
 	 * * On deny let reviewer specify a reason, there should be some reason presets on dbotslist/elyam

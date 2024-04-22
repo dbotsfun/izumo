@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@apollo/server": "^4.10.2",
 		"@knaadh/nestjs-drizzle-postgres": "^1.0.0",
+		"@nest-lab/or-guard": "^2.4.1",
 		"@nestjs/apollo": "^12.1.0",
 		"@nestjs/axios": "^3.0.2",
 		"@nestjs/common": "^10.3.7",
@@ -38,6 +39,7 @@
 		"@nestjs/jwt": "^10.2.0",
 		"@nestjs/passport": "^10.0.3",
 		"@nestjs/platform-express": "^10.3.7",
+		"@sapphire/bitfield": "^1.2.2",
 		"axios": "^1.6.8",
 		"bcrypt": "^5.1.1",
 		"class-transformer": "^0.5.1",

@@ -109,7 +109,6 @@ export class VanityService {
 		return vanity;
 	}
 
-	// TODO: Permissions
 	/**
 	 * Deletes a vanity by its name.
 	 *

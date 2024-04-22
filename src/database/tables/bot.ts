@@ -1,8 +1,7 @@
 import { onUpdate } from '@database/common/onUpdate';
 import type { ArrayEnum } from '@lib/types';
 import type { BotUserPermissions } from '@modules/bot/objects/bot/bot.user.permissions';
-import { cast } from '@utils/common/cast';
-import { enumToArray } from '@utils/common/enumToArray';
+import { cast, enumToArray } from '@utils/common';
 import { relations } from 'drizzle-orm';
 import {
 	boolean,
@@ -44,12 +43,12 @@ export const bots = pgTable(
 		description: text('description').notNull(),
 		shortDescription: text('short_description').notNull(),
 		prefix: text('prefix'),
-		createdAt: timestamp('created_at', { precision: 3, mode: 'date' })
+		createdAt: timestamp('created_at', { precision: 3, mode: 'string' })
 			.defaultNow()
 			.notNull(),
 		updatedAt: timestamp('updated_at', {
 			precision: 3,
-			mode: 'date'
+			mode: 'string'
 		})
 			.notNull()
 			.$onUpdate(onUpdate),
@@ -60,7 +59,6 @@ export const bots = pgTable(
 		guildCount: integer('guild_count').default(0).notNull(),
 		apiKey: text('api_key'),
 		importedFrom: botListSource('imported_from'),
-		// TODO: failed to parse database type 'jsonb[]'
 		userPermissions: json('user_permissions')
 			.array()
 			.$type<BotUserPermissions[]>()

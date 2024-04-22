@@ -18,7 +18,7 @@ export const users = pgTable('users', {
 	})
 		.notNull()
 		.$onUpdate(onUpdate),
-	permissions: integer('permissions')
+	permissions: integer('permissions').default(0).notNull()
 });
 
 export type TuserInsert = typeof users.$inferInsert;

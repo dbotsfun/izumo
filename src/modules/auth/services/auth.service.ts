@@ -7,7 +7,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { days } from '@nestjs/throttler';
-import { arrayFind } from '@utils/common/arrayFind';
+import { arrayFind } from '@utils/common';
 import { eq } from 'drizzle-orm';
 import { firstValueFrom } from 'rxjs';
 import type { GeneratedHash, NewSession } from '../interfaces/auth.interface';
