@@ -59,7 +59,6 @@ export const bots = pgTable(
 		guildCount: integer('guild_count').default(0).notNull(),
 		apiKey: text('api_key'),
 		importedFrom: botListSource('imported_from'),
-		// TODO: failed to parse database type 'jsonb[]'
 		userPermissions: json('user_permissions')
 			.array()
 			.$type<BotUserPermissions[]>()
