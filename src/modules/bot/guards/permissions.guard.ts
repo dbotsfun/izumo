@@ -14,13 +14,24 @@ import {
 } from '../permissions/owner.permissions';
 import { BotService } from '../services/bot.service';
 
+/**
+ * Custom bot owner permissions guard.
+ */
 @Injectable()
 export class BotOwnerPermissionsGuards
 	extends BaseGuard
 	implements CanActivate, OnModuleInit
 {
+	/**
+	 * The bot service instance.
+	 */
 	private _botService!: BotService;
 
+	/**
+	 * Creates a new instance of the BotOwnerPermissionsGuards class.
+	 * @param _moduleref - The module reference.
+	 * @param reflector - The reflector instance.
+	 */
 	public constructor(
 		private _moduleref: ModuleRef,
 		public override reflector: Reflector
@@ -28,10 +39,18 @@ export class BotOwnerPermissionsGuards
 		super();
 	}
 
+	/**
+	 * Lifecycle hook that runs after the module has been initialized.
+	 */
 	public onModuleInit() {
 		this._botService = this._moduleref.get(BotService, { strict: false });
 	}
 
+	/**
+	 * Determines if the user has the required permissions to activate the route.
+	 * @param context - The execution context.
+	 * @returns A promise that resolves to a boolean indicating if the user has the required permissions.
+	 */
 	public async canActivate(context: ExecutionContext): Promise<boolean> {
 		const ctx = this.getContext(context);
 
@@ -84,7 +103,7 @@ export class BotOwnerPermissionsGuards
 
 		// Check if the user has the required permissions
 		return BotOwnerPermissionsBitField.has(
-			user.permissionsBitfield,
+			ownerPermissions.permissions,
 			permissions
 		);
 	}
