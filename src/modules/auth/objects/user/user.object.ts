@@ -52,10 +52,9 @@ export class AuthUserObject implements TuserSelect {
 	 * The permissions of the user.
 	 */
 	@Field(() => Int, {
-		description: 'The permissions of the user',
-		nullable: true
+		description: 'The permissions of the user'
 	})
-	public permissions!: number | null;
+	public permissions!: number;
 
 	/**
 	 * The creation date of the user.
