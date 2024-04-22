@@ -331,6 +331,7 @@ export class BotService implements OnModuleInit {
 				name: botApiInformation.bot.username,
 				avatar: botApiInformation.bot.avatar,
 				guildCount: botApiInformation.bot.approximate_guild_count
+				// TODO: owners permissions
 			})
 			.where(eq(bots.id, input.id))
 			.returning(secureCols); // TODO: Better way to OMIT the "apiKey" field
