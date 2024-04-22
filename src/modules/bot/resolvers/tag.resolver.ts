@@ -47,7 +47,6 @@ export class BotTagResolver {
 		description: 'Fetches a tag by name.'
 	})
 	public async get(@Args('input') input: GetBotTagInput) {
-		console.log('input', input);
 		return this._tagService.getTag(input.name);
 	}
 

@@ -5,7 +5,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { arraySome } from '@utils/common/arraySome';
+import { arraySome } from '@utils/common';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 import type { JwtRefreshPayload } from '../interfaces/payload.interface';

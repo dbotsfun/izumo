@@ -2,7 +2,7 @@ import type { GQLExecutionContext } from '@lib/types';
 import { Injectable } from '@nestjs/common';
 import type { Reflector } from '@nestjs/core';
 import type { GqlExecutionContext } from '@nestjs/graphql';
-import { BaseAuthGuard } from '@utils/bases/guards/authguard.base';
+import { BaseAuthGuard } from '@utils/bases';
 import type { Request } from 'express';
 
 /**

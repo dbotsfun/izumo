@@ -5,7 +5,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { arraySome } from '@utils/common/arraySome';
+import { arraySome } from '@utils/common';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 import type { JwtPayload } from '../interfaces/payload.interface';
@@ -105,6 +105,20 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 			throw new UnauthorizedException(ErrorMessages.AUTH_INVALID_TOKEN);
 		}
 
-		return payload;
+		// Find the user's permissions
+		const { permissions } =
+			// biome-ignore lint/style/noNonNullAssertion: if a user session exists, the user should exist
+			(await this._drizzleService.query.users.findFirst({
+				where: (table, { eq }) => eq(table.id, payload.id),
+				columns: {
+					permissions: true
+				}
+			}))!;
+
+		return {
+			...payload,
+			permissionsBitfield: permissions,
+			permissions: []
+		};
 	}
 }

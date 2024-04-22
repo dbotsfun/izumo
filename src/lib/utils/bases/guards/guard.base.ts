@@ -1,4 +1,4 @@
-import type { Awaitable } from '@lib/types/utils';
+import type { GQLExecutionContext } from '@lib/types';
 import { type ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
@@ -8,17 +8,17 @@ import type { Request } from 'express';
 export type BaseGuardType = typeof BaseGuard;
 
 @Injectable()
-export abstract class BaseGuard {
+export class BaseGuard {
 	public reflector!: Reflector;
-
-	public abstract run(context: GqlExecutionContext): Awaitable<Request>;
 
 	public getContext(context: ExecutionContext): GqlExecutionContext {
 		return GqlExecutionContext.create(context);
 	}
 
-	protected getRequest(context: ExecutionContext): Awaitable<Request> {
-		return this.run(this.getContext(context));
+	protected getRequest(context: ExecutionContext): Request {
+		const ctx = GqlExecutionContext.create(context);
+
+		return ctx.getContext<GQLExecutionContext>().req;
 	}
 
 	public isOmited(context: GqlExecutionContext) {

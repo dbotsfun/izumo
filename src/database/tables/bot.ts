@@ -1,8 +1,7 @@
 import { onUpdate } from '@database/common/onUpdate';
 import type { ArrayEnum } from '@lib/types';
 import type { BotUserPermissions } from '@modules/bot/objects/bot/bot.user.permissions';
-import { cast } from '@utils/common/cast';
-import { enumToArray } from '@utils/common/enumToArray';
+import { cast, enumToArray } from '@utils/common';
 import { relations } from 'drizzle-orm';
 import {
 	boolean,

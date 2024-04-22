@@ -4,7 +4,10 @@ import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
+import { BotOwnerPermissions } from '../decorators/permissions.decorator';
+import { BotOwnerPermissionsGuards } from '../guards/permissions.guard';
 import { GetBotInput } from '../inputs/bot/get.input';
+import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { ApiKeyService } from '../services/apikey.service';
 
 /**
@@ -12,7 +15,7 @@ import { ApiKeyService } from '../services/apikey.service';
  */
 @Resolver(() => String)
 @UsePipes(ValidationTypes, ValidationPipe)
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, BotOwnerPermissionsGuards)
 export class ApiKeyResolver {
 	/**
 	 * Creates an instance of the ApiKeyResolver class.
@@ -30,6 +33,7 @@ export class ApiKeyResolver {
 		name: 'resetApiKey',
 		description: 'Reset and return a new Api Key'
 	})
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageApiKey])
 	public resetApiKey(
 		@User() user: JwtPayload,
 		@Args('input') input: GetBotInput

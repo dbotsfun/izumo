@@ -9,11 +9,14 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
 import { InternalGuard } from '@utils/guards/internal.guard';
 import { ValidationTypes } from 'class-validator';
+import { BotOwnerPermissions } from '../decorators/permissions.decorator';
+import { BotOwnerPermissionsGuards } from '../guards/permissions.guard';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
 import { FiltersBotInput, SafeFiltersInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
+import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotService } from '../services/bot.service';
 
 /**
@@ -65,7 +68,7 @@ export class BotResolver {
 	})
 	@UseGuards(
 		// TODO: Change this Guard to a elevated permissions Guard, since the query IS private
-		OrGuard([InternalGuard, JwtAuthGuard], { throwOnFirstError: true })
+		OrGuard([InternalGuard, JwtAuthGuard])
 	)
 	public panelBots(
 		@Args('pagination', { nullable: true }) pagination: PaginationInput,
@@ -115,6 +118,8 @@ export class BotResolver {
 		name: 'updateBot',
 		description: 'Updates an existing bot.'
 	})
+	@UseGuards(BotOwnerPermissionsGuards)
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageBot])
 	public update(
 		@User() user: JwtPayload,
 		@Args('input') input: CreateBotInput
@@ -132,6 +137,8 @@ export class BotResolver {
 		name: 'deleteBot',
 		description: 'Deletes an existing bot.'
 	})
+	@UseGuards(BotOwnerPermissionsGuards)
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageBot])
 	public delete(
 		@User() user: JwtPayload,
 		@Args('input') input: DeleteBotInput

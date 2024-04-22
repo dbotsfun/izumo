@@ -1,6 +1,5 @@
 // import { ArrayEnum } from '@lib/types';
-// import { cast } from '@utils/common/cast';
-// import { enumToArray } from '@utils/common/enumToArray';
+// import { enumToArray, cast } from '@utils/common';
 import { pgTable, text } from 'drizzle-orm/pg-core';
 import { bots } from './bot';
 

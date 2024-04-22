@@ -18,8 +18,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { seconds } from '@nestjs/throttler';
-import { arrayDedupe } from '@utils/common/arrayDedupe';
-import { cast } from '@utils/common/cast';
+import { arrayDedupe, cast } from '@utils/common';
 import { eq } from 'drizzle-orm';
 import { firstValueFrom } from 'rxjs';
 import type { CreateWebhookInput } from '../inputs/webhook/create.input';
