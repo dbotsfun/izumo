@@ -1,4 +1,3 @@
-import type { Type } from '@nestjs/common';
 import {
 	ValidationArguments,
 	ValidationOptions,

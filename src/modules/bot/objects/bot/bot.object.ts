@@ -1,5 +1,6 @@
 import { BotStatus, type TbotsSelect } from '@database/tables';
 import { Paginated } from '@gql/pagination';
+import type { OmitType } from '@lib/types/utils';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import { BotUserPermissions } from './bot.user.permissions';
 
@@ -9,7 +10,7 @@ import { BotUserPermissions } from './bot.user.permissions';
 @ObjectType({
 	description: 'A bot object.'
 })
-export class BotObject implements Omit<TbotsSelect, 'apiKey'> {
+export class BotObject implements OmitType<TbotsSelect, 'apiKey' | 'banner'> {
 	/**
 	 * The unique identifier of the bot.
 	 */
