@@ -62,7 +62,8 @@ export const bots = pgTable(
 		userPermissions: json('user_permissions')
 			.array()
 			.$type<BotUserPermissions[]>()
-			.notNull()
+			.notNull(),
+		banner: text('banner')
 	},
 	(table) => {
 		return {
