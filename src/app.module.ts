@@ -11,6 +11,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { validate } from '@utils/index';
 import type { Request, Response } from 'express';
 import * as schema from './database/schema';
+import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BotModule } from './modules/bot/bot.module';
 import { VanityModule } from './modules/vanity/vanity.module';
@@ -103,7 +104,8 @@ import { VanityModule } from './modules/vanity/vanity.module';
 
 		BotModule,
 		AuthModule,
-		VanityModule
+		VanityModule,
+		AdminModule
 	],
 	controllers: [],
 	providers: []
