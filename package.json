@@ -2,7 +2,7 @@
 	"name": "izumo",
 	"version": "0.0.1",
 	"description": "Izumo is the new API for dbots",
-	"author": "@dbotslist",
+	"author": "@dbotsfun",
 	"private": true,
 	"license": "MIT",
 	"scripts": {
