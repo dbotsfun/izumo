@@ -1,10 +1,11 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { type BotStatus, bots } from '@database/schema';
+import { BotStatus, bots } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { BotService } from '@modules/bot/services/bot.service';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { WebhookService } from '@services/webhook.service';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -19,7 +20,8 @@ export class AdminBotService {
 	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
-		private _botService: BotService
+		private _botService: BotService,
+		private _webhookService: WebhookService
 	) {}
 
 	/**
@@ -29,7 +31,11 @@ export class AdminBotService {
 	 * @returns The updated bot object.
 	 * @throws NotFoundException if the bot with the specified ID is not found.
 	 */
-	public async setStatus(id: string, status: BotStatus) {
+	public async setStatus(
+		reviewer: JwtPayload,
+		id: string,
+		status: BotStatus
+	) {
 		// Update status of the bot
 		const [bot] = await this._drizzleService
 			.update(bots)
@@ -40,6 +46,23 @@ export class AdminBotService {
 		// If the bot is not found, throw a NotFoundException
 		if (!bot) {
 			throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
+		}
+
+		switch (status) {
+			case BotStatus.APPROVED:
+				this._webhookService.sendDiscordMessage(
+					`🎉 <@${id}> has been approved! Issued by <@${reviewer.id}>`
+				);
+				break;
+
+			case BotStatus.DENIED:
+				this._webhookService.sendDiscordMessage(
+					`😒 <@${id}> has been denied... Issued by <@${reviewer.id}>`
+				);
+				break;
+
+			default:
+				break;
 		}
 
 		return bot;

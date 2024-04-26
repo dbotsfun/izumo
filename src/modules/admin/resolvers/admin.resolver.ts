@@ -32,7 +32,7 @@ export class AdminResolver {
 		description: 'Sets the permissions for a user.'
 	})
 	@UserPermissions([UserPermissionsFlags.ManagePermissions])
-	public async setUserPermissions(
+	public async updateUserPermissions(
 		@Args('input') input: AdminUserPermissionsInput
 	) {
 		return this._adminService.setUserPermissions(
