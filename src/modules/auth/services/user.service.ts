@@ -4,7 +4,7 @@ import { users } from '@database/tables';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import type { AuthUserUpdate } from '../inputs/user/update.input';
+import type { AuthUserUpdateInput } from '../inputs/user/update.input';
 
 /**
  * Service that provides methods to interact with the authenticated user
@@ -45,7 +45,7 @@ export class AuthUserService {
 	 * @returns The updated user.
 	 * @throws NotFoundException if the user is not found.
 	 */
-	public async update(id: string, input: AuthUserUpdate) {
+	public async update(id: string, input: AuthUserUpdateInput) {
 		// Update the user
 		const [user] = await this._drizzleService
 			.update(users)

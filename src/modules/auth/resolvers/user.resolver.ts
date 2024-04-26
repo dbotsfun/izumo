@@ -10,7 +10,7 @@ import {
 import { ValidationTypes } from 'class-validator';
 import { User } from '../decorators/user.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import { AuthUserUpdate } from '../inputs/user/update.input';
+import { AuthUserUpdateInput } from '../inputs/user/update.input';
 import type { JwtPayload } from '../interfaces/payload.interface';
 import { AuthUserSessionObject } from '../objects/user/session.object';
 import { AuthUserObject } from '../objects/user/user.object';
@@ -59,7 +59,7 @@ export class AuthUserResolver {
 	@UseGuards(JwtAuthGuard)
 	public async update(
 		@User() user: JwtPayload,
-		@Args('input') input: AuthUserUpdate
+		@Args('input') input: AuthUserUpdateInput
 	) {
 		return this._userService.update(user.id, input);
 	}

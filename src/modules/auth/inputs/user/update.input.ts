@@ -13,7 +13,7 @@ import { IsOptional, IsString, IsUrl } from 'class-validator';
 @InputType({
 	description: 'The input of the user update mutation'
 })
-export class AuthUserUpdate
+export class AuthUserUpdateInput
 	implements
 		OmitType<
 			TuserInsert,

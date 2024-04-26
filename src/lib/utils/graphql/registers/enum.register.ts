@@ -4,6 +4,7 @@ import {
 	WebhookEvent,
 	WebhookPayloadField
 } from '@database/tables';
+import { UserPermissionsFlags } from '@modules/admin/permissions/user.permissions';
 import { registerEnumType } from '@nestjs/graphql';
 import { SortOrder } from '../pagination';
 
@@ -83,6 +84,34 @@ registerEnumType(WebhookEvent, {
 		},
 		STATUS_CHANGE: {
 			description: 'The status of a bot has changed.'
+		}
+	}
+});
+
+registerEnumType(UserPermissionsFlags, {
+	name: 'UserPermissionsFlags',
+	description: 'The permissions that a user has.',
+	valuesMap: {
+		Admin: {
+			description: 'The user is an admin.'
+		},
+		ManageBadges: {
+			description: 'The user can manage badges.'
+		},
+		ManageBots: {
+			description: 'The user can manage bots.'
+		},
+		ManageReviews: {
+			description: 'The user can manage reviews.'
+		},
+		ManageTags: {
+			description: 'The user can manage tags.'
+		},
+		ManageUsers: {
+			description: 'The user can manage users.'
+		},
+		ManagePermissions: {
+			description: 'The user can manage permissions.'
 		}
 	}
 });

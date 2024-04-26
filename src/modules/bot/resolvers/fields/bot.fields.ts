@@ -1,7 +1,5 @@
 import { PaginationInput } from '@gql/pagination';
-import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
-import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { BotObject } from '@modules/bot/objects/bot/bot.object';
 import { BotOwnerObject } from '@modules/bot/objects/owner/owner.object';
 import { BotTagObject } from '@modules/bot/objects/tag/tag.object';
@@ -83,7 +81,7 @@ export class BotFields {
 		description: 'The webhook for the bot.'
 	})
 	@UseGuards(JwtAuthGuard)
-	public webhook(@Parent() bot: BotObject, @User() user: JwtPayload) {
-		return this._botWebhookService.getWebhook(bot.id, user);
+	public webhook(@Parent() bot: BotObject) {
+		return this._botWebhookService.getWebhook(bot.id);
 	}
 }

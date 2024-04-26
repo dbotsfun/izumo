@@ -6,8 +6,9 @@ export const UserPermissionsFlags = {
 	ManageReviews: 1 << 2,
 	ManageTags: 1 << 3,
 	ManageBots: 1 << 4,
+	ManagePermissions: 1 << 5,
 
-	Admin: 1 << 5
+	Admin: 1 << 6
 };
 
 export const UserPermissionsBitfields = new BitField(UserPermissionsFlags);

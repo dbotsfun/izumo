@@ -8,7 +8,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { InternalGuard } from '@utils/guards/internal.guard';
-import { BotOwnerPermissionsGuards } from './guards/permissions.guard';
+import { BotOwnerPermissionsGuard } from './guards/permissions.guard';
 import { ApiKeyResolver } from './resolvers/apikey.resolver';
 import { BotResolver } from './resolvers/bot.resolver';
 import { BotFields } from './resolvers/fields/bot.fields';
@@ -50,7 +50,7 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 		JwtAuthGuard,
 		{
 			provide: AUTH_AND_OWNER_PERMISSIONS,
-			useClass: AndGuard([JwtAuthGuard, BotOwnerPermissionsGuards])
+			useClass: AndGuard([JwtAuthGuard, BotOwnerPermissionsGuard])
 		}
 	],
 	imports: [

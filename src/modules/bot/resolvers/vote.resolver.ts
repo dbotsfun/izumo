@@ -14,6 +14,7 @@ import { BotVoteService } from '../services/vote.service';
  */
 @Resolver(() => BotVoteObject)
 @UsePipes(ValidationTypes, ValidationPipe)
+@UseGuards(JwtAuthGuard)
 export class BotVoteResolver {
 	/**
 	 * Creates an instance of `BotVoteResolver`.
@@ -29,7 +30,6 @@ export class BotVoteResolver {
 	 * @returns A Promise that resolves to the checked vote.
 	 */
 	@Query(() => BotCanVoteObject)
-	@UseGuards(JwtAuthGuard)
 	public async canVote(
 		@Args('input') input: BotVoteCreateInput,
 		@User() user: JwtPayload
@@ -45,7 +45,6 @@ export class BotVoteResolver {
 	 * @returns A Promise that resolves to the created vote.
 	 */
 	@Mutation(() => BotVoteObject)
-	@UseGuards(JwtAuthGuard)
 	public async createVote(
 		@Args('input') input: BotVoteCreateInput,
 		@User() user: JwtPayload

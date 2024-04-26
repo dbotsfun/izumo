@@ -70,9 +70,7 @@ export class BotWebhookService implements OnModuleInit {
 		}
 
 		// Check if the webhook already exists
-		const hasWebhooks = await this.getWebhook(input.id, user).catch(
-			() => null
-		);
+		const hasWebhooks = await this.getWebhook(input.id).catch(() => null);
 
 		// If the webhook already exists, throw an error
 		if (hasWebhooks) {
@@ -96,7 +94,7 @@ export class BotWebhookService implements OnModuleInit {
 	 * @returns The retrieved webhook.
 	 * @throws NotFoundException if the webhook does not exist.
 	 */
-	public async getWebhook(id: string, user: JwtPayload) {
+	public async getWebhook(id: string) {
 		const webhook = await this._drizzleService.query.webhooks.findFirst({
 			where: (table, { eq }) => eq(table.id, id)
 		});
@@ -116,13 +114,13 @@ export class BotWebhookService implements OnModuleInit {
 	 * @returns The updated webhook.
 	 * @throws NotFoundException if the webhook does not exist.
 	 */
-	public async updateWebhook(input: UpdateWebhookInput, user: JwtPayload) {
+	public async updateWebhook(input: UpdateWebhookInput) {
 		// Check if the webhook exists
 		const {
 			events: _events,
 			payloadFields: _payloadFields,
 			...existingWebhook
-		} = await this.getWebhook(input.id, user);
+		} = await this.getWebhook(input.id);
 
 		// Sanitize the events
 		const events = this.sanitizeEvents(input.events);
@@ -156,9 +154,9 @@ export class BotWebhookService implements OnModuleInit {
 	 * @returns The deleted webhook.
 	 * @throws NotFoundException if the webhook does not exist.
 	 */
-	public async deleteWebhook(id: string, user: JwtPayload) {
+	public async deleteWebhook(id: string) {
 		// Check if the webhook exists
-		const webhook = await this.getWebhook(id, user);
+		const webhook = await this.getWebhook(id);
 
 		// Delete the webhook
 		await this._drizzleService

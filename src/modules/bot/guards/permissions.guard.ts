@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import {
 	type CanActivate,
 	type ExecutionContext,
@@ -5,7 +6,6 @@ import {
 	type OnModuleInit
 } from '@nestjs/common';
 import { ModuleRef, Reflector } from '@nestjs/core';
-import { BaseGuard } from '@utils/bases';
 import { JsonFind } from '@utils/common';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
 import {
@@ -18,8 +18,8 @@ import { BotService } from '../services/bot.service';
  * Custom bot owner permissions guard.
  */
 @Injectable()
-export class BotOwnerPermissionsGuards
-	extends BaseGuard
+export class BotOwnerPermissionsGuard
+	extends JwtAuthGuard
 	implements CanActivate, OnModuleInit
 {
 	/**
@@ -36,7 +36,7 @@ export class BotOwnerPermissionsGuards
 		private _moduleref: ModuleRef,
 		public override reflector: Reflector
 	) {
-		super();
+		super(reflector);
 	}
 
 	/**
@@ -51,13 +51,18 @@ export class BotOwnerPermissionsGuards
 	 * @param context - The execution context.
 	 * @returns A promise that resolves to a boolean indicating if the user has the required permissions.
 	 */
-	public async canActivate(context: ExecutionContext): Promise<boolean> {
+	public override async canActivate(
+		context: ExecutionContext
+	): Promise<boolean> {
 		const ctx = this.getContext(context);
 
 		// If the guard is omitted, return true
 		if (this.isOmited(ctx)) {
 			return true;
 		}
+
+		// Call the super class canActivate
+		await super.canActivate(context);
 
 		// Get the permissions from the handler
 		const permissions = this.reflector.get(
