@@ -99,6 +99,8 @@ export enum ErrorMessages {
 	// Vanity
 	VANITY_NOT_FOUND = 'Vanity not found',
 	VANITY_ALREADY_EXISTS = 'Vanity already exists',
+	VANITY_USER_MISMATCH = 'User mismatch',
+	VANITY_BOT_MISMATCH = 'Bot mismatch',
 
 	// Votes
 	VOTE_USER_ALREADY_VOTED = 'You have already voted for this bot',

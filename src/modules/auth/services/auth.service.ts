@@ -7,6 +7,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { days } from '@nestjs/throttler';
+import { HashService } from '@services/hash.service';
 import { arrayFind } from '@utils/common';
 import { eq } from 'drizzle-orm';
 import { firstValueFrom } from 'rxjs';
@@ -19,7 +20,6 @@ import type {
 	JwtPayload,
 	JwtRefreshPayload
 } from '../interfaces/payload.interface';
-import { HashService } from './hash.service';
 
 /**
  * Service class for handling authentication-related operations.

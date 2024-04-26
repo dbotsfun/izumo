@@ -63,7 +63,7 @@ export class BotWebhookService implements OnModuleInit {
 	 */
 	public async createWebhook(input: CreateWebhookInput, user: JwtPayload) {
 		// Check if the bot exists in the database
-		const bot = await this._botService.checkBotOwnership(user.id);
+		const bot = await this._botService.getUserBot(input.id, user.id);
 
 		if (bot.status !== BotStatus.APPROVED) {
 			throw new ForbiddenException(ErrorMessages.BOT_NOT_APPROVED);
@@ -97,9 +97,6 @@ export class BotWebhookService implements OnModuleInit {
 	 * @throws NotFoundException if the webhook does not exist.
 	 */
 	public async getWebhook(id: string, user: JwtPayload) {
-		// Check if the bot exists in the database and the user is the owner
-		await this._botService.checkBotOwnership(user.id);
-
 		const webhook = await this._drizzleService.query.webhooks.findFirst({
 			where: (table, { eq }) => eq(table.id, id)
 		});

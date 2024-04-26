@@ -140,6 +140,34 @@ export class BotService implements OnModuleInit {
 	}
 
 	/**
+	 * Retrieves a bot by its ID and user ID.
+	 * Throws a NotFoundException if the bot is not found or unauthorized.
+	 * @param id - The ID of  the bot.
+	 * @param userId - The ID of the user.
+	 * @returns The bot object.
+	 * @throws NotFoundException if the bot is not found or unauthorized.
+	 */
+	public async getUserBot(id: string, userId: string) {
+		// Check if the user is the owner of the bot
+		const userBot = await this._drizzleService.query.botToUser
+			.findFirst({
+				where: (table, { eq, and }) =>
+					and(eq(table.a, id), eq(table.b, userId)),
+				with: { bot: true }
+			})
+			.execute();
+
+		// If the bot is not found, throw a NotFoundException
+		if (!userBot) {
+			throw new NotFoundException(
+				ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED
+			);
+		}
+
+		return userBot.bot;
+	}
+
+	/**
 	 * Retrieves the API information for a bot.
 	 * @param id The ID of the bot.
 	 * @returns A Promise that resolves to an object containing the application and bot information.
@@ -261,9 +289,6 @@ export class BotService implements OnModuleInit {
 	 * @returns The updated bot.
 	 */
 	public async updateBot(owner: JwtPayload, input: UpdateBotInput) {
-		// Check if the user is the owner of the bot
-		await this.checkBotOwnership(owner.id);
-
 		// Get the bot information from the Discord API
 		const botApiInformation = await this.getBotApiInformation(input.id);
 
@@ -351,9 +376,6 @@ export class BotService implements OnModuleInit {
 	 * @returns The deleted bot.
 	 */
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
-		// Check if the user is the owner of the bot
-		await this.checkBotOwnership(owner.id);
-
 		// Delete the bot
 		const [deleteBot] = await this._drizzleService
 			.delete(bots)
@@ -372,30 +394,4 @@ export class BotService implements OnModuleInit {
 	 * * On deny let reviewer specify a reason, there should be some reason presets on dbotslist/elyam
 	 * * On any reviewer action trigger the webhook logs
 	 */
-
-	/**
-	 * Checks the ownership of a bot based on its ID.
-	 * Throws a NotFoundException if the bot is not found or unauthorized.
-	 * @param id - The ID of the bot to check ownership for.
-	 * @returns The bot object.
-	 * @throws NotFoundException if the bot is not found or unauthorized.
-	 */
-	public async checkBotOwnership(id: string) {
-		// Check if the user is the owner of the bot
-		const userBot = await this._drizzleService.query.botToUser
-			.findFirst({
-				where: (table, { eq }) => eq(table.b, id),
-				with: { bot: true }
-			})
-			.execute();
-
-		// If the bot is not found, throw a NotFoundException
-		if (!userBot) {
-			throw new NotFoundException(
-				ErrorMessages.BOT_NOT_FOUND_OR_UNAUTHORIZED
-			);
-		}
-
-		return userBot.bot;
-	}
 }

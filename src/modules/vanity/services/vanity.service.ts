@@ -37,10 +37,12 @@ export class VanityService {
 	 */
 	private readonly _vanityValidation: Record<
 		VanityType,
-		(id: string) => Promise<unknown>
+		(id: string, user: string) => Promise<{ id: string }>
 	> = {
-		[VanityType.USER]: (id: string) => this._ownerService.getOwner(id),
-		[VanityType.BOT]: (id: string) => this._botService.getBot(id)
+		[VanityType.USER]: (id: string, _user: string) =>
+			this._ownerService.getOwner(id),
+		[VanityType.BOT]: (id: string, user: string) =>
+			this._botService.getUserBot(id, user)
 	};
 
 	/**
@@ -87,7 +89,7 @@ export class VanityService {
 		}
 
 		// Check if the target ID exists in the database.
-		await this._vanityValidation[input.type](input.targetId);
+		await this._vanityValidation[input.type](input.targetId, user.id);
 
 		// Create the vanity entry.
 		const [vanity] = await this._drizzleService

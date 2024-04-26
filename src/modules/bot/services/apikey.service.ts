@@ -2,7 +2,6 @@ import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { BotStatus, bots } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
-import { HashService } from '@modules/auth/services/hash.service';
 import {
 	Inject,
 	Injectable,
@@ -11,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import { HashService } from '@services/hash.service';
 import { eq } from 'drizzle-orm';
 import type { JwtApikeyPayload } from '../interfaces/apikey.interface';
 import { BotService } from './bot.service';

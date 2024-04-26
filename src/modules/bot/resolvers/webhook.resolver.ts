@@ -5,6 +5,7 @@ import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
+import { BotOwnershipGuard } from '../guards/ownership.guard';
 import { BotOwnerPermissionsGuards } from '../guards/permissions.guard';
 import { CreateWebhookInput } from '../inputs/webhook/create.input';
 import { GetWebhookInput } from '../inputs/webhook/get.input';
@@ -17,7 +18,7 @@ import { BotWebhookService } from '../services/webhook.service';
  * Resolver for managing webhooks of the bot.
  */
 @Resolver(() => WebhookObject)
-@UseGuards(JwtAuthGuard, BotOwnerPermissionsGuards)
+@UseGuards(JwtAuthGuard, BotOwnershipGuard, BotOwnerPermissionsGuards)
 @UsePipes(ValidationTypes, ValidationPipe)
 export class BotWebhookResolver {
 	/**

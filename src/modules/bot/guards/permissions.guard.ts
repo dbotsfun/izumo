@@ -73,7 +73,7 @@ export class BotOwnerPermissionsGuards
 		// Get the arguments from the context
 		const args = ctx.getArgs<{ id: string }>();
 		// Get the user from the request
-		const user = this.getRequest(context).user;
+		const { user } = this.getRequest(context);
 		// Get the bot ID from the arguments
 		const botId = JsonFind<string>(args, 'id');
 

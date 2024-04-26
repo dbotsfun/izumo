@@ -10,6 +10,7 @@ import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
 import { InternalGuard } from '@utils/guards/internal.guard';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
+import { BotOwnershipGuard } from '../guards/ownership.guard';
 import { BotOwnerPermissionsGuards } from '../guards/permissions.guard';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
@@ -118,7 +119,7 @@ export class BotResolver {
 		name: 'updateBot',
 		description: 'Updates an existing bot.'
 	})
-	@UseGuards(BotOwnerPermissionsGuards)
+	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuards)
 	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageBot])
 	public update(
 		@User() user: JwtPayload,
@@ -137,8 +138,8 @@ export class BotResolver {
 		name: 'deleteBot',
 		description: 'Deletes an existing bot.'
 	})
-	@UseGuards(BotOwnerPermissionsGuards)
-	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageBot])
+	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuards)
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.Admin])
 	public delete(
 		@User() user: JwtPayload,
 		@Args('input') input: DeleteBotInput
