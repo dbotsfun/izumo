@@ -17,12 +17,12 @@ export class AdminBotService {
 	/**
 	 * A record that maps each bot status (excluding PENDING) to a function that generates a status message.
 	 */
-	private readonly statuMessages: Record<
+	private readonly statusMessages: Record<
 		Exclude<BotStatus, BotStatus.PENDING>,
 		(payload: StatusMessagePayload) => string
 	> = {
 		[BotStatus.APPROVED]: (payload: StatusMessagePayload) =>
-			`🎉 <@${payload.id}> by <@${payload.owner}> has been approved by <@${payload.reviewer}>!`,
+			`🎉 <@${payload.id}> by <@${payload.owner}> has been approved by <@${payload.reviewer.id}>!`,
 		[BotStatus.DENIED]: (payload: StatusMessagePayload) =>
 			`😒 <@${payload.id}> by ${payload.owner} has been denied by <@${payload.reviewer.id}>...`
 	};
@@ -69,7 +69,7 @@ export class AdminBotService {
 		}
 
 		// Get the status message
-		const response = this.statuMessages[
+		const response = this.statusMessages[
 			status as Exclude<BotStatus, BotStatus.PENDING>
 		]({ reviewer, id, status, owner: owner.b });
 
