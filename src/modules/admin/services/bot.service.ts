@@ -24,7 +24,7 @@ export class AdminBotService {
 		[BotStatus.APPROVED]: (payload: StatusMessagePayload) =>
 			`🎉 <@${payload.id}> by <@${payload.owner}> has been approved by <@${payload.reviewer.id}>!`,
 		[BotStatus.DENIED]: (payload: StatusMessagePayload) =>
-			`😒 <@${payload.id}> by ${payload.owner} has been denied by <@${payload.reviewer.id}>...`
+			`😒 <@${payload.id}> by <@${payload.owner}> has been denied by <@${payload.reviewer.id}>...`
 	};
 
 	/**
