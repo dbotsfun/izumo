@@ -7,12 +7,26 @@ import { BotService } from '@modules/bot/services/bot.service';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { WebhookService } from '@services/webhook.service';
 import { eq } from 'drizzle-orm';
+import type { StatusMessagePayload } from '../interfaces/bot/review.interface';
 
 /**
  * Service class for managing admin bots.
  */
 @Injectable()
 export class AdminBotService {
+	/**
+	 * A record that maps each bot status (excluding PENDING) to a function that generates a status message.
+	 */
+	private readonly statuMessages: Record<
+		Exclude<BotStatus, BotStatus.PENDING>,
+		(payload: StatusMessagePayload) => string
+	> = {
+		[BotStatus.APPROVED]: (payload: StatusMessagePayload) =>
+			`🎉 <@${payload.id}> has been approved! Issued by <@${payload.reviewer.id}>`,
+		[BotStatus.DENIED]: (payload: StatusMessagePayload) =>
+			`😒 <@${payload.id}> has been denied... Issued by <@${payload.reviewer.id}>`
+	};
+
 	/**
 	 * Constructs a new instance of the BotService class.
 	 * @param _drizzleService - The injected instance of the DrizzleService.
@@ -48,21 +62,14 @@ export class AdminBotService {
 			throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
 		}
 
-		switch (status) {
-			case BotStatus.APPROVED:
-				this._webhookService.sendDiscordMessage(
-					`🎉 <@${id}> has been approved! Issued by <@${reviewer.id}>`
-				);
-				break;
+		// Get the status message
+		const response = this.statuMessages[
+			status as Exclude<BotStatus, BotStatus.PENDING>
+		]({ reviewer, id, status });
 
-			case BotStatus.DENIED:
-				this._webhookService.sendDiscordMessage(
-					`😒 <@${id}> has been denied... Issued by <@${reviewer.id}>`
-				);
-				break;
-
-			default:
-				break;
+		// Send a webhook message
+		if (response) {
+			await this._webhookService.sendDiscordMessage(response);
 		}
 
 		return bot;
