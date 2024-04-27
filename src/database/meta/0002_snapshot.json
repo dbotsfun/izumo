@@ -1,10 +1,8 @@
 {
-	"id": "cd604798-c2f3-4a9f-855e-5c85441b1395",
-	"prevId": "81baee54-ae4e-47af-9558-5fb1dceb6294",
-	"version": "5",
-	"dialect": "pg",
+	"version": "6",
+	"dialect": "postgresql",
 	"tables": {
-		"_BadgeToUser": {
+		"public._BadgeToUser": {
 			"name": "_BadgeToUser",
 			"schema": "",
 			"columns": {
@@ -37,26 +35,26 @@
 				"_BadgeToUser_A_badges_id_fk": {
 					"name": "_BadgeToUser_A_badges_id_fk",
 					"tableFrom": "_BadgeToUser",
-					"tableTo": "badges",
 					"columnsFrom": ["A"],
+					"tableTo": "badges",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				},
 				"_BadgeToUser_B_users_id_fk": {
 					"name": "_BadgeToUser_B_users_id_fk",
 					"tableFrom": "_BadgeToUser",
-					"tableTo": "users",
 					"columnsFrom": ["B"],
+					"tableTo": "users",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"badges": {
+		"public.badges": {
 			"name": "badges",
 			"schema": "",
 			"columns": {
@@ -91,7 +89,7 @@
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"_BotToUser": {
+		"public._BotToUser": {
 			"name": "_BotToUser",
 			"schema": "",
 			"columns": {
@@ -124,26 +122,26 @@
 				"_BotToUser_A_bots_id_fk": {
 					"name": "_BotToUser_A_bots_id_fk",
 					"tableFrom": "_BotToUser",
-					"tableTo": "bots",
 					"columnsFrom": ["A"],
+					"tableTo": "bots",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				},
 				"_BotToUser_B_users_id_fk": {
 					"name": "_BotToUser_B_users_id_fk",
 					"tableFrom": "_BotToUser",
-					"tableTo": "users",
 					"columnsFrom": ["B"],
+					"tableTo": "users",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"bots": {
+		"public.bots": {
 			"name": "bots",
 			"schema": "",
 			"columns": {
@@ -271,7 +269,7 @@
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"users": {
+		"public.users": {
 			"name": "users",
 			"schema": "",
 			"columns": {
@@ -330,7 +328,7 @@
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"_BotToTag": {
+		"public._BotToTag": {
 			"name": "_BotToTag",
 			"schema": "",
 			"columns": {
@@ -363,26 +361,26 @@
 				"_BotToTag_A_bots_id_fk": {
 					"name": "_BotToTag_A_bots_id_fk",
 					"tableFrom": "_BotToTag",
-					"tableTo": "bots",
 					"columnsFrom": ["A"],
+					"tableTo": "bots",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				},
 				"_BotToTag_B_tags_name_fk": {
 					"name": "_BotToTag_B_tags_name_fk",
 					"tableFrom": "_BotToTag",
-					"tableTo": "tags",
 					"columnsFrom": ["B"],
+					"tableTo": "tags",
 					"columnsTo": ["name"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"tags": {
+		"public.tags": {
 			"name": "tags",
 			"schema": "",
 			"columns": {
@@ -404,7 +402,7 @@
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"review_replies": {
+		"public.review_replies": {
 			"name": "review_replies",
 			"schema": "",
 			"columns": {
@@ -457,26 +455,26 @@
 				"review_replies_review_id_reviews_id_fk": {
 					"name": "review_replies_review_id_reviews_id_fk",
 					"tableFrom": "review_replies",
-					"tableTo": "reviews",
 					"columnsFrom": ["review_id"],
+					"tableTo": "reviews",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				},
 				"review_replies_user_id_users_id_fk": {
 					"name": "review_replies_user_id_users_id_fk",
 					"tableFrom": "review_replies",
-					"tableTo": "users",
 					"columnsFrom": ["user_id"],
+					"tableTo": "users",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"reviews": {
+		"public.reviews": {
 			"name": "reviews",
 			"schema": "",
 			"columns": {
@@ -536,26 +534,26 @@
 				"reviews_bot_id_bots_id_fk": {
 					"name": "reviews_bot_id_bots_id_fk",
 					"tableFrom": "reviews",
-					"tableTo": "bots",
 					"columnsFrom": ["bot_id"],
+					"tableTo": "bots",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				},
 				"reviews_user_id_users_id_fk": {
 					"name": "reviews_user_id_users_id_fk",
 					"tableFrom": "reviews",
-					"tableTo": "users",
 					"columnsFrom": ["user_id"],
+					"tableTo": "users",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"webhooks": {
+		"public.webhooks": {
 			"name": "webhooks",
 			"schema": "",
 			"columns": {
@@ -595,17 +593,17 @@
 				"webhooks_id_bots_id_fk": {
 					"name": "webhooks_id_bots_id_fk",
 					"tableFrom": "webhooks",
-					"tableTo": "bots",
 					"columnsFrom": ["id"],
+					"tableTo": "bots",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"votes": {
+		"public.votes": {
 			"name": "votes",
 			"schema": "",
 			"columns": {
@@ -639,26 +637,26 @@
 				"votes_bot_id_bots_id_fk": {
 					"name": "votes_bot_id_bots_id_fk",
 					"tableFrom": "votes",
-					"tableTo": "bots",
 					"columnsFrom": ["bot_id"],
+					"tableTo": "bots",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				},
 				"votes_user_id_users_id_fk": {
 					"name": "votes_user_id_users_id_fk",
 					"tableFrom": "votes",
-					"tableTo": "users",
 					"columnsFrom": ["user_id"],
+					"tableTo": "users",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"vanities": {
+		"public.vanities": {
 			"name": "vanities",
 			"schema": "",
 			"columns": {
@@ -692,7 +690,7 @@
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
-		"sessions": {
+		"public.sessions": {
 			"name": "sessions",
 			"schema": "",
 			"columns": {
@@ -731,11 +729,11 @@
 				"sessions_user_id_users_id_fk": {
 					"name": "sessions_user_id_users_id_fk",
 					"tableFrom": "sessions",
-					"tableTo": "users",
 					"columnsFrom": ["user_id"],
+					"tableTo": "users",
 					"columnsTo": ["id"],
-					"onDelete": "cascade",
-					"onUpdate": "cascade"
+					"onUpdate": "cascade",
+					"onDelete": "cascade"
 				}
 			},
 			"compositePrimaryKeys": {
@@ -748,32 +746,28 @@
 		}
 	},
 	"enums": {
-		"BotListSource": {
+		"public.BotListSource": {
 			"name": "BotListSource",
-			"values": {
-				"DISCORD_LIST": "DISCORD_LIST"
-			}
+			"schema": "public",
+			"values": ["DISCORD_LIST"]
 		},
-		"BotStatus": {
+		"public.BotStatus": {
 			"name": "BotStatus",
-			"values": {
-				"DENIED": "DENIED",
-				"PENDING": "PENDING",
-				"APPROVED": "APPROVED"
-			}
+			"schema": "public",
+			"values": ["DENIED", "PENDING", "APPROVED"]
 		},
-		"VanityType": {
+		"public.VanityType": {
 			"name": "VanityType",
-			"values": {
-				"USER": "USER",
-				"BOT": "BOT"
-			}
+			"schema": "public",
+			"values": ["USER", "BOT"]
 		}
 	},
 	"schemas": {},
 	"_meta": {
-		"columns": {},
 		"schemas": {},
-		"tables": {}
-	}
+		"tables": {},
+		"columns": {}
+	},
+	"id": "cd604798-c2f3-4a9f-855e-5c85441b1395",
+	"prevId": "81baee54-ae4e-47af-9558-5fb1dceb6294"
 }

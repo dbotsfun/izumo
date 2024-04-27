@@ -22,8 +22,8 @@
 		"update:i": "pnpm up --interactive",
 		"update:f": "pnpm up --latest",
 		"db:drop": "pnpm drizzle-kit drop",
-		"db:push": "pnpm drizzle-kit push:pg",
-		"db:generate": "pnpm drizzle-kit generate:pg",
+		"db:push": "pnpm drizzle-kit migrate",
+		"db:generate": "pnpm drizzle-kit generate",
 		"postinstall": "pnpm lefthook install"
 	},
 	"dependencies": {
