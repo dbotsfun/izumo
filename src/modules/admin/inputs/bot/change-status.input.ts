@@ -30,7 +30,7 @@ export class AdminBotChangeStatusInput {
 	/**
 	 * The reason for the status change.
 	 */
-	@Field({
+	@Field(() => String, {
 		description: 'The reason for the status change.',
 		nullable: true
 	})

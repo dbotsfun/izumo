@@ -1,8 +1,8 @@
 import { User } from '@modules/auth/decorators/user.decorator';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
-import type { DeleteBotInput } from '@modules/bot/inputs/bot/delete.input';
+import { DeleteBotInput } from '@modules/bot/inputs/bot/delete.input';
 import { BotObject } from '@modules/bot/objects/bot/bot.object';
-import type { BotService } from '@modules/bot/services/bot.service';
+import { BotService } from '@modules/bot/services/bot.service';
 import { OrGuard } from '@nest-lab/or-guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';

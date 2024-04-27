@@ -20,11 +20,11 @@ export class AuthUserService {
 	) {}
 
 	/**
-	 * Fetches the authenticated user
+	 * Gets a user by their ID.
 	 * @param id  - The ID of the user to fetch
 	 * @returns The authenticated user
 	 */
-	public async me(id: string) {
+	public async getUser(id: string) {
 		// Find the user by their ID
 		const user = await this._drizzleService.query.users.findFirst({
 			where: (table, { eq }) => eq(table.id, id)
