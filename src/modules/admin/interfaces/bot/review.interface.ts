@@ -11,4 +11,6 @@ export type StatusMessagePayload = {
 	id: string;
 	/** The new status of the bot. */
 	status: BotStatus;
+	/** The bot owner id */
+	owner: string;
 };

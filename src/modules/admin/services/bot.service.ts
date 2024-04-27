@@ -3,10 +3,10 @@ import { DATABASE } from '@constants/tokens';
 import { BotStatus, bots } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
-import { BotService } from '@modules/bot/services/bot.service';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { WebhookService } from '@services/webhook.service';
 import { eq } from 'drizzle-orm';
+import type { AdminBotChangeStatusInput } from '../inputs/bot/change-status.input';
 import type { StatusMessagePayload } from '../interfaces/bot/review.interface';
 
 /**
@@ -22,19 +22,18 @@ export class AdminBotService {
 		(payload: StatusMessagePayload) => string
 	> = {
 		[BotStatus.APPROVED]: (payload: StatusMessagePayload) =>
-			`🎉 <@${payload.id}> has been approved! Issued by <@${payload.reviewer.id}>`,
+			`🎉 <@${payload.id}> by <@${payload.owner}> has been approved by <@${payload.reviewer}>!`,
 		[BotStatus.DENIED]: (payload: StatusMessagePayload) =>
-			`😒 <@${payload.id}> has been denied... Issued by <@${payload.reviewer.id}>`
+			`😒 <@${payload.id}> by ${payload.owner} has been denied by <@${payload.reviewer.id}>...`
 	};
 
 	/**
 	 * Constructs a new instance of the BotService class.
 	 * @param _drizzleService - The injected instance of the DrizzleService.
-	 * @param _botService - The instance of the BotService.
+	 * @param _webhookService - The webhook service.
 	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
-		private _botService: BotService,
 		private _webhookService: WebhookService
 	) {}
 
@@ -47,8 +46,11 @@ export class AdminBotService {
 	 */
 	public async setStatus(
 		reviewer: JwtPayload,
-		id: string,
-		status: BotStatus
+		{
+			id,
+			status,
+			reason = 'No reason was provided, please contact the reviewer for more information.'
+		}: AdminBotChangeStatusInput
 	) {
 		// Update status of the bot
 		const [bot] = await this._drizzleService
@@ -57,31 +59,29 @@ export class AdminBotService {
 			.where(eq(bots.id, id))
 			.returning();
 
+		const owner = await this._drizzleService.query.botToUser.findFirst({
+			where: (table, { eq }) => eq(table.a, id)
+		});
+
 		// If the bot is not found, throw a NotFoundException
-		if (!bot) {
+		if (!bot || !owner) {
 			throw new NotFoundException(ErrorMessages.BOT_NOT_FOUND);
 		}
 
 		// Get the status message
 		const response = this.statuMessages[
 			status as Exclude<BotStatus, BotStatus.PENDING>
-		]({ reviewer, id, status });
+		]({ reviewer, id, status, owner: owner.b });
 
 		// Send a webhook message
 		if (response) {
-			await this._webhookService.sendDiscordMessage(response);
+			await this._webhookService.sendDiscordMessage(
+				status === BotStatus.DENIED
+					? `${response}\nReason: ${reason}`
+					: response
+			);
 		}
 
 		return bot;
-	}
-
-	/**
-	 * Deletes a bot with the specified ID.
-	 * @param id - The ID of the bot to delete.
-	 * @param user - The user making the request.
-	 * @returns A promise that resolves when the bot is successfully deleted.
-	 */
-	public delete(id: string, user: JwtPayload) {
-		return this._botService.deleteBot(user, { id });
 	}
 }

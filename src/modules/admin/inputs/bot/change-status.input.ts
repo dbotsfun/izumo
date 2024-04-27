@@ -1,6 +1,7 @@
 import { BotStatus } from '@database/schema';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
+import { IsOptional, IsString } from 'class-validator';
 
 /**
  * Input to change a bot status.
@@ -25,4 +26,15 @@ export class AdminBotChangeStatusInput {
 		description: 'The new status.'
 	})
 	public status!: BotStatus;
+
+	/**
+	 * The reason for the status change.
+	 */
+	@Field({
+		description: 'The reason for the status change.',
+		nullable: true
+	})
+	@IsOptional()
+	@IsString()
+	public reason?: string | undefined;
 }
