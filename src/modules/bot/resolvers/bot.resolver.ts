@@ -3,18 +3,16 @@ import { PaginationInput } from '@gql/pagination';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
-import { OrGuard } from '@nest-lab/or-guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
-import { InternalGuard } from '@utils/guards/internal.guard';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
 import { BotOwnershipGuard } from '../guards/ownership.guard';
 import { BotOwnerPermissionsGuard } from '../guards/permissions.guard';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
-import { FiltersBotInput, SafeFiltersInput } from '../inputs/bot/filters.input';
+import { SafeFiltersInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
@@ -55,27 +53,6 @@ export class BotResolver {
 			},
 			pagination
 		);
-	}
-
-	/**
-	 * Same as bots query but this time is private and user can access every fields
-	 * @param pagination - The filters for pagination
-	 * @param input - The filters for pagination
-	 * @returns The paginated bots
-	 */
-	@Query(() => BotsConnection, {
-		name: 'panelBots',
-		description: 'Gives a list of bots'
-	})
-	@UseGuards(
-		// TODO: Change this Guard to a elevated permissions Guard, since the query IS private
-		OrGuard([InternalGuard, JwtAuthGuard])
-	)
-	public panelBots(
-		@Args('pagination', { nullable: true }) pagination: PaginationInput,
-		@Args('input', { nullable: true }) input: FiltersBotInput
-	) {
-		return this._botService.paginateBots(input, pagination);
 	}
 
 	/**

@@ -49,9 +49,9 @@ export class AdminPermissionsGuard extends JwtAuthGuard implements CanActivate {
 			ctx.getHandler()
 		);
 
-		// If the handler does not have the permissions decorator, return false
+		// If the handler does not have the permissions decorator, return true
 		if (!permissions.length) {
-			return false;
+			return true;
 		}
 
 		// If the user has the admin permission, they can do anything

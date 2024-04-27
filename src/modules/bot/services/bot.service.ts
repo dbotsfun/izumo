@@ -20,7 +20,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { AxiosError } from 'axios';
-import { and, eq, getTableColumns, like } from 'drizzle-orm';
+import { and, eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { WebhookService } from '../../../services/webhook.service';
 import { CreateBotInput } from '../inputs/bot/create.input';
@@ -84,10 +84,13 @@ export class BotService implements OnModuleInit {
 		>({
 			pagination,
 			schema: bots,
-			where: and(
-				eq(bots.status, input?.status || BotStatus.APPROVED),
-				input?.query ? like(bots.name, input.query) : undefined // TODO: Make a less specific search query logic
-			)
+			where: (table, { isNotNull, eq, like }) =>
+				and(
+					input?.status
+						? eq(bots.status, input.status)
+						: isNotNull(table.id),
+					input?.query ? like(table.name, input.query) : undefined // TODO: Make a less specific search query logic
+				)
 		});
 	}
 
@@ -388,10 +391,4 @@ export class BotService implements OnModuleInit {
 
 		return deleteBot;
 	}
-
-	/**
-	 * * Approve, Deny
-	 * * On deny let reviewer specify a reason, there should be some reason presets on dbotslist/elyam
-	 * * On any reviewer action trigger the webhook logs
-	 */
 }
