@@ -1,6 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { VanityType, vanities } from '@database/schema';
+import { VanityType } from '@database/enums';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { BotService } from '@modules/bot/services/bot.service';
@@ -37,10 +38,12 @@ export class VanityService {
 	 */
 	private readonly _vanityValidation: Record<
 		VanityType,
-		(id: string) => Promise<unknown>
+		(id: string, user: string) => Promise<{ id: string }>
 	> = {
-		[VanityType.USER]: (id: string) => this._ownerService.getOwner(id),
-		[VanityType.BOT]: (id: string) => this._botService.getBot(id)
+		[VanityType.USER]: (id: string, _user: string) =>
+			this._ownerService.getOwner(id),
+		[VanityType.BOT]: (id: string, user: string) =>
+			this._botService.getUserBot(id, user)
 	};
 
 	/**
@@ -87,11 +90,11 @@ export class VanityService {
 		}
 
 		// Check if the target ID exists in the database.
-		await this._vanityValidation[input.type](input.targetId);
+		await this._vanityValidation[input.type](input.targetId, user.id);
 
 		// Create the vanity entry.
 		const [vanity] = await this._drizzleService
-			.insert(vanities)
+			.insert(schema.vanities)
 			.values({
 				id: input.id,
 				targetId: input.targetId,
@@ -121,8 +124,8 @@ export class VanityService {
 
 		// Delete the vanity.
 		const [deletedVanity] = await this._drizzleService
-			.delete(vanities)
-			.where(eq(vanities.id, name))
+			.delete(schema.vanities)
+			.where(eq(schema.vanities.id, name))
 			.returning()
 			.execute();
 
@@ -144,15 +147,15 @@ export class VanityService {
 
 		// Check if the target ID exists in the database. If it does not, throw an error.
 		const [updatedVanity] = await this._drizzleService
-			.update(vanities)
+			.update(schema.vanities)
 			.set({
 				id: input.id,
 				targetId: input.targetId
 			})
 			.where(
 				and(
-					eq(vanities.targetId, input.targetId),
-					eq(vanities.type, input.type)
+					eq(schema.vanities.targetId, input.targetId),
+					eq(schema.vanities.type, input.type)
 				)
 			)
 			.returning()

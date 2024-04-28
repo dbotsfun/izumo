@@ -8,7 +8,6 @@ import { ObjectType, OmitType } from '@nestjs/graphql';
 	description: 'The bot owner object'
 })
 export class BotOwnerObject extends OmitType(AuthUserObject, [
-	'banner',
 	'createdAt',
 	'updatedAt',
 	'permissions'

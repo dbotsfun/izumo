@@ -43,10 +43,10 @@ export class BotOwnerService {
 	 * @throws NotFoundException if no owners are found.
 	 */
 	public async getOwners(id: string): Promise<BotOwnerObject[]> {
-		const response = await this._drizzleService.query.botToUser
+		const response = await this._drizzleService.query.botsTousers
 			.findMany({
-				where: (table, { eq }) => eq(table.a, id),
-				with: { owner: true }
+				where: (table, { eq }) => eq(table.A, id),
+				with: { users: true }
 			})
 			.execute();
 
@@ -54,6 +54,6 @@ export class BotOwnerService {
 			throw new NotFoundException(ErrorMessages.USERS_NOT_FOUND);
 		}
 
-		return response.map((table) => table.owner);
+		return response.map((table) => table.users);
 	}
 }

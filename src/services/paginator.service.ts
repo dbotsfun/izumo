@@ -1,5 +1,5 @@
 import { DATABASE } from '@constants/tokens';
-import { botToTag, bots } from '@database/tables';
+import { schema } from '@database/schema';
 import {
 	type PaginatedItems,
 	type PaginationInput,
@@ -140,19 +140,19 @@ export class PaginatorService {
 
 		// Prepare the query to fetch the paginated data
 		const query = this._drizzleService
-			.select({ bots })
-			.from(botToTag)
-			.where(eq(botToTag.b, tag))
-			.leftJoin(bots, eq(botToTag.a, bots.id)) // join the bots table
-			.orderBy(order(bots.id))
+			.select({ bots: schema.bots })
+			.from(schema.botsTotags)
+			.where(eq(schema.botsTotags.B, tag))
+			.leftJoin(schema.bots, eq(schema.botsTotags.A, schema.bots.id)) // join the bots table
+			.orderBy(order(schema.bots.id))
 			.limit(limit)
 			.offset(offset);
 
 		// Get the total count of entries
 		const [{ count: totalEntries }] = await this._drizzleService
 			.select({ count: count() })
-			.from(botToTag)
-			.where(eq(botToTag.b, tag))
+			.from(schema.botsTotags)
+			.where(eq(schema.botsTotags.B, tag))
 			.execute();
 
 		const entries = await query.execute();

@@ -1,1 +1,1 @@
-export * from './tables';
+export { schema } from './tables/schema';

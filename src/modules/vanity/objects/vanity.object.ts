@@ -1,10 +1,12 @@
-import { type TvanitiesSelect, VanityType } from '@database/schema';
+import { VanityType } from '@database/enums';
+import type { schema } from '@database/schema';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import type { InferSelectModel } from 'drizzle-orm';
 
 @ObjectType({
 	description: 'The object representing a vanity URL.'
 })
-export class VanityObject implements TvanitiesSelect {
+export class VanityObject implements InferSelectModel<typeof schema.vanities> {
 	@Field(() => ID, {
 		description: 'The ID of the vanity URL.'
 	})

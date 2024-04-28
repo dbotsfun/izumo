@@ -1,11 +1,11 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus } from '@database/schema';
+import { BotStatus } from '@database/enums';
 import type { DrizzleService } from '@lib/types';
-import { HashService } from '@modules/auth/services/hash.service';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { HashService } from '@services/hash.service';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 import type { JwtApikeyPayload } from '../interfaces/apikey.interface';
@@ -73,7 +73,7 @@ export class JwtApikeyStrategy extends PassportStrategy(
 		}
 
 		// biome-ignore lint/style/noNonNullAssertion: if the bot is approved then it must have an API key
-		if (!(await this._hashService.compare(token, bot.apiKey!))) {
+		if (!(await this._hashService.compare(token, bot.apikey!))) {
 			throw new UnauthorizedException(ErrorMessages.API_KEY_INVALID);
 		}
 

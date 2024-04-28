@@ -34,6 +34,7 @@
 			"@utils/*": ["src/lib/utils/*"],
 			"@gql/*": ["src/lib/utils/graphql/*"],
 			"@constants/*": ["src/lib/constants/*"],
+			"@services/*": ["src/services/*"],
 			"@modules/*": ["src/modules/*"],
 			"@database/*": ["src/database/*"],
 			"@lib/*": ["src/lib/*"],

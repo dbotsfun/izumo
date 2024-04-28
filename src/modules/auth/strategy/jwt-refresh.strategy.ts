@@ -5,11 +5,11 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
+import { HashService } from '@services/hash.service';
 import { arraySome } from '@utils/common';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 import type { JwtRefreshPayload } from '../interfaces/payload.interface';
-import { HashService } from '../services/hash.service';
 
 /**
  * JwtRefreshStrategy class is responsible for validating and refreshing JWT tokens.

@@ -1,4 +1,4 @@
-import type { TbotsInsert } from '@database/tables';
+import type { schema } from '@database/schema';
 import { IsSnowflake } from '@gql/validators/isSnowflake';
 import type { OmitType } from '@lib/types/utils';
 import { Field, ID, InputType } from '@nestjs/graphql';
@@ -10,6 +10,7 @@ import {
 	IsUrl,
 	Length
 } from 'class-validator';
+import type { InferInsertModel } from 'drizzle-orm';
 
 /**
  * The input type for the createBot mutation.
@@ -20,10 +21,10 @@ import {
 export class CreateBotInput
 	implements
 		OmitType<
-			TbotsInsert,
+			InferInsertModel<typeof schema.bots>,
 			| 'name'
 			| 'avatar'
-			| 'apiKey'
+			| 'apikey'
 			| 'status'
 			| 'certified'
 			| 'createdAt'

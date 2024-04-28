@@ -1,11 +1,9 @@
-import {
-	TwebhooksInsert,
-	WebhookEvent,
-	WebhookPayloadField
-} from '@database/schema';
+import { WebhookEvent, WebhookPayloadField } from '@database/enums';
+import type { schema } from '@database/schema';
 import { IsSnowflake } from '@gql/validators/isSnowflake';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { ArrayUnique, IsEnum, IsOptional, IsUrl } from 'class-validator';
+import type { InferInsertModel } from 'drizzle-orm';
 
 /**
  * Represents the input for creating a webhook.
@@ -13,7 +11,9 @@ import { ArrayUnique, IsEnum, IsOptional, IsUrl } from 'class-validator';
 @InputType({
 	description: 'The input to create a webhook'
 })
-export class CreateWebhookInput implements TwebhooksInsert {
+export class CreateWebhookInput
+	implements InferInsertModel<typeof schema.webhooks>
+{
 	/**
 	 * The bot ID to create the webhook.
 	 */
@@ -68,5 +68,5 @@ export class CreateWebhookInput implements TwebhooksInsert {
 		each: true
 	})
 	@ArrayUnique()
-	public payloadFields?: WebhookPayloadField[] | null;
+	public payloadFields?: WebhookPayloadField[];
 }

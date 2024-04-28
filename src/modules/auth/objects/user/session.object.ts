@@ -1,5 +1,6 @@
-import type { TsessionsSelect } from '@database/tables';
+import type { schema } from '@database/schema';
 import { Field, ObjectType } from '@nestjs/graphql';
+import type { InferInsertModel } from 'drizzle-orm';
 
 /**
  * Represents an authentication session object.
@@ -7,7 +8,9 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType({
 	description: 'The authentication session object'
 })
-export class AuthUserSessionObject implements Omit<TsessionsSelect, 'userId'> {
+export class AuthUserSessionObject
+	implements Omit<InferInsertModel<typeof schema.sessions>, 'userId'>
+{
 	/**
 	 * Hashed refresh token.
 	 */

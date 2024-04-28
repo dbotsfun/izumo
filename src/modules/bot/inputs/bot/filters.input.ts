@@ -1,4 +1,4 @@
-import { BotStatus } from '@database/tables';
+import { BotStatus } from '@database/enums';
 import { Field, InputType, OmitType } from '@nestjs/graphql';
 import { IsOptional } from 'class-validator';
 
@@ -16,17 +16,18 @@ export class FiltersBotInput {
 	@Field(() => BotStatus, {
 		description: 'The bots status.'
 	})
+	@IsOptional()
 	public status!: BotStatus;
 
 	/**
 	 * A string to search more specific bots
 	 * @type {string}
 	 */
-	@IsOptional()
 	@Field(() => String, {
 		description: 'The bots query.',
 		nullable: true
 	})
+	@IsOptional()
 	public query!: string | null;
 }
 

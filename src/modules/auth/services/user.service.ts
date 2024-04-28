@@ -1,10 +1,10 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { users } from '@database/tables';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import type { AuthUserUpdate } from '../inputs/user/update.input';
+import type { AuthUserUpdateInput } from '../inputs/user/update.input';
 
 /**
  * Service that provides methods to interact with the authenticated user
@@ -20,11 +20,11 @@ export class AuthUserService {
 	) {}
 
 	/**
-	 * Fetches the authenticated user
+	 * Gets a user by their ID.
 	 * @param id  - The ID of the user to fetch
 	 * @returns The authenticated user
 	 */
-	public async me(id: string) {
+	public async getUser(id: string) {
 		// Find the user by their ID
 		const user = await this._drizzleService.query.users.findFirst({
 			where: (table, { eq }) => eq(table.id, id)
@@ -45,12 +45,12 @@ export class AuthUserService {
 	 * @returns The updated user.
 	 * @throws NotFoundException if the user is not found.
 	 */
-	public async update(id: string, input: AuthUserUpdate) {
+	public async update(id: string, input: AuthUserUpdateInput) {
 		// Update the user
 		const [user] = await this._drizzleService
-			.update(users)
+			.update(schema.users)
 			.set(input)
-			.where(eq(users.id, id))
+			.where(eq(schema.users.id, id))
 			.returning();
 
 		// If the user is not found, throw a NotFoundException

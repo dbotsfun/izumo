@@ -1,4 +1,3 @@
-import { AUTH_AND_OWNER_PERMISSIONS } from '@constants/tokens';
 import { User } from '@modules/auth/decorators/user.decorator';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { OrGuard } from '@nest-lab/or-guard';
@@ -7,6 +6,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { InternalGuard } from '@utils/guards/internal.guard';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
+import { BotOwnerPermissionsGuard } from '../guards/permissions.guard';
 import { GetBotInput } from '../inputs/bot/get.input';
 import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { ApiKeyService } from '../services/apikey.service';
@@ -16,7 +16,7 @@ import { ApiKeyService } from '../services/apikey.service';
  */
 @Resolver(() => String)
 @UsePipes(ValidationTypes, ValidationPipe)
-@UseGuards(OrGuard([InternalGuard, AUTH_AND_OWNER_PERMISSIONS]))
+@UseGuards(OrGuard([InternalGuard, BotOwnerPermissionsGuard]))
 export class ApiKeyResolver {
 	/**
 	 * Creates an instance of the ApiKeyResolver class.

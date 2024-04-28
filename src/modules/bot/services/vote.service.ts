@@ -1,7 +1,8 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, votes } from '@database/schema';
+import { BotStatus } from '@database/enums';
+import { schema } from '@database/schema';
 import type { PaginationInput } from '@gql/pagination';
 import type { DrizzleService } from '@lib/types';
 import {
@@ -67,11 +68,11 @@ export class BotVoteService implements OnModuleInit {
 
 		// Create the vote.
 		const [vote] = await this._drizzleService
-			.insert(votes)
+			.insert(schema.votes)
 			.values({
 				botId,
 				userId,
-				expires: Date.now() + hours(12)
+				expires: BigInt(Date.now() + hours(12))
 			})
 			.returning();
 
@@ -89,11 +90,11 @@ export class BotVoteService implements OnModuleInit {
 		pagination: PaginationInput = {}
 	) {
 		return this._paginatorService.paginate<
-			typeof votes._.config,
-			typeof votes
+			typeof schema.votes._.config,
+			typeof schema.votes
 		>({
-			schema: votes,
-			where: eq(votes.botId, botId),
+			schema: schema.votes,
+			where: eq(schema.votes.botId, botId),
 			pagination
 		});
 	}
@@ -110,12 +111,12 @@ export class BotVoteService implements OnModuleInit {
 	): Promise<BotCanVoteObject> {
 		const userVotes = await this._drizzleService
 			.select()
-			.from(votes)
+			.from(schema.votes)
 			.where(
 				and(
-					eq(votes.botId, botId),
-					eq(votes.userId, userId),
-					gt(votes.expires, Date.now())
+					eq(schema.votes.botId, botId),
+					eq(schema.votes.userId, userId),
+					gt(schema.votes.expires, BigInt(Date.now()))
 				)
 			)
 			.limit(1)
@@ -123,7 +124,7 @@ export class BotVoteService implements OnModuleInit {
 
 		return {
 			canVote: !userVotes.length,
-			expires: userVotes[0]?.expires
+			expires: Number(userVotes[0]?.expires)
 		};
 	}
 }

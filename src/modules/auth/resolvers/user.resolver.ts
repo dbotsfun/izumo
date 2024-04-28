@@ -1,3 +1,4 @@
+import { BotOwnerObject } from '@modules/bot/objects/owner/owner.object';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
 	Args,
@@ -7,10 +8,10 @@ import {
 	ResolveField,
 	Resolver
 } from '@nestjs/graphql';
-import { ValidationTypes } from 'class-validator';
 import { User } from '../decorators/user.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import { AuthUserUpdate } from '../inputs/user/update.input';
+import { GetUserInput } from '../inputs/user/get.input';
+import { AuthUserUpdateInput } from '../inputs/user/update.input';
 import type { JwtPayload } from '../interfaces/payload.interface';
 import { AuthUserSessionObject } from '../objects/user/session.object';
 import { AuthUserObject } from '../objects/user/user.object';
@@ -21,7 +22,7 @@ import { AuthUserService } from '../services/user.service';
  * Resolver for user-related operations.
  */
 @Resolver(() => AuthUserObject)
-@UsePipes(ValidationTypes, ValidationPipe)
+@UsePipes(ValidationPipe)
 export class AuthUserResolver {
 	/**
 	 * Creates an instance of UserResolver.
@@ -43,7 +44,20 @@ export class AuthUserResolver {
 	})
 	@UseGuards(JwtAuthGuard)
 	public async me(@User() user: JwtPayload) {
-		return this._userService.me(user.id);
+		return this._userService.getUser(user.id);
+	}
+
+	/**
+	 * Retrieves a user based on the provided input.
+	 * @param input - The input object containing the user ID.
+	 * @returns A Promise that resolves to the user object.
+	 */
+	@Query(() => BotOwnerObject, {
+		name: 'getUser',
+		description: 'Fetches a user by their ID'
+	})
+	public async user(@Args('input') input: GetUserInput) {
+		return this._userService.getUser(input.id);
 	}
 
 	/**
@@ -59,7 +73,7 @@ export class AuthUserResolver {
 	@UseGuards(JwtAuthGuard)
 	public async update(
 		@User() user: JwtPayload,
-		@Args('input') input: AuthUserUpdate
+		@Args('input') input: AuthUserUpdateInput
 	) {
 		return this._userService.update(user.id, input);
 	}
@@ -71,7 +85,14 @@ export class AuthUserResolver {
 		description: 'Fetches the sessions of the authenticated user'
 	})
 	@UseGuards(JwtAuthGuard)
-	public async sessions(@Parent() user: AuthUserObject) {
+	public async sessions(
+		@Parent() user: AuthUserObject,
+		@User() jwtUser: JwtPayload
+	) {
+		if (jwtUser.id !== user.id) {
+			return [];
+		}
+
 		return this._authService.userSessions(user.id);
 	}
 }
