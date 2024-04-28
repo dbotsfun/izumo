@@ -1,6 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { VanityType, vanities } from '@database/schema';
+import { VanityType } from '@database/enums';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { BotService } from '@modules/bot/services/bot.service';
@@ -93,7 +94,7 @@ export class VanityService {
 
 		// Create the vanity entry.
 		const [vanity] = await this._drizzleService
-			.insert(vanities)
+			.insert(schema.vanities)
 			.values({
 				id: input.id,
 				targetId: input.targetId,
@@ -123,8 +124,8 @@ export class VanityService {
 
 		// Delete the vanity.
 		const [deletedVanity] = await this._drizzleService
-			.delete(vanities)
-			.where(eq(vanities.id, name))
+			.delete(schema.vanities)
+			.where(eq(schema.vanities.id, name))
 			.returning()
 			.execute();
 
@@ -146,15 +147,15 @@ export class VanityService {
 
 		// Check if the target ID exists in the database. If it does not, throw an error.
 		const [updatedVanity] = await this._drizzleService
-			.update(vanities)
+			.update(schema.vanities)
 			.set({
 				id: input.id,
 				targetId: input.targetId
 			})
 			.where(
 				and(
-					eq(vanities.targetId, input.targetId),
-					eq(vanities.type, input.type)
+					eq(schema.vanities.targetId, input.targetId),
+					eq(schema.vanities.type, input.type)
 				)
 			)
 			.returning()

@@ -1,6 +1,7 @@
-import type { TvotesSelect } from '@database/schema';
+import type { schema } from '@database/schema';
 import { Paginated } from '@gql/pagination';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import type { InferSelectModel } from 'drizzle-orm';
 
 /**
  * Represents a vote object for a bot.
@@ -8,7 +9,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 @ObjectType({
 	description: 'A vote object for a bot'
 })
-export class BotVoteObject implements TvotesSelect {
+export class BotVoteObject implements InferSelectModel<typeof schema.votes> {
 	/**
 	 * The ID of the vote.
 	 */
@@ -39,7 +40,7 @@ export class BotVoteObject implements TvotesSelect {
 	@Field(() => Number, {
 		description: 'The expiration date of the vote'
 	})
-	public expires!: number;
+	public expires!: bigint;
 }
 
 /**

@@ -1,6 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, bots } from '@database/schema';
+import { BotStatus } from '@database/enums';
+import { schema } from '@database/tables/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
@@ -54,13 +55,13 @@ export class AdminBotService {
 	) {
 		// Update status of the bot
 		const [bot] = await this._drizzleService
-			.update(bots)
+			.update(schema.bots)
 			.set({ status })
-			.where(eq(bots.id, id))
+			.where(eq(schema.bots.id, id))
 			.returning();
 
-		const owner = await this._drizzleService.query.botToUser.findFirst({
-			where: (table, { eq }) => eq(table.a, id)
+		const owner = await this._drizzleService.query.botsTousers.findFirst({
+			where: (table, { eq }) => eq(table.A, id)
 		});
 
 		// If the bot is not found, throw a NotFoundException
@@ -71,7 +72,7 @@ export class AdminBotService {
 		// Get the status message
 		const response = this.statusMessages[
 			status as Exclude<BotStatus, BotStatus.PENDING>
-		]({ reviewer, id, status, owner: owner.b });
+		]({ reviewer, id, status, owner: owner.B });
 
 		// Send a webhook message
 		if (response) {

@@ -32,6 +32,6 @@ export class BotTagFields {
 		@Parent() tag: BotTagObject,
 		@Args('pagination', { nullable: true }) pagination?: PaginationInput
 	) {
-		return this._tagService.paginateBotTags(tag.name, pagination);
+		return this._tagService.paginateBotTags(tag.id, pagination);
 	}
 }

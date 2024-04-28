@@ -1,14 +1,12 @@
-import {
-	TwebhooksSelect,
-	WebhookEvent,
-	WebhookPayloadField
-} from '@database/schema';
+import { WebhookEvent, WebhookPayloadField } from '@database/enums';
+import type { schema } from '@database/schema';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import type { InferSelectModel } from 'drizzle-orm';
 
 @ObjectType({
 	description: 'The webhook object'
 })
-export class WebhookObject implements TwebhooksSelect {
+export class WebhookObject implements InferSelectModel<typeof schema.webhooks> {
 	/**
 	 * The bot ID.
 	 */
@@ -40,7 +38,7 @@ export class WebhookObject implements TwebhooksSelect {
 		description: 'Custom payload fields to be sent with the webhook',
 		nullable: true
 	})
-	public payloadFields!: WebhookPayloadField[] | null;
+	public payloadFields!: WebhookPayloadField[];
 
 	/**
 	 * The events to listen to for the webhook.

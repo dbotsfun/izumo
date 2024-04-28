@@ -2,7 +2,8 @@ import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { MAX_TAGS_PER_BOT } from '@constants/limits';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, botToUser, bots } from '@database/tables';
+import { BotStatus } from '@database/enums';
+import { schema } from '@database/schema';
 import { type PaginationInput } from '@gql/pagination';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
@@ -27,7 +28,7 @@ import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
-import { BotObject, type BotsConnection } from '../objects/bot/bot.object';
+import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotTagService } from './tag.service';
 
@@ -79,15 +80,15 @@ export class BotService implements OnModuleInit {
 		pagination: PaginationInput = {}
 	): Promise<BotsConnection> {
 		return this._paginatorService.paginate<
-			typeof bots._.config,
-			typeof bots
+			typeof schema.bots._.config,
+			typeof schema.bots
 		>({
 			pagination,
-			schema: bots,
+			schema: schema.bots,
 			where: (table, { isNotNull, eq, like }) =>
 				and(
 					input?.status
-						? eq(bots.status, input.status)
+						? eq(schema.bots.status, input.status)
 						: isNotNull(table.id),
 					input?.query ? like(table.name, input.query) : undefined // TODO: Make a less specific search query logic
 				)
@@ -97,15 +98,15 @@ export class BotService implements OnModuleInit {
 	/**
 	 * Retrieves a bot by its ID.
 	 * @param {string} id - The ID of the bot to retrieve.
-	 * @returns {Promise<Bot>} - A promise that resolves to the bot object.
+	 * @returns {Promise<BotObject>} - A promise that resolves to the bot object.
 	 */
-	public async getBot(id: string): Promise<BotObject> {
+	public async getBot(id: string) {
 		// Get the bot from the database
 		const response = await this._drizzleService.query.bots
 			.findFirst({
 				where: (bot, { eq }) => eq(bot.id, id),
 				columns: {
-					apiKey: false
+					apikey: false
 				}
 			})
 			.execute();
@@ -127,10 +128,10 @@ export class BotService implements OnModuleInit {
 	 */
 	public async getUserBots(id: string): Promise<BotObject[]> {
 		// Get the bots owned by the user
-		const response = await this._drizzleService.query.botToUser
+		const response = await this._drizzleService.query.botsTousers
 			.findMany({
-				where: (table, { eq }) => eq(table.b, id),
-				with: { bot: { columns: { apiKey: false } } }
+				where: (table, { eq }) => eq(table.B, id),
+				with: { bots: { columns: { apikey: false } } }
 			})
 			.execute();
 
@@ -139,7 +140,7 @@ export class BotService implements OnModuleInit {
 			throw new NotFoundException(ErrorMessages.USER_HAS_NO_BOTS);
 		}
 
-		return response.map((table) => table.bot);
+		return response.map((table) => table.bots);
 	}
 
 	/**
@@ -152,11 +153,11 @@ export class BotService implements OnModuleInit {
 	 */
 	public async getUserBot(id: string, userId: string) {
 		// Check if the user is the owner of the bot
-		const userBot = await this._drizzleService.query.botToUser
+		const userBot = await this._drizzleService.query.botsTousers
 			.findFirst({
 				where: (table, { eq, and }) =>
-					and(eq(table.a, id), eq(table.b, userId)),
-				with: { bot: true }
+					and(eq(table.A, id), eq(table.B, userId)),
+				with: { bots: true }
 			})
 			.execute();
 
@@ -167,7 +168,7 @@ export class BotService implements OnModuleInit {
 			);
 		}
 
-		return userBot.bot;
+		return userBot.bots;
 	}
 
 	/**
@@ -240,7 +241,7 @@ export class BotService implements OnModuleInit {
 		const bot = await this._drizzleService.transaction(async (tx) => {
 			// Insert the bot into the database
 			const [bot] = await this._drizzleService
-				.insert(bots)
+				.insert(schema.bots)
 				.values({
 					...input,
 					name: botApiInformation.bot.username,
@@ -266,10 +267,10 @@ export class BotService implements OnModuleInit {
 			});
 
 			// Insert the bot into the botToUser table
-			await tx.insert(botToUser).values(
+			await tx.insert(schema.botsTousers).values(
 				[owner.id, ...coOwners].map((userId) => ({
-					a: bot.id,
-					b: userId
+					A: bot.id,
+					B: userId
 				}))
 			);
 
@@ -298,16 +299,16 @@ export class BotService implements OnModuleInit {
 		// Check if the bot is private if not set its status to pending and throw an error
 		if (!botApiInformation.application.bot_public) {
 			await this._drizzleService
-				.update(bots)
+				.update(schema.bots)
 				.set({
 					status: BotStatus.PENDING // Change bot status to PENDING if it is private, why would we have a private bot listed?
 				})
-				.where(eq(bots.id, input.id));
+				.where(eq(schema.bots.id, input.id));
 
 			throw new ForbiddenException(ErrorMessages.BOT_PRIVATE);
 		}
 
-		const { apiKey, ...secureCols } = getTableColumns(bots);
+		const { apikey, ...secureCols } = getTableColumns(schema.bots);
 
 		// If tags are provided in the input
 		if (input.tags) {
@@ -315,11 +316,11 @@ export class BotService implements OnModuleInit {
 			const currentTags = await this._tagService.getBotTags(input.id);
 			// Get the tags that were removed
 			const removedTags = currentTags.filter(
-				(tag) => !input.tags.includes(tag.name)
+				(tag) => !input.tags.includes(tag.id)
 			);
 			// Get the tags that were added
 			const addedTags = input.tags.filter(
-				(tag) => !currentTags.map((t) => t.name).includes(tag)
+				(tag) => !currentTags.map((t) => t.id).includes(tag)
 			);
 
 			// Check if the bot has more than the allowed tags
@@ -346,14 +347,14 @@ export class BotService implements OnModuleInit {
 				// Remove the tags that were removed
 				await this._tagService.removeTagsFromBot({
 					botId: input.id,
-					tagNames: removedTags.map((tag) => tag.name)
+					tagNames: removedTags.map((tag) => tag.id)
 				});
 			}
 		}
 
 		// Auto-update API information
 		const [updateBot] = await this._drizzleService
-			.update(bots)
+			.update(schema.bots)
 			.set({
 				...input,
 				name: botApiInformation.bot.username,
@@ -361,7 +362,7 @@ export class BotService implements OnModuleInit {
 				guildCount: botApiInformation.bot.approximate_guild_count
 				// TODO: owners permissions
 			})
-			.where(eq(bots.id, input.id))
+			.where(eq(schema.bots.id, input.id))
 			.returning(secureCols); // TODO: Better way to OMIT the "apiKey" field
 
 		await this._webhookService.sendDiscordMessage(
@@ -381,8 +382,8 @@ export class BotService implements OnModuleInit {
 	public async deleteBot(owner: JwtPayload, input: DeleteBotInput) {
 		// Delete the bot
 		const [deleteBot] = await this._drizzleService
-			.delete(bots)
-			.where(eq(bots.id, input.id))
+			.delete(schema.bots)
+			.where(eq(schema.bots.id, input.id))
 			.returning();
 
 		await this._webhookService.sendDiscordMessage(

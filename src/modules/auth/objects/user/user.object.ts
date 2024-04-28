@@ -1,10 +1,11 @@
-import type { TuserSelect } from '@database/tables';
+import type { schema } from '@database/schema';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import type { InferSelectModel } from 'drizzle-orm';
 
 @ObjectType({
 	description: 'The authenticated user object'
 })
-export class AuthUserObject implements TuserSelect {
+export class AuthUserObject implements InferSelectModel<typeof schema.users> {
 	/**
 	 * The unique identifier of the user
 	 */
@@ -59,16 +60,16 @@ export class AuthUserObject implements TuserSelect {
 	/**
 	 * The creation date of the user.
 	 */
-	@Field(() => String, {
+	@Field(() => Date, {
 		description: 'The creation date of the user'
 	})
-	public createdAt!: string;
+	public createdAt!: Date;
 
 	/**
 	 * The last update date of the user.
 	 */
-	@Field(() => String, {
+	@Field(() => Date, {
 		description: 'The last update date of the user'
 	})
-	public updatedAt!: string;
+	public updatedAt!: Date;
 }

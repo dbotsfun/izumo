@@ -1,4 +1,4 @@
-import type { TuserInsert } from '@database/tables';
+import type { schema } from '@database/schema';
 import type { OmitType } from '@lib/types/utils';
 import { Field, InputType } from '@nestjs/graphql';
 import {
@@ -16,7 +16,7 @@ import { IsOptional, IsString, IsUrl } from 'class-validator';
 export class AuthUserUpdateInput
 	implements
 		OmitType<
-			TuserInsert,
+			typeof schema.users.$inferInsert,
 			| 'createdAt'
 			| 'updatedAt'
 			| 'permissions'

@@ -1,4 +1,4 @@
-import { BotStatus } from '@database/tables';
+import { BotStatus } from '@database/enums';
 import { Field, InputType, OmitType } from '@nestjs/graphql';
 import { IsOptional } from 'class-validator';
 

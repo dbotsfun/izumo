@@ -47,7 +47,7 @@ export class BotTagResolver {
 		description: 'Fetches a tag by name.'
 	})
 	public async get(@Args('input') input: GetBotTagInput) {
-		return this._tagService.getTag(input.name);
+		return this._tagService.getTag(input.id);
 	}
 
 	/**
@@ -61,6 +61,6 @@ export class BotTagResolver {
 	})
 	@UseGuards(JwtAuthGuard)
 	public async create(@Args('input') input: CreateBotTagInput) {
-		return this._tagService.createTag(input.name);
+		return this._tagService.createTag(input.id);
 	}
 }

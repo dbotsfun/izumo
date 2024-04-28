@@ -1,4 +1,4 @@
-import { BotStatus } from '@database/tables';
+import { BotStatus } from '@database/enums';
 import { PaginationInput } from '@gql/pagination';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';

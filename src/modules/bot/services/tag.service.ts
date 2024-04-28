@@ -1,7 +1,7 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { botToTag, tags } from '@database/tables';
+import { schema } from '@database/schema';
 import type { PaginationInput } from '@gql/pagination';
 import type { DrizzleService } from '@lib/types';
 import {
@@ -58,9 +58,9 @@ export class BotTagService implements OnModuleInit {
 		const name = this.formatTagName(query);
 		// Create the tag if it does exist throws an error.
 		const [tag] = await this._drizzleService
-			.insert(tags)
+			.insert(schema.tags)
 			.values({
-				name,
+				id: name,
 				displayName: query
 			})
 			.returning()
@@ -83,15 +83,15 @@ export class BotTagService implements OnModuleInit {
 		pagination: PaginationInput = {}
 	) {
 		return this._paginatorService.paginate<
-			typeof tags._.config,
-			typeof tags
+			typeof schema.tags._.config,
+			typeof schema.tags
 		>({
 			pagination,
-			schema: tags,
+			schema: schema.tags,
 			where: input?.query
 				? or(
-						eq(tags.name, this.formatTagName(input.query)),
-						ilike(tags.displayName, input.query)
+						eq(schema.tags.id, this.formatTagName(input.query)),
+						ilike(schema.tags.displayName, input.query)
 					)
 				: undefined
 		});
@@ -123,11 +123,11 @@ export class BotTagService implements OnModuleInit {
 
 		// Assign the tags to the bot.
 		await this._drizzleService
-			.insert(botToTag)
+			.insert(schema.botsTotags)
 			.values(
 				tags.map((tag) => ({
-					a: input.botId,
-					b: tag.name
+					A: input.botId,
+					B: tag.id
 				}))
 			)
 			.execute();
@@ -142,10 +142,10 @@ export class BotTagService implements OnModuleInit {
 	 * @throws NotFoundException if no tags are found for the bot.
 	 */
 	public async getBotTags(id: string): Promise<BotTagObject[]> {
-		const response = await this._drizzleService.query.botToTag
+		const response = await this._drizzleService.query.botsTotags
 			.findMany({
-				where: (table, { eq }) => eq(table.a, id),
-				with: { tag: true }
+				where: (table, { eq }) => eq(table.A, id),
+				with: { tags: true }
 			})
 			.execute();
 
@@ -153,7 +153,7 @@ export class BotTagService implements OnModuleInit {
 			throw new NotFoundException(ErrorMessages.TAGS_NOT_FOUND);
 		}
 
-		return response.map((table) => table.tag);
+		return response.map((table) => table.tags);
 	}
 
 	/**
@@ -165,7 +165,7 @@ export class BotTagService implements OnModuleInit {
 	public async getTagsByName(names: string[]): Promise<BotTagObject[]> {
 		names = names.map((name) => this.formatTagName(name));
 		const tags = await this._drizzleService.query.tags.findMany({
-			where: (table, { inArray }) => inArray(table.name, names)
+			where: (table, { inArray }) => inArray(table.id, names)
 		});
 
 		if (!tags.length) {
@@ -186,7 +186,7 @@ export class BotTagService implements OnModuleInit {
 		const tag = await this._drizzleService.query.tags.findFirst({
 			where: (table, { or, eq, ilike }) =>
 				or(
-					eq(table.name, this.formatTagName(name)),
+					eq(table.id, this.formatTagName(name)),
 					ilike(table.displayName, name)
 				)
 		});
@@ -216,7 +216,7 @@ export class BotTagService implements OnModuleInit {
 		if (tags.length !== names.length) {
 			for (const tag of names) {
 				// Check if the tag already exists.
-				if (tags.find((t) => t.name === tag)) continue;
+				if (tags.find((t) => t.id === tag)) continue;
 
 				// Create the tag if it does not exist.
 				const actualTag = await this.createTag(tag).catch(() => null);
@@ -241,8 +241,13 @@ export class BotTagService implements OnModuleInit {
 		tagNames
 	}: ConnectBotTagsToBotInput) {
 		return this._drizzleService
-			.delete(botToTag)
-			.where(and(inArray(botToTag.b, tagNames), eq(botToTag.a, botId)))
+			.delete(schema.botsTotags)
+			.where(
+				and(
+					inArray(schema.botsTotags.B, tagNames),
+					eq(schema.botsTotags.A, botId)
+				)
+			)
 			.returning()
 			.execute();
 	}

@@ -3,8 +3,8 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
 	dialect: 'postgresql',
-	out: './src/database',
-	schema: './src/database/schema.ts',
+	out: './src/database/migrations',
+	schema: './src/database/tables/*',
 	dbCredentials: {
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		url: process.env.DATABASE_URL!
@@ -14,7 +14,7 @@ export default defineConfig({
 	// Always ask for confirmation
 	strict: true,
 	migrations: {
-		table: 'drizzle_migrations',
+		table: '__migrations',
 		schema: 'public'
 	}
 });

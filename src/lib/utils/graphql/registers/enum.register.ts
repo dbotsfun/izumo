@@ -3,7 +3,7 @@ import {
 	VanityType,
 	WebhookEvent,
 	WebhookPayloadField
-} from '@database/tables';
+} from '@database/enums';
 import { UserPermissionsFlags } from '@modules/admin/permissions/user.permissions';
 import { registerEnumType } from '@nestjs/graphql';
 import { SortOrder } from '../pagination';

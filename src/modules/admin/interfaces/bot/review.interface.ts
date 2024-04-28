@@ -1,4 +1,4 @@
-import type { BotStatus } from '@database/schema';
+import type { BotStatus } from '@database/enums';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 
 /**

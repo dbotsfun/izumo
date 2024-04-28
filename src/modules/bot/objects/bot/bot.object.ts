@@ -1,7 +1,9 @@
-import { BotStatus, type TbotsSelect } from '@database/tables';
+import { BotStatus } from '@database/enums';
+import type { schema } from '@database/schema';
 import { Paginated } from '@gql/pagination';
 import type { OmitType } from '@lib/types/utils';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import type { InferSelectModel } from 'drizzle-orm';
 import { BotUserPermissions } from './bot.user.permissions';
 
 /**
@@ -10,7 +12,13 @@ import { BotUserPermissions } from './bot.user.permissions';
 @ObjectType({
 	description: 'A bot object.'
 })
-export class BotObject implements OmitType<TbotsSelect, 'apiKey' | 'banner'> {
+export class BotObject
+	implements
+		OmitType<
+			InferSelectModel<typeof schema.bots>,
+			'apikey' | 'banner' | 'userPermissions'
+		>
+{
 	/**
 	 * The unique identifier of the bot.
 	 */
@@ -81,18 +89,18 @@ export class BotObject implements OmitType<TbotsSelect, 'apiKey' | 'banner'> {
 	/**
 	 * The creation date of the bot.
 	 */
-	@Field(() => String, {
+	@Field(() => Date, {
 		description: 'The creation date of the bot.'
 	})
-	public createdAt!: string;
+	public createdAt!: Date;
 
 	/**
 	 * The last update date of the bot.
 	 */
-	@Field(() => String, {
+	@Field(() => Date, {
 		description: 'The last update date of the bot.'
 	})
-	public updatedAt!: string;
+	public updatedAt!: Date;
 
 	/**
 	 * The GitHub repository URL of the bot.
@@ -145,7 +153,7 @@ export class BotObject implements OmitType<TbotsSelect, 'apiKey' | 'banner'> {
 		description: 'The source from which the bot was imported.',
 		nullable: true
 	})
-	public importedFrom!: 'DISCORD_LIST' | null;
+	public importedFrom!: string | null;
 
 	/**
 	 * The permissions of the bot user.

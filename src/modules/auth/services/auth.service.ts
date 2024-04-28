@@ -1,6 +1,6 @@
 import { DiscordAuthEndpoints } from '@constants/discord/endpoints';
 import { DATABASE, ErrorMessages } from '@constants/index';
-import { type TuserInsert, sessions, users } from '@database/tables';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { days } from '@nestjs/throttler';
 import { HashService } from '@services/hash.service';
 import { arrayFind } from '@utils/common';
-import { eq } from 'drizzle-orm';
+import { type InferInsertModel, eq } from 'drizzle-orm';
 import { firstValueFrom } from 'rxjs';
 import type { GeneratedHash, NewSession } from '../interfaces/auth.interface';
 import {
@@ -86,7 +86,7 @@ export class AuthService {
 		// Create a session in the database
 		await this._drizzleService.transaction(async (tx) => {
 			// User fields to insert or update in the database
-			const userFields: TuserInsert = {
+			const userFields: InferInsertModel<typeof schema.users> = {
 				id: userData.id,
 				username: userData.username,
 				avatar: userData.avatar
@@ -94,16 +94,16 @@ export class AuthService {
 
 			// Insert or update the user in the database
 			await tx
-				.insert(users)
+				.insert(schema.users)
 				.values(userFields)
 				.onConflictDoUpdate({
 					set: userFields,
-					where: eq(users.id, userFields.id),
-					target: [users.id]
+					where: eq(schema.users.id, userFields.id),
+					target: [schema.users.id]
 				});
 
 			// Insert the session into the database
-			await tx.insert(sessions).values({
+			await tx.insert(schema.sessions).values({
 				refreshToken: await this._hashService.hash(refreshToken),
 				accessToken: await this._hashService.hash(accessToken),
 				userId: userData.id
@@ -176,21 +176,21 @@ export class AuthService {
 		await this._drizzleService.transaction(async (tx) => {
 			// Update the user in the database
 			await tx
-				.update(users)
+				.update(schema.users)
 				.set({
 					username: userData.username,
 					avatar: userData.avatar
 				})
-				.where(eq(users.id, userData.id));
+				.where(eq(schema.users.id, userData.id));
 
 			// Update the session in the database
 			await tx
-				.update(sessions)
+				.update(schema.sessions)
 				.set({
 					accessToken: await this._hashService.hash(accessToken),
 					refreshToken: await this._hashService.hash(refreshToken)
 				})
-				.where(eq(sessions.refreshToken, session.refreshToken));
+				.where(eq(schema.sessions.refreshToken, session.refreshToken));
 		});
 
 		return {
@@ -237,8 +237,8 @@ export class AuthService {
 
 		// Delete the session from the database
 		await this._drizzleService
-			.delete(sessions)
-			.where(eq(sessions.accessToken, session.accessToken));
+			.delete(schema.sessions)
+			.where(eq(schema.sessions.accessToken, session.accessToken));
 
 		return true;
 	}

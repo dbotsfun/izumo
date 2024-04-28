@@ -1,11 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import {
-	BotStatus,
-	WebhookEvent,
-	WebhookPayloadField,
-	webhooks
-} from '@database/schema';
+import { BotStatus, WebhookEvent, WebhookPayloadField } from '@database/enums';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { HttpService } from '@nestjs/axios';
@@ -79,7 +75,7 @@ export class BotWebhookService implements OnModuleInit {
 
 		// Insert the webhook into the database
 		const [webhook] = await this._drizzleService
-			.insert(webhooks)
+			.insert(schema.webhooks)
 			.values(input)
 			.returning()
 			.execute();
@@ -132,7 +128,7 @@ export class BotWebhookService implements OnModuleInit {
 
 		// Update the webhook
 		const [webhook] = await this._drizzleService
-			.update(webhooks)
+			.update(schema.webhooks)
 			.set({
 				// Merge the existing webhook with the new input
 				...existingWebhook,
@@ -140,7 +136,7 @@ export class BotWebhookService implements OnModuleInit {
 				events,
 				payloadFields
 			})
-			.where(eq(webhooks.id, input.id))
+			.where(eq(schema.webhooks.id, input.id))
 			.returning()
 			.execute();
 
@@ -160,8 +156,8 @@ export class BotWebhookService implements OnModuleInit {
 
 		// Delete the webhook
 		await this._drizzleService
-			.delete(webhooks)
-			.where(eq(webhooks.id, id))
+			.delete(schema.webhooks)
+			.where(eq(schema.webhooks.id, id))
 			.execute();
 
 		return webhook;

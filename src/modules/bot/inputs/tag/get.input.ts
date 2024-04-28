@@ -5,5 +5,5 @@ import { CreateBotTagInput } from './create.input';
 	description: 'The input type for fetching a tag'
 })
 export class GetBotTagInput extends PickType(CreateBotTagInput, [
-	'name'
+	'id'
 ] as const) {}

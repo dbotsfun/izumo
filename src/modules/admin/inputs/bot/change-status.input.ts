@@ -1,4 +1,4 @@
-import { BotStatus } from '@database/schema';
+import { BotStatus } from '@database/enums';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsSnowflake } from '@utils/graphql/validators/isSnowflake';
 import { IsOptional, IsString } from 'class-validator';

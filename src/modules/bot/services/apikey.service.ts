@@ -1,6 +1,7 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { BotStatus, bots } from '@database/schema';
+import { BotStatus } from '@database/enums';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import {
 	Inject,
@@ -80,11 +81,11 @@ export class ApiKeyService implements OnModuleInit {
 
 		// Update the bot with the generated API key. Only the hash is stored to ensure security.
 		await this._drizzleService
-			.update(bots)
+			.update(schema.bots)
 			.set({
-				apiKey: hash
+				apikey: hash
 			})
-			.where(eq(bots.id, botId));
+			.where(eq(schema.bots.id, botId));
 
 		return apiKey;
 	}
@@ -104,15 +105,15 @@ export class ApiKeyService implements OnModuleInit {
 		const botData = await this._drizzleService.query.bots.findFirst({
 			where: (table, { eq }) => eq(table.id, decoded.botId),
 			columns: {
-				apiKey: true
+				apikey: true
 			}
 		});
 
 		// If the bot data is not found, throw an error.
-		if (!botData || !botData.apiKey) {
+		if (!botData || !botData.apikey) {
 			throw new UnauthorizedException(ErrorMessages.API_KEY_INVALID);
 		}
 
-		return this._hashService.compare(botData.apiKey, apiKey);
+		return this._hashService.compare(botData.apikey, apiKey);
 	}
 }

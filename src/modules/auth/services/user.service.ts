@@ -1,6 +1,6 @@
 import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
-import { users } from '@database/tables';
+import { schema } from '@database/schema';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
@@ -48,9 +48,9 @@ export class AuthUserService {
 	public async update(id: string, input: AuthUserUpdateInput) {
 		// Update the user
 		const [user] = await this._drizzleService
-			.update(users)
+			.update(schema.users)
 			.set(input)
-			.where(eq(users.id, id))
+			.where(eq(schema.users.id, id))
 			.returning();
 
 		// If the user is not found, throw a NotFoundException
