@@ -1,3 +1,4 @@
+import { BotOwnerObject } from '@modules/bot/objects/owner/owner.object';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
 	Args,
@@ -51,7 +52,7 @@ export class AuthUserResolver {
 	 * @param input - The input object containing the user ID.
 	 * @returns A Promise that resolves to the user object.
 	 */
-	@Query(() => AuthUserObject, {
+	@Query(() => BotOwnerObject, {
 		name: 'getUser',
 		description: 'Fetches a user by their ID'
 	})
