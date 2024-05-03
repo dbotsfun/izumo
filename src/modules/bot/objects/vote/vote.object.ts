@@ -40,7 +40,7 @@ export class BotVoteObject implements InferSelectModel<typeof schema.votes> {
 	@Field(() => Number, {
 		description: 'The expiration date of the vote'
 	})
-	public expires!: bigint;
+	public expires!: number;
 }
 
 /**

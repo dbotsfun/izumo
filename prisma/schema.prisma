@@ -136,7 +136,7 @@ model Vote {
     id      Int    @id @default(autoincrement())
     botId   String @map("bot_id")
     userId  String @map("user_id")
-    expires BigInt @map("expires")
+    expires Int    @map("expires")
     //
     bot     Bot    @relation(fields: [botId], references: [id], onDelete: Cascade)
     user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
