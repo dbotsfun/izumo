@@ -1,3 +1,4 @@
+import { now } from '@database/common';
 import { BotStatus } from '@database/enums';
 import { BotUserPermissions } from '@modules/bot/objects/bot/bot.user.permissions';
 import {
@@ -37,6 +38,6 @@ export const bots = pgTable('bots', {
 		.defaultNow()
 		.notNull(),
 	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
-		.defaultNow()
+		.$defaultFn(() => now())
 		.notNull()
 });

@@ -31,6 +31,7 @@ model Bot {
     /// drizzle.type @modules/bot/objects/bot/bot.user.permissions::BotUserPermissions
     userPermissions  Json[]   @map("user_permissions")
     createdAt        DateTime @default(now()) @map("created_at")
+    /// drizzle.default @database/common::now `() => now()`
     updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
     //
     reviews          Review[]
@@ -49,6 +50,7 @@ model Badge {
     description String
     icon        String
     createdAt   DateTime @default(now()) @map("created_at")
+    /// drizzle.default @database/common::now `() => now()`
     updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
     //
     users       User[]
@@ -64,6 +66,7 @@ model Review {
     rating    Int
     content   String
     createdAt DateTime @default(now()) @map("created_at")
+    /// drizzle.default @database/common::now `() => now()`
     updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
     //
     bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
@@ -81,6 +84,7 @@ model User {
     bio         String?
     permissions Int       @default(0)
     createdAt   DateTime  @default(now()) @map("created_at")
+    /// drizzle.default @database/common::now `() => now()`
     updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
     //
     reviews     Review[]
@@ -93,14 +97,16 @@ model User {
 }
 
 model Session {
-    userId       String   @id @map("user_id")
+    userId       String   @map("user_id")
     refreshToken String   @map("refresh_token")
     accessToken  String   @map("access_token")
     createdAt    DateTime @default(now()) @map("created_at")
+    /// drizzle.default @database/common::now `() => now()`
     updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
     //
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@id([accessToken, refreshToken])
     @@map("sessions")
 }
 

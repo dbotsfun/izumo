@@ -1,3 +1,4 @@
+import { now } from '@database/common';
 import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const badges = pgTable('badges', {
@@ -10,6 +11,6 @@ export const badges = pgTable('badges', {
 		.defaultNow()
 		.notNull(),
 	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
-		.defaultNow()
+		.$defaultFn(() => now())
 		.notNull()
 });
