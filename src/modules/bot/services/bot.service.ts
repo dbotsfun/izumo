@@ -126,7 +126,10 @@ export class BotService implements OnModuleInit {
 	 * @param {string} id - The ID of the owner.
 	 * @returns {Promise<Bot[]>} - A promise that resolves to an array of bots.
 	 */
-	public async getUserBots(id: string): Promise<BotObject[]> {
+	public async getUserBots(
+		id: string,
+		throwIfNoBots = true
+	): Promise<BotObject[]> {
 		// Get the bots owned by the user
 		const response = await this._drizzleService.query.botsTousers
 			.findMany({
@@ -135,12 +138,12 @@ export class BotService implements OnModuleInit {
 			})
 			.execute();
 
-		// If the user has no bots, throw a NotFoundException
-		if (!response.length) {
+		// If the user has no bots and throwIfNoBots is true, throw a NotFoundException
+		if (!response.length && throwIfNoBots) {
 			throw new NotFoundException(ErrorMessages.USER_HAS_NO_BOTS);
 		}
 
-		return response.map((table) => table.bots);
+		return response.map((table) => table.bots) ?? [];
 	}
 
 	/**
