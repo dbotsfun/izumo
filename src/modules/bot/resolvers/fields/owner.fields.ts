@@ -24,6 +24,9 @@ export class BotOwnerFields {
 		description: 'The bots that the owner owns.'
 	})
 	public bots(@Parent() owner: BotOwnerObject) {
-		return this._botService.getUserBots(owner.id);
+		return this._botService.getUserBots(
+			owner.id,
+			false /** todo: find a better way to determine if should throw an error */
+		);
 	}
 }
