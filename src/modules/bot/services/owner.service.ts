@@ -2,6 +2,7 @@ import { ErrorMessages } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { BotOwnerBadgeObject } from '../objects/owner/owner.badges.object';
 import type { BotOwnerObject } from '../objects/owner/owner.object';
 /**
  * Service class for handling bot owner-related operations.
@@ -55,5 +56,21 @@ export class BotOwnerService {
 		}
 
 		return response.map((table) => table.users);
+	}
+
+	/**
+	 * Retrieves the owner badges by user ID
+	 * @param id The ID of the owner
+	 * @returns The owner badges
+	 */
+	public async getOwnerBadges(id: string): Promise<BotOwnerBadgeObject[]> {
+		const badges = await this._drizzleService.query.badgesTousers
+			.findMany({
+				where: (table, { eq }) => eq(table.A, id),
+				with: { badges: true }
+			})
+			.execute();
+
+		return badges.map((b) => b.badges);
 	}
 }
