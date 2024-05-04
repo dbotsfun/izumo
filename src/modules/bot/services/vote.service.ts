@@ -72,7 +72,7 @@ export class BotVoteService implements OnModuleInit {
 			.values({
 				botId,
 				userId,
-				expires: BigInt(Date.now() + hours(12))
+				expires: Date.now() + hours(12)
 			})
 			.returning();
 
@@ -116,7 +116,7 @@ export class BotVoteService implements OnModuleInit {
 				and(
 					eq(schema.votes.botId, botId),
 					eq(schema.votes.userId, userId),
-					gt(schema.votes.expires, BigInt(Date.now()))
+					gt(schema.votes.expires, Date.now())
 				)
 			)
 			.limit(1)

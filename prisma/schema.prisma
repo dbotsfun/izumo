@@ -15,6 +15,7 @@ model Bot {
     avatar           String?
     certified        Boolean  @default(false)
     banner           String?
+    ownerId          String   @map("owner_id")
     /// drizzle.type @database/enums::BotStatus
     /// drizzle.default @database/enums::BotStatus `() => BotStatus.PENDING`
     status           String   @default("PENDING")
