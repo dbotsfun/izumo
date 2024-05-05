@@ -5,11 +5,11 @@ import { users } from './users';
 
 export const badgesTousersRelations = relations(badgesTousers, (helpers) => ({
 	badges: helpers.one(badges, {
-		fields: [badgesTousers.A],
+		fields: [badgesTousers.badgeId],
 		references: [badges.id]
 	}),
 	users: helpers.one(users, {
-		fields: [badgesTousers.B],
+		fields: [badgesTousers.userId],
 		references: [users.id]
 	})
 }));

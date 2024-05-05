@@ -11,6 +11,7 @@ export const badges = pgTable('badges', {
 		.defaultNow()
 		.notNull(),
 	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
-		.$defaultFn(() => now())
+		.defaultNow()
+		.$onUpdate(now)
 		.notNull()
 });

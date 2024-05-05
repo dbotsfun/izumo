@@ -46,7 +46,7 @@ export class BotOwnerService {
 	public async getOwners(id: string): Promise<BotOwnerObject[]> {
 		const response = await this._drizzleService.query.botsTousers
 			.findMany({
-				where: (table, { eq }) => eq(table.A, id),
+				where: (table, { eq }) => eq(table.botId, id),
 				with: { users: true }
 			})
 			.execute();
@@ -66,7 +66,7 @@ export class BotOwnerService {
 	public async getOwnerBadges(id: string): Promise<BotOwnerBadgeObject[]> {
 		const badges = await this._drizzleService.query.badgesTousers
 			.findMany({
-				where: (table, { eq }) => eq(table.A, id),
+				where: (table, { eq }) => eq(table.badgeId, id),
 				with: { badges: true }
 			})
 			.execute();

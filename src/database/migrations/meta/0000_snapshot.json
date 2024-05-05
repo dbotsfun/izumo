@@ -1,5 +1,5 @@
 {
-	"id": "794664c3-4dcf-4ab9-90eb-8c1c1f9a0178",
+	"id": "a48c79c9-1ee7-43c1-bbfc-ad89f962fd65",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "6",
 	"dialect": "postgresql",
@@ -22,7 +22,26 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"_BadgeToUser_A_badges_id_fk": {
+					"name": "_BadgeToUser_A_badges_id_fk",
+					"tableFrom": "_BadgeToUser",
+					"tableTo": "badges",
+					"columnsFrom": ["A"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"_BadgeToUser_B_users_id_fk": {
+					"name": "_BadgeToUser_B_users_id_fk",
+					"tableFrom": "_BadgeToUser",
+					"tableTo": "users",
+					"columnsFrom": ["B"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
@@ -98,7 +117,26 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"_BotToTag_A_bots_id_fk": {
+					"name": "_BotToTag_A_bots_id_fk",
+					"tableFrom": "_BotToTag",
+					"tableTo": "bots",
+					"columnsFrom": ["A"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"_BotToTag_B_tags_id_fk": {
+					"name": "_BotToTag_B_tags_id_fk",
+					"tableFrom": "_BotToTag",
+					"tableTo": "tags",
+					"columnsFrom": ["B"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
@@ -119,8 +157,38 @@
 					"notNull": true
 				}
 			},
-			"indexes": {},
-			"foreignKeys": {},
+			"indexes": {
+				"_BotToUser_AB_unique": {
+					"name": "_BotToUser_AB_unique",
+					"columns": ["A", "B"],
+					"isUnique": true
+				},
+				"_BotToUser_B_index": {
+					"name": "_BotToUser_B_index",
+					"columns": ["B"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"_BotToUser_A_bots_id_fk": {
+					"name": "_BotToUser_A_bots_id_fk",
+					"tableFrom": "_BotToUser",
+					"tableTo": "bots",
+					"columnsFrom": ["A"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"_BotToUser_B_users_id_fk": {
+					"name": "_BotToUser_B_users_id_fk",
+					"tableFrom": "_BotToUser",
+					"tableTo": "users",
+					"columnsFrom": ["B"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
@@ -163,7 +231,8 @@
 					"name": "status",
 					"type": "text",
 					"primaryKey": false,
-					"notNull": true
+					"notNull": true,
+					"default": "'PENDING'"
 				},
 				"description": {
 					"name": "description",
@@ -301,8 +370,33 @@
 					"default": "now()"
 				}
 			},
-			"indexes": {},
-			"foreignKeys": {},
+			"indexes": {
+				"reviews_bot_id_user_id_key": {
+					"name": "reviews_bot_id_user_id_key",
+					"columns": ["bot_id", "user_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"reviews_bot_id_bots_id_fk": {
+					"name": "reviews_bot_id_bots_id_fk",
+					"tableFrom": "reviews",
+					"tableTo": "bots",
+					"columnsFrom": ["bot_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"reviews_user_id_users_id_fk": {
+					"name": "reviews_user_id_users_id_fk",
+					"tableFrom": "reviews",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
@@ -313,7 +407,7 @@
 				"user_id": {
 					"name": "user_id",
 					"type": "text",
-					"primaryKey": true,
+					"primaryKey": false,
 					"notNull": true
 				},
 				"refresh_token": {
@@ -344,8 +438,23 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
-			"compositePrimaryKeys": {},
+			"foreignKeys": {
+				"sessions_user_id_users_id_fk": {
+					"name": "sessions_user_id_users_id_fk",
+					"tableFrom": "sessions",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {
+				"sessions_access_token_refresh_token_pk": {
+					"name": "sessions_access_token_refresh_token_pk",
+					"columns": ["access_token", "refresh_token"]
+				}
+			},
 			"uniqueConstraints": {}
 		},
 		"public.tags": {
@@ -462,13 +571,24 @@
 				},
 				"type": {
 					"name": "type",
-					"type": "text",
+					"type": "vanity_type",
+					"typeSchema": "public",
 					"primaryKey": false,
 					"notNull": true
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"vanities_user_id_users_id_fk": {
+					"name": "vanities_user_id_users_id_fk",
+					"tableFrom": "vanities",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
@@ -502,7 +622,26 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"votes_bot_id_bots_id_fk": {
+					"name": "votes_bot_id_bots_id_fk",
+					"tableFrom": "votes",
+					"tableTo": "bots",
+					"columnsFrom": ["bot_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"votes_user_id_users_id_fk": {
+					"name": "votes_user_id_users_id_fk",
+					"tableFrom": "votes",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		},
@@ -543,12 +682,28 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"webhooks_id_bots_id_fk": {
+					"name": "webhooks_id_bots_id_fk",
+					"tableFrom": "webhooks",
+					"tableTo": "bots",
+					"columnsFrom": ["id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {}
 		}
 	},
-	"enums": {},
+	"enums": {
+		"public.vanity_type": {
+			"name": "vanity_type",
+			"schema": "public",
+			"values": ["USER", "BOT"]
+		}
+	},
 	"schemas": {},
 	"_meta": {
 		"columns": {},

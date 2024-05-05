@@ -61,7 +61,7 @@ export class AdminBotService {
 			.returning();
 
 		const owner = await this._drizzleService.query.botsTousers.findFirst({
-			where: (table, { eq }) => eq(table.A, id)
+			where: (table, { eq }) => eq(table.botId, id)
 		});
 
 		// If the bot is not found, throw a NotFoundException

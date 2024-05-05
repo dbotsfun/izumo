@@ -133,7 +133,7 @@ export class BotService implements OnModuleInit {
 		// Get the bots owned by the user
 		const response = await this._drizzleService.query.botsTousers
 			.findMany({
-				where: (table, { eq }) => eq(table.B, id),
+				where: (table, { eq }) => eq(table.userId, id),
 				with: { bots: { columns: { apikey: false } } }
 			})
 			.execute();
@@ -159,7 +159,7 @@ export class BotService implements OnModuleInit {
 		const userBot = await this._drizzleService.query.botsTousers
 			.findFirst({
 				where: (table, { eq, and }) =>
-					and(eq(table.A, id), eq(table.B, userId)),
+					and(eq(table.botId, id), eq(table.userId, userId)),
 				with: { bots: true }
 			})
 			.execute();
