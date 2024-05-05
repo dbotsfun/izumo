@@ -5,7 +5,7 @@ import { users } from './users';
 export const badgesTousers = pgTable('_BadgeToUser', {
 	badgeId: text('A')
 		.notNull()
-		.references(() => badges.id, {
+		.references(() => badges.name, {
 			onDelete: 'cascade',
 			onUpdate: 'cascade'
 		}),

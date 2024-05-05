@@ -6,7 +6,7 @@ import { users } from './users';
 export const badgesTousersRelations = relations(badgesTousers, (helpers) => ({
 	badges: helpers.one(badges, {
 		fields: [badgesTousers.badgeId],
-		references: [badges.id]
+		references: [badges.name]
 	}),
 	users: helpers.one(users, {
 		fields: [badgesTousers.userId],

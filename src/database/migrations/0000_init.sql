@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS "_BadgeToUser" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "badges" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
+	"name" text PRIMARY KEY NOT NULL,
 	"display_name" text NOT NULL,
 	"description" text NOT NULL,
 	"icon" text NOT NULL,
@@ -106,11 +105,11 @@ CREATE TABLE IF NOT EXISTS "webhooks" (
 	"url" text NOT NULL,
 	"secret" text NOT NULL,
 	"events" text[] NOT NULL,
-	"payload_fields" text[] DEFAULT  NOT NULL
+	"payload_fields" text[] DEFAULT '{"botId", "type", "userId"}' NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "_BadgeToUser" ADD CONSTRAINT "_BadgeToUser_A_badges_id_fk" FOREIGN KEY ("A") REFERENCES "public"."badges"("id") ON DELETE cascade ON UPDATE cascade;
+ ALTER TABLE "_BadgeToUser" ADD CONSTRAINT "_BadgeToUser_A_badges_name_fk" FOREIGN KEY ("A") REFERENCES "public"."badges"("name") ON DELETE cascade ON UPDATE cascade;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

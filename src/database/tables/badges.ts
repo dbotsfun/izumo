@@ -1,9 +1,8 @@
 import { now } from '@database/common';
-import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const badges = pgTable('badges', {
-	id: serial('id').primaryKey(),
-	name: text('name').notNull(),
+	name: text('name').notNull().primaryKey(),
 	displayName: text('display_name').notNull(),
 	description: text('description').notNull(),
 	icon: text('icon').notNull(),

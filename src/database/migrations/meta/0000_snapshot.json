@@ -1,5 +1,5 @@
 {
-	"id": "a48c79c9-1ee7-43c1-bbfc-ad89f962fd65",
+	"id": "5ad3a3e2-66c9-4198-a4c0-bd2dc2d35021",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "6",
 	"dialect": "postgresql",
@@ -23,12 +23,12 @@
 			},
 			"indexes": {},
 			"foreignKeys": {
-				"_BadgeToUser_A_badges_id_fk": {
-					"name": "_BadgeToUser_A_badges_id_fk",
+				"_BadgeToUser_A_badges_name_fk": {
+					"name": "_BadgeToUser_A_badges_name_fk",
 					"tableFrom": "_BadgeToUser",
 					"tableTo": "badges",
 					"columnsFrom": ["A"],
-					"columnsTo": ["id"],
+					"columnsTo": ["name"],
 					"onDelete": "cascade",
 					"onUpdate": "cascade"
 				},
@@ -49,16 +49,10 @@
 			"name": "badges",
 			"schema": "",
 			"columns": {
-				"id": {
-					"name": "id",
-					"type": "serial",
-					"primaryKey": true,
-					"notNull": true
-				},
 				"name": {
 					"name": "name",
 					"type": "text",
-					"primaryKey": false,
+					"primaryKey": true,
 					"notNull": true
 				},
 				"display_name": {
@@ -678,7 +672,7 @@
 					"type": "text[]",
 					"primaryKey": false,
 					"notNull": true,
-					"default": []
+					"default": ["botId", "type", "userId"]
 				}
 			},
 			"indexes": {},

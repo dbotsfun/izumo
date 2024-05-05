@@ -18,7 +18,11 @@ export const webhooks = pgTable('webhooks', {
 		.notNull(),
 	payloadFields: text('payload_fields')
 		.array()
+		.default([
+			WebhookPayloadField.BOT,
+			WebhookPayloadField.TYPE,
+			WebhookPayloadField.USER
+		])
 		.$type<WebhookPayloadField[]>()
-		.default([])
 		.notNull()
 });
