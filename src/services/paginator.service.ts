@@ -105,8 +105,7 @@ export class PaginatorService {
 			.execute();
 
 		// Get the paginated data
-		const entries = 
-		(await query.execute()) as S['$inferSelect'][];
+		const entries = (await query.execute()) as S['$inferSelect'][];
 
 		return {
 			nodes: entries,
