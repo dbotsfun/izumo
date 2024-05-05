@@ -72,7 +72,6 @@
 		"git-cz": "^4.9.0",
 		"jest": "^29.7.0",
 		"lefthook": "^1.6.10",
-		"lint-staged": "^15.2.2",
 		"source-map-support": "^0.5.21",
 		"supertest": "^7.0.0",
 		"ts-jest": "^29.1.2",
@@ -96,12 +95,6 @@
 		"commitizen": {
 			"path": "./node_modules/cz-conventional-changelog"
 		}
-	},
-	"lint-staged": {
-		"*.{mjs,js,ts,json}": [
-			"biome check --apply-unsafe",
-			"biome format --write"
-		]
 	},
 	"pnpm": {
 		"patchedDependencies": {
