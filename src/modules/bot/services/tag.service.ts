@@ -126,8 +126,8 @@ export class BotTagService implements OnModuleInit {
 			.insert(schema.botsTotags)
 			.values(
 				tags.map((tag) => ({
-					A: input.botId,
-					B: tag.id
+					botId: input.botId,
+					tagId: tag.id
 				}))
 			)
 			.execute();
@@ -144,7 +144,7 @@ export class BotTagService implements OnModuleInit {
 	public async getBotTags(id: string): Promise<BotTagObject[]> {
 		const response = await this._drizzleService.query.botsTotags
 			.findMany({
-				where: (table, { eq }) => eq(table.A, id),
+				where: (table, { eq }) => eq(table.botId, id),
 				with: { tags: true }
 			})
 			.execute();
@@ -244,8 +244,8 @@ export class BotTagService implements OnModuleInit {
 			.delete(schema.botsTotags)
 			.where(
 				and(
-					inArray(schema.botsTotags.B, tagNames),
-					eq(schema.botsTotags.A, botId)
+					inArray(schema.botsTotags.tagId, tagNames),
+					eq(schema.botsTotags.botId, botId)
 				)
 			)
 			.returning()

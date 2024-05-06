@@ -4,9 +4,12 @@ import { botsTousers } from './bots-tousers';
 import { users } from './users';
 
 export const botsTousersRelations = relations(botsTousers, (helpers) => ({
-	bots: helpers.one(bots, { fields: [botsTousers.A], references: [bots.id] }),
+	bots: helpers.one(bots, {
+		fields: [botsTousers.botId],
+		references: [bots.id]
+	}),
 	users: helpers.one(users, {
-		fields: [botsTousers.B],
+		fields: [botsTousers.userId],
 		references: [users.id]
 	})
 }));

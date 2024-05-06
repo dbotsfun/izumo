@@ -18,7 +18,7 @@ export const bots = pgTable('bots', {
 	banner: text('banner'),
 	status: text('status')
 		.$type<BotStatus>()
-		.$defaultFn(() => BotStatus.PENDING)
+		.default(BotStatus.PENDING)
 		.notNull(),
 	description: text('description').notNull(),
 	shortDescription: text('short_description').notNull(),
@@ -34,10 +34,11 @@ export const bots = pgTable('bots', {
 		.array()
 		.$type<BotUserPermissions[]>()
 		.notNull(),
-	createdAt: timestamp('created_at', { mode: 'date', precision: 3 })
+	createdAt: timestamp('created_at', { mode: 'string', precision: 3 })
 		.defaultNow()
 		.notNull(),
-	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
-		.$defaultFn(() => now())
+	updatedAt: timestamp('updated_at', { mode: 'string', precision: 3 })
+		.defaultNow()
+		.$onUpdate(now)
 		.notNull()
 });

@@ -61,7 +61,7 @@ export class AdminBotService {
 			.returning();
 
 		const owner = await this._drizzleService.query.botsTousers.findFirst({
-			where: (table, { eq }) => eq(table.A, id)
+			where: (table, { eq }) => eq(table.botId, id)
 		});
 
 		// If the bot is not found, throw a NotFoundException
@@ -72,7 +72,7 @@ export class AdminBotService {
 		// Get the status message
 		const response = this.statusMessages[
 			status as Exclude<BotStatus, BotStatus.PENDING>
-		]({ reviewer, id, status, owner: owner.B });
+		]({ reviewer, id, status, owner: owner.userId });
 
 		// Send a webhook message
 		if (response) {

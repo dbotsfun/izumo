@@ -8,10 +8,11 @@ export const users = pgTable('users', {
 	banner: text('banner'),
 	bio: text('bio'),
 	permissions: integer('permissions').default(0).notNull(),
-	createdAt: timestamp('created_at', { mode: 'date', precision: 3 })
+	createdAt: timestamp('created_at', { mode: 'string', precision: 3 })
 		.defaultNow()
 		.notNull(),
-	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
-		.$defaultFn(() => now())
+	updatedAt: timestamp('updated_at', { mode: 'string', precision: 3 })
+		.defaultNow()
+		.$onUpdate(now)
 		.notNull()
 });

@@ -41,7 +41,7 @@ export class BotOwnershipGuard extends BaseGuard implements CanActivate {
 		// Get the owners of the bot
 		const owners = await this._drizzleService.query.botsTousers.findFirst({
 			where: (table, { and, eq }) =>
-				and(eq(table.A, bot), eq(table.B, user.id))
+				and(eq(table.botId, bot), eq(table.userId, user.id))
 		});
 
 		// If not bot owners, return false

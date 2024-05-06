@@ -89,18 +89,18 @@ export class BotObject
 	/**
 	 * The creation date of the bot.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The creation date of the bot.'
 	})
-	public createdAt!: Date;
+	public createdAt!: string;
 
 	/**
 	 * The last update date of the bot.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The last update date of the bot.'
 	})
-	public updatedAt!: Date;
+	public updatedAt!: string;
 
 	/**
 	 * The GitHub repository URL of the bot.

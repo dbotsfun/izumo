@@ -1,4 +1,6 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import type { schema } from '@database/schema';
+import { Field, ObjectType } from '@nestjs/graphql';
+import type { InferSelectModel } from 'drizzle-orm';
 
 /**
  * Represents the badges of the owner.
@@ -6,15 +8,9 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 @ObjectType({
 	description: 'Represents the badges of the owner.'
 })
-export class BotOwnerBadgeObject {
-	/**
-	 * The unique identifier of the badge.
-	 */
-	@Field(() => Int, {
-		description: 'The unique identifier of the badge.'
-	})
-	public id!: number;
-
+export class BotOwnerBadgeObject
+	implements InferSelectModel<typeof schema.badges>
+{
 	/**
 	 * The name of the badge.
 	 */
@@ -50,16 +46,16 @@ export class BotOwnerBadgeObject {
 	/**
 	 * The creation date of the badge.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The creation date of the badge.'
 	})
-	public createdAt!: Date;
+	public createdAt!: string;
 
 	/**
 	 * The last update date of the badge.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The last update date of the badge.'
 	})
-	public updatedAt!: Date;
+	public updatedAt!: string;
 }

@@ -14,7 +14,8 @@ export class FiltersBotInput {
 	 * @type {BotStatus}
 	 */
 	@Field(() => BotStatus, {
-		description: 'The bots status.'
+		description: 'The bots status.',
+		nullable: true
 	})
 	@IsOptional()
 	public status!: BotStatus;

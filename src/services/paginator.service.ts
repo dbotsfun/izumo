@@ -142,8 +142,8 @@ export class PaginatorService {
 		const query = this._drizzleService
 			.select({ bots: schema.bots })
 			.from(schema.botsTotags)
-			.where(eq(schema.botsTotags.B, tag))
-			.leftJoin(schema.bots, eq(schema.botsTotags.A, schema.bots.id)) // join the bots table
+			.where(eq(schema.botsTotags.tagId, tag))
+			.leftJoin(schema.bots, eq(schema.botsTotags.botId, schema.bots.id)) // join the bots table
 			.orderBy(order(schema.bots.id))
 			.limit(limit)
 			.offset(offset);
@@ -152,7 +152,7 @@ export class PaginatorService {
 		const [{ count: totalEntries }] = await this._drizzleService
 			.select({ count: count() })
 			.from(schema.botsTotags)
-			.where(eq(schema.botsTotags.B, tag))
+			.where(eq(schema.botsTotags.tagId, tag))
 			.execute();
 
 		const entries = await query.execute();

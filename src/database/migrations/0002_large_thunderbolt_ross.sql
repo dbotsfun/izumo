@@ -1,1 +1,0 @@
-ALTER TABLE "votes" ALTER COLUMN "expires" SET DATA TYPE integer;
