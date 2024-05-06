@@ -14,13 +14,13 @@ export const sessions = pgTable(
 		refreshToken: text('refresh_token').notNull(),
 		accessToken: text('access_token').notNull(),
 		createdAt: timestamp('created_at', {
-			mode: 'date',
+			mode: 'string',
 			precision: 3
 		})
 			.defaultNow()
 			.notNull(),
 		updatedAt: timestamp('updated_at', {
-			mode: 'date',
+			mode: 'string',
 			precision: 3
 		})
 			.defaultNow()

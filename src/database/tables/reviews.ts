@@ -28,10 +28,10 @@ export const reviews = pgTable(
 			}),
 		rating: integer('rating').notNull(),
 		content: text('content').notNull(),
-		createdAt: timestamp('created_at', { mode: 'date', precision: 3 })
+		createdAt: timestamp('created_at', { mode: 'string', precision: 3 })
 			.defaultNow()
 			.notNull(),
-		updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
+		updatedAt: timestamp('updated_at', { mode: 'string', precision: 3 })
 			.defaultNow()
 			.$onUpdate(now)
 			.notNull()

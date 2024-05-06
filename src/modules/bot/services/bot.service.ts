@@ -21,7 +21,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { AxiosError } from 'axios';
-import { and, eq, getTableColumns } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { WebhookService } from '../../../services/webhook.service';
 import { CreateBotInput } from '../inputs/bot/create.input';
@@ -85,12 +85,16 @@ export class BotService implements OnModuleInit {
 		>({
 			pagination,
 			schema: schema.bots,
-			where: (table, { isNotNull, eq, like }) =>
+			where: (table, { isNotNull, eq, sql, and }) =>
 				and(
 					input?.status
 						? eq(schema.bots.status, input.status)
 						: isNotNull(table.id),
-					input?.query ? like(table.name, input.query) : undefined // TODO: Make a less specific search query logic
+					input?.query
+						? sql`LOWER(${
+								table.name
+							}) ILIKE LOWER(${`%${input.query}%`})`
+						: undefined
 				)
 		});
 	}
@@ -100,7 +104,7 @@ export class BotService implements OnModuleInit {
 	 * @param {string} id - The ID of the bot to retrieve.
 	 * @returns {Promise<BotObject>} - A promise that resolves to the bot object.
 	 */
-	public async getBot(id: string) {
+	public async getBot(id: string): Promise<BotObject> {
 		// Get the bot from the database
 		const response = await this._drizzleService.query.bots
 			.findFirst({
@@ -272,8 +276,8 @@ export class BotService implements OnModuleInit {
 			// Insert the bot into the botToUser table
 			await tx.insert(schema.botsTousers).values(
 				[owner.id, ...coOwners].map((userId) => ({
-					A: bot.id,
-					B: userId
+					botId: bot.id,
+					userId: userId
 				}))
 			);
 

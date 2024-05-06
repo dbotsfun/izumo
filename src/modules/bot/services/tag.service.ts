@@ -126,8 +126,8 @@ export class BotTagService implements OnModuleInit {
 			.insert(schema.botsTotags)
 			.values(
 				tags.map((tag) => ({
-					A: input.botId,
-					B: tag.id
+					botId: input.botId,
+					tagId: tag.id
 				}))
 			)
 			.execute();

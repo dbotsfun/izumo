@@ -1,6 +1,6 @@
 import type { schema } from '@database/schema';
 import { Field, ObjectType } from '@nestjs/graphql';
-import type { InferInsertModel } from 'drizzle-orm';
+import type { InferSelectModel } from 'drizzle-orm';
 
 /**
  * Represents an authentication session object.
@@ -9,7 +9,7 @@ import type { InferInsertModel } from 'drizzle-orm';
 	description: 'The authentication session object'
 })
 export class AuthUserSessionObject
-	implements Omit<InferInsertModel<typeof schema.sessions>, 'userId'>
+	implements Omit<InferSelectModel<typeof schema.sessions>, 'userId'>
 {
 	/**
 	 * Hashed refresh token.
@@ -26,4 +26,20 @@ export class AuthUserSessionObject
 		description: 'Hashed access token'
 	})
 	public accessToken!: string;
+
+	/**
+	 * Created at timestamp.
+	 */
+	@Field(() => String, {
+		description: 'Created at timestamp'
+	})
+	public createdAt!: string;
+
+	/**
+	 * Updated at timestamp.
+	 */
+	@Field(() => String, {
+		description: 'Updated at timestamp'
+	})
+	public updatedAt!: string;
 }

@@ -29,10 +29,10 @@ export class BotTagObject implements InferSelectModel<typeof schema.tags> {
 	/**
 	 * The date the tag was created.
 	 */
-	@Field(() => Date, {
+	@Field(() => String, {
 		description: 'The date the tag was created.'
 	})
-	public createdAt!: Date;
+	public createdAt!: string;
 }
 
 @ObjectType({

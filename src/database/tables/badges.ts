@@ -6,10 +6,10 @@ export const badges = pgTable('badges', {
 	displayName: text('display_name').notNull(),
 	description: text('description').notNull(),
 	icon: text('icon').notNull(),
-	createdAt: timestamp('created_at', { mode: 'date', precision: 3 })
+	createdAt: timestamp('created_at', { mode: 'string', precision: 3 })
 		.defaultNow()
 		.notNull(),
-	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 })
+	updatedAt: timestamp('updated_at', { mode: 'string', precision: 3 })
 		.defaultNow()
 		.$onUpdate(now)
 		.notNull()
