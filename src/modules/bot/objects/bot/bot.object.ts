@@ -4,7 +4,6 @@ import { Paginated } from '@gql/pagination';
 import type { OmitType } from '@lib/types/utils';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import type { InferSelectModel } from 'drizzle-orm';
-import { BotUserPermissions } from './bot.user.permissions';
 
 /**
  * Represents a bot object.
@@ -13,11 +12,7 @@ import { BotUserPermissions } from './bot.user.permissions';
 	description: 'A bot object.'
 })
 export class BotObject
-	implements
-		OmitType<
-			InferSelectModel<typeof schema.bots>,
-			'apikey' | 'banner' | 'userPermissions'
-		>
+	implements OmitType<InferSelectModel<typeof schema.bots>, 'apikey'>
 {
 	/**
 	 * The unique identifier of the bot.
@@ -35,6 +30,15 @@ export class BotObject
 		nullable: true
 	})
 	public avatar!: string | null;
+
+	/**
+	 * The banner image URL of the bot.
+	 */
+	@Field(() => String, {
+		description: 'The banner image URL of the bot.',
+		nullable: true
+	})
+	public banner!: string | null;
 
 	/**
 	 * The username of the bot.
@@ -154,15 +158,6 @@ export class BotObject
 		nullable: true
 	})
 	public importedFrom!: string | null;
-
-	/**
-	 * The permissions of the bot user.
-	 */
-	@Field(() => [BotUserPermissions], {
-		description: 'The permissions of the bot user.',
-		nullable: true
-	})
-	public userPermissions!: BotUserPermissions[];
 }
 /**
  * A paginated list of bot objects.

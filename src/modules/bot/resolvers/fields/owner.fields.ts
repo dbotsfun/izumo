@@ -31,7 +31,7 @@ export class BotOwnerFields {
 	public bots(@Parent() owner: BotOwnerObject) {
 		return this._botService.getUserBots(
 			owner.id,
-			false /** todo: find a better way to determine if should throw an error */
+			false /** TODO: find a better way to determine if should throw an error */
 		);
 	}
 

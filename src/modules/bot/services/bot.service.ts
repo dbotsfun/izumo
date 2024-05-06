@@ -21,7 +21,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { AxiosError } from 'axios';
-import { eq, getTableColumns } from 'drizzle-orm';
+import { type InferInsertModel, eq, getTableColumns } from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { WebhookService } from '../../../services/webhook.service';
 import { CreateBotInput } from '../inputs/bot/create.input';
@@ -147,7 +147,7 @@ export class BotService implements OnModuleInit {
 			throw new NotFoundException(ErrorMessages.USER_HAS_NO_BOTS);
 		}
 
-		return response.map((table) => table.bots) ?? [];
+		return response.map((table) => table.bots);
 	}
 
 	/**
@@ -253,8 +253,8 @@ export class BotService implements OnModuleInit {
 					...input,
 					name: botApiInformation.bot.username,
 					avatar: botApiInformation.bot.avatar,
-					guildCount: botApiInformation.bot.approximate_guild_count,
-					userPermissions: [
+					guildCount: botApiInformation.bot.approximate_guild_count
+					/*userPermissions: [
 						{
 							id: owner.id,
 							permissions: BotOwnerPermissionsFlag.Admin
@@ -263,7 +263,7 @@ export class BotService implements OnModuleInit {
 							id: userId,
 							permissions: 0 // Let the owner assign permissions
 						}))
-					]
+					] */
 				})
 				.returning();
 
@@ -275,10 +275,16 @@ export class BotService implements OnModuleInit {
 
 			// Insert the bot into the botToUser table
 			await tx.insert(schema.botsTousers).values(
-				[owner.id, ...coOwners].map((userId) => ({
-					botId: bot.id,
-					userId: userId
-				}))
+				[owner.id, ...coOwners].map((userId) => {
+					const isOwner = userId === owner.id;
+
+					return {
+						botId: bot.id,
+						userId: userId,
+						isOwner,
+						permissions: isOwner ? BotOwnerPermissionsFlag.Admin : 0
+					} satisfies InferInsertModel<typeof schema.botsTousers>;
+				})
 			);
 
 			return bot;
