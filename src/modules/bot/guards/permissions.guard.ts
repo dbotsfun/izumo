@@ -85,6 +85,7 @@ export class BotOwnerPermissionsGuard
 
 		// If the user has the admin permission, they can do anything
 		if (
+			owner.isOwner ||
 			BotOwnerPermissionsBitField.has(
 				owner.permissions,
 				BotOwnerPermissionsFlag.Admin
