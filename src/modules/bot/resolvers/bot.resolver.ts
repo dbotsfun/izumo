@@ -14,6 +14,7 @@ import { CreateBotInput } from '../inputs/bot/create.input';
 import { DeleteBotInput } from '../inputs/bot/delete.input';
 import { SafeFiltersInput } from '../inputs/bot/filters.input';
 import { GetBotInput } from '../inputs/bot/get.input';
+import { UpdateBotOwnerPermisisionsInput } from '../inputs/owner/update-perms.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotService } from '../services/bot.service';
@@ -103,6 +104,24 @@ export class BotResolver {
 		@Args('input') input: CreateBotInput
 	) {
 		return this._botService.updateBot(user, input);
+	}
+
+	/**
+	 * Updates the owner permissions for a bot.
+	 *
+	 * @param input - The input object containing the bot ID and the updated permissions.
+	 * @returns A Promise that resolves to the updated bot permissions.
+	 */
+	@Mutation(() => Boolean, {
+		name: 'updateOwnerPermissions',
+		description: 'Updates the owner permissions of a bot.'
+	})
+	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuard)
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.Admin])
+	public updatePermissions(
+		@Args('input') input: UpdateBotOwnerPermisisionsInput
+	) {
+		return this._botService.updatePermissions(input);
 	}
 
 	/**

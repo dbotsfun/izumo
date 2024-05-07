@@ -21,13 +21,20 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { AxiosError } from 'axios';
-import { type InferInsertModel, eq, getTableColumns } from 'drizzle-orm';
+import {
+	type InferInsertModel,
+	and,
+	eq,
+	getTableColumns,
+	not
+} from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { WebhookService } from '../../../services/webhook.service';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
+import type { UpdateBotOwnerPermisisionsInput } from '../inputs/owner/update-perms.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotTagService } from './tag.service';
@@ -254,16 +261,6 @@ export class BotService implements OnModuleInit {
 					name: botApiInformation.bot.username,
 					avatar: botApiInformation.bot.avatar,
 					guildCount: botApiInformation.bot.approximate_guild_count
-					/*userPermissions: [
-						{
-							id: owner.id,
-							permissions: BotOwnerPermissionsFlag.Admin
-						},
-						...coOwners.map((userId) => ({
-							id: userId,
-							permissions: 0 // Let the owner assign permissions
-						}))
-					] */
 				})
 				.returning();
 
@@ -404,5 +401,33 @@ export class BotService implements OnModuleInit {
 		);
 
 		return deleteBot;
+	}
+
+	/**
+	 * Updates the permissions of a bot owner.
+	 * @param {UpdateBotOwnerPermisisionsInput} input - The input object containing the new permissions and the owner's ID.
+	 * @param {string} botId - The ID of the bot.
+	 * @returns {Promise<Boolean>} - A promise that resolves to the updated bot object.
+	 */
+	public async updatePermissions({
+		permissions,
+		id,
+		botId
+	}: UpdateBotOwnerPermisisionsInput): Promise<boolean> {
+		const [updateBot] = await this._drizzleService
+			.update(schema.botsTousers)
+			.set({
+				permissions
+			})
+			.where(
+				and(
+					eq(schema.botsTousers.botId, botId),
+					eq(schema.botsTousers.userId, id),
+					not(eq(schema.botsTousers.isOwner, true))
+				)
+			)
+			.returning();
+
+		return Boolean(updateBot);
 	}
 }
