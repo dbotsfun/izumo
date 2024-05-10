@@ -30,7 +30,6 @@ export class CreateBotInput
 			| 'createdAt'
 			| 'updatedAt'
 			| 'importedFrom'
-			| 'userPermissions'
 		>
 {
 	/**

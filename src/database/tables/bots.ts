@@ -1,10 +1,8 @@
 import { now } from '@database/common';
 import { BotStatus } from '@database/enums';
-import { BotUserPermissions } from '@modules/bot/objects/bot/bot.user.permissions';
 import {
 	boolean,
 	integer,
-	jsonb,
 	pgTable,
 	text,
 	timestamp
@@ -30,10 +28,6 @@ export const bots = pgTable('bots', {
 	guildCount: integer('guild_count').default(0).notNull(),
 	apikey: text('api_key'),
 	importedFrom: text('imported_from'),
-	userPermissions: jsonb('user_permissions')
-		.array()
-		.$type<BotUserPermissions[]>()
-		.notNull(),
 	createdAt: timestamp('created_at', { mode: 'string', precision: 3 })
 		.defaultNow()
 		.notNull(),

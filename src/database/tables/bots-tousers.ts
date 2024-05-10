@@ -1,4 +1,11 @@
-import { index, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
+import {
+	boolean,
+	index,
+	integer,
+	pgTable,
+	text,
+	uniqueIndex
+} from 'drizzle-orm/pg-core';
 import { bots } from './bots';
 import { users } from './users';
 
@@ -16,7 +23,9 @@ export const botsTousers = pgTable(
 			.references(() => users.id, {
 				onDelete: 'cascade',
 				onUpdate: 'cascade'
-			})
+			}),
+		isOwner: boolean('is_owner').notNull().default(false),
+		permissions: integer('permissions').notNull().default(0)
 	},
 	(table) => ({
 		abUnique: uniqueIndex('_BotToUser_AB_unique').on(

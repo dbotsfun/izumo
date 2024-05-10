@@ -79,6 +79,7 @@ export enum ErrorMessages {
 	USER_NOT_FOUND = 'User not found',
 	USERS_NOT_FOUND = 'Users not found',
 	USER_HAS_NO_BOTS = 'User has no bots',
+	USER_IS_NOT_AN_OWNER = 'User is not an owner',
 
 	// Auth
 	AUTH_TOKEN_IS_REQUIRED = 'An authentication token is required to perform this action',

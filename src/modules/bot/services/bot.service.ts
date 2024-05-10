@@ -21,13 +21,20 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { AxiosError } from 'axios';
-import { eq, getTableColumns } from 'drizzle-orm';
+import {
+	type InferInsertModel,
+	and,
+	eq,
+	getTableColumns,
+	not
+} from 'drizzle-orm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { WebhookService } from '../../../services/webhook.service';
 import { CreateBotInput } from '../inputs/bot/create.input';
 import type { DeleteBotInput } from '../inputs/bot/delete.input';
 import type { FiltersBotInput } from '../inputs/bot/filters.input';
 import type { UpdateBotInput } from '../inputs/bot/update.input';
+import type { UpdateBotOwnerPermisisionsInput } from '../inputs/owner/update-perms.input';
 import { BotObject, BotsConnection } from '../objects/bot/bot.object';
 import { BotOwnerPermissionsFlag } from '../permissions/owner.permissions';
 import { BotTagService } from './tag.service';
@@ -147,7 +154,7 @@ export class BotService implements OnModuleInit {
 			throw new NotFoundException(ErrorMessages.USER_HAS_NO_BOTS);
 		}
 
-		return response.map((table) => table.bots) ?? [];
+		return response.map((table) => table.bots);
 	}
 
 	/**
@@ -253,17 +260,7 @@ export class BotService implements OnModuleInit {
 					...input,
 					name: botApiInformation.bot.username,
 					avatar: botApiInformation.bot.avatar,
-					guildCount: botApiInformation.bot.approximate_guild_count,
-					userPermissions: [
-						{
-							id: owner.id,
-							permissions: BotOwnerPermissionsFlag.Admin
-						},
-						...coOwners.map((userId) => ({
-							id: userId,
-							permissions: 0 // Let the owner assign permissions
-						}))
-					]
+					guildCount: botApiInformation.bot.approximate_guild_count
 				})
 				.returning();
 
@@ -275,10 +272,16 @@ export class BotService implements OnModuleInit {
 
 			// Insert the bot into the botToUser table
 			await tx.insert(schema.botsTousers).values(
-				[owner.id, ...coOwners].map((userId) => ({
-					botId: bot.id,
-					userId: userId
-				}))
+				[owner.id, ...coOwners].map((userId) => {
+					const isOwner = userId === owner.id;
+
+					return {
+						botId: bot.id,
+						userId: userId,
+						isOwner,
+						permissions: isOwner ? BotOwnerPermissionsFlag.Admin : 0
+					} satisfies InferInsertModel<typeof schema.botsTousers>;
+				})
 			);
 
 			return bot;
@@ -398,5 +401,33 @@ export class BotService implements OnModuleInit {
 		);
 
 		return deleteBot;
+	}
+
+	/**
+	 * Updates the permissions of a bot owner.
+	 * @param {UpdateBotOwnerPermisisionsInput} input - The input object containing the new permissions and the owner's ID.
+	 * @param {string} botId - The ID of the bot.
+	 * @returns {Promise<Boolean>} - A promise that resolves to the updated bot object.
+	 */
+	public async updatePermissions({
+		permissions,
+		id,
+		botId
+	}: UpdateBotOwnerPermisisionsInput): Promise<boolean> {
+		const [updateBot] = await this._drizzleService
+			.update(schema.botsTousers)
+			.set({
+				permissions
+			})
+			.where(
+				and(
+					eq(schema.botsTousers.botId, botId),
+					eq(schema.botsTousers.userId, id),
+					not(eq(schema.botsTousers.isOwner, true))
+				)
+			)
+			.returning();
+
+		return Boolean(updateBot);
 	}
 }

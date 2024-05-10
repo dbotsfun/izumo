@@ -9,14 +9,26 @@ import {
 import { BaseGuard } from '@utils/bases';
 import { JsonFind } from '@utils/common';
 
+/**
+ * Guard to determine if the user has ownership of the bot.
+ */
 @Injectable()
 export class BotOwnershipGuard extends BaseGuard implements CanActivate {
+	/**
+	 * Creates an instance of the OwnershipGuard class.
+	 * @param _drizzleService - The injected instance of the DrizzleService.
+	 */
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService
 	) {
 		super();
 	}
 
+	/**
+	 * Determines if the user has ownership of the bot.
+	 * @param context - The execution context.
+	 * @returns A boolean indicating whether the user has ownership of the bot.
+	 */
 	public async canActivate(context: ExecutionContext) {
 		const ctx = this.getContext(context);
 

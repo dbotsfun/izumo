@@ -2,6 +2,7 @@ import { PaginationInput } from '@gql/pagination';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import { BotObject } from '@modules/bot/objects/bot/bot.object';
 import { BotOwnerObject } from '@modules/bot/objects/owner/owner.object';
+import { BotOwnerPermissionsObject } from '@modules/bot/objects/owner/owner.permissions.object';
 import { BotTagObject } from '@modules/bot/objects/tag/tag.object';
 import { BotVoteObjectConnection } from '@modules/bot/objects/vote/vote.object';
 import { WebhookObject } from '@modules/bot/objects/webhook/webhook.object';
@@ -13,7 +14,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 
 /**
- * Represents the fields resolver for the Bot object.
+ * Represents the resolver class for the fields of a bot.
  */
 @Resolver(() => BotObject)
 export class BotFields {
@@ -83,5 +84,18 @@ export class BotFields {
 	@UseGuards(JwtAuthGuard)
 	public webhook(@Parent() bot: BotObject) {
 		return this._botWebhookService.getWebhook(bot.id);
+	}
+
+	/**
+	 * Retrieves the permissions of the bot owner.
+	 * @param bot - The bot object.
+	 * @returns An array of permissions of the bot owner.
+	 */
+	@ResolveField(() => [BotOwnerPermissionsObject], {
+		name: 'ownerPermissions',
+		description: 'Gets a list of permissions that the bot owners have.'
+	})
+	public permissions(@Parent() bot: BotObject) {
+		return this._botOwnerService.getOwnerPermissions(bot.id);
 	}
 }
