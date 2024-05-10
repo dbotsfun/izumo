@@ -9,7 +9,7 @@ export interface GeneratedHash {
 	/**
 	 * The salt used to generate the hash.
 	 */
-	salt: string;
+	salt: Buffer;
 }
 
 /**

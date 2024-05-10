@@ -1,15 +1,10 @@
 import crypto from 'node:crypto';
-import * as argon2 from 'argon2';
+import argon2 from 'argon2';
 
 /**
  * Service for hashing and comparing data using bcrypt.
  */
 export class HashService {
-	/**
-	 * The bcrypt hasher.
-	 */
-	public _hasher: typeof argon2 = argon2;
-
 	/**
 	 * @param rounds - The number of rounds to be used for hashing.
 	 */
@@ -23,16 +18,15 @@ export class HashService {
 	 */
 	public async hash(
 		data: string | Buffer,
-		saltOrRounds?: string | number
+		saltOrRounds: Buffer | number = this.rounds
 	): Promise<string> {
 		const salt =
-			typeof saltOrRounds === 'string'
+			saltOrRounds instanceof Buffer
 				? saltOrRounds
 				: await this.genSalt(saltOrRounds);
-		return this._hasher.hash(data, {
-			salt,
-			type: argon2.argon2id,
-			timeCost: this.rounds
+
+		return argon2.hash(data, {
+			salt: Buffer.from(salt)
 		});
 	}
 
@@ -43,7 +37,7 @@ export class HashService {
 	 * @returns A promise that resolves to a boolean indicating whether the data matches the encrypted data.
 	 */
 	public async compare(data: string, encrypted: string): Promise<boolean> {
-		return this._hasher.verify(encrypted, data);
+		return argon2.verify(encrypted, data);
 	}
 
 	/**
@@ -51,7 +45,7 @@ export class HashService {
 	 * @param length - The length of the salt to be generated.
 	 * @returns A promise that resolves to the generated salt.
 	 */
-	public async genSalt(length = 16): Promise<string> {
-		return crypto.randomBytes(length).toString('hex');
+	public async genSalt(length = 16): Promise<Buffer> {
+		return crypto.randomBytes(length);
 	}
 }
