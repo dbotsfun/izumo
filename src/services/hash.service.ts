@@ -1,4 +1,5 @@
-import * as bcrypt from 'bcrypt';
+import crypto from 'node:crypto';
+import * as argon2 from 'argon2';
 
 /**
  * Service for hashing and comparing data using bcrypt.
@@ -7,12 +8,12 @@ export class HashService {
 	/**
 	 * The bcrypt hasher.
 	 */
-	public _hasher: typeof bcrypt = bcrypt;
+	public _hasher: typeof argon2 = argon2;
 
 	/**
-	 * @param saltRounds - The number of rounds to be used for hashing.
+	 * @param rounds - The number of rounds to be used for hashing.
 	 */
-	public constructor(private saltRounds = 10) {}
+	public constructor(private rounds = 10) {}
 
 	/**
 	 * Hashes the given data with the specified salt or number of rounds.
@@ -28,36 +29,29 @@ export class HashService {
 			typeof saltOrRounds === 'string'
 				? saltOrRounds
 				: await this.genSalt(saltOrRounds);
-		return this._hasher.hash(data, salt);
+		return this._hasher.hash(data, {
+			salt,
+			type: argon2.argon2id,
+			timeCost: this.rounds
+		});
 	}
 
 	/**
 	 * Compares the given data with the encrypted data.
 	 * @param data - The data to be compared.
-	 * @param encrypted - The encrypted data to be compared against.
+	 * @param encrypted - The encrypted data to be compared.
 	 * @returns A promise that resolves to a boolean indicating whether the data matches the encrypted data.
 	 */
 	public async compare(data: string, encrypted: string): Promise<boolean> {
-		return this._hasher.compare(data, encrypted);
+		return this._hasher.verify(encrypted, data);
 	}
 
 	/**
-	 * Generates a salt asynchronously with the specified number of rounds.
-	 * @param rounds - The number of rounds to be used for generating the salt.
+	 * Generates a salt with the specified length.
+	 * @param length - The length of the salt to be generated.
 	 * @returns A promise that resolves to the generated salt.
 	 */
-	public async genSalt(rounds: number = this.saltRounds): Promise<string> {
-		return this._hasher.genSalt(rounds);
-	}
-
-	/**
-	 * Generates a salt synchronously with the specified number of rounds.
-	 * @param rounds - The number of rounds to be used for generating the salt.
-	 * @returns The generated salt.
-	 */
-	public async genSaltSync(
-		rounds: number = this.saltRounds
-	): Promise<string> {
-		return this._hasher.genSaltSync(rounds);
+	public async genSalt(length = 16): Promise<string> {
+		return crypto.randomBytes(length).toString('hex');
 	}
 }
