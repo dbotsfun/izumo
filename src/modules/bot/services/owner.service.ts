@@ -4,6 +4,8 @@ import type { DrizzleService } from '@lib/types';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { BotOwnerBadgeObject } from '../objects/owner/owner.badges.object';
 import type { BotOwnerObject } from '../objects/owner/owner.object';
+import type { BotOwnerPermissionsObject } from '../objects/owner/owner.permissions.object';
+
 /**
  * Service class for handling bot owner-related operations.
  */
@@ -72,5 +74,31 @@ export class BotOwnerService {
 			.execute();
 
 		return badges.map((b) => b.badges);
+	}
+
+	/**
+	 * Retrieves a list of owner permissions by bot ID.
+	 * @param id The ID of the bot.
+	 * @returns The owner permissions
+	 */
+	public async getOwnerPermissions(
+		id: string
+	): Promise<BotOwnerPermissionsObject[]> {
+		const response = await this._drizzleService.query.botsTousers
+			.findMany({
+				where: (table, { eq }) => eq(table.botId, id),
+				columns: { permissions: true, userId: true }
+			})
+			.execute();
+
+		// If the response is null, throw an error
+		if (!response.length) {
+			throw new NotFoundException(ErrorMessages.USER_IS_NOT_AN_OWNER);
+		}
+
+		return response.map((table) => ({
+			id: table.userId,
+			permissions: table.permissions
+		}));
 	}
 }
