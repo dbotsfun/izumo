@@ -55,8 +55,11 @@ export class VanityService {
 	 */
 	public async getVanity(name: string, type?: VanityType) {
 		const vanity = await this._drizzleService.query.vanities.findFirst({
-			where: (table, { eq, and }) =>
-				and(eq(table.id, name), type ? eq(table.type, type) : undefined)
+			where: (table, { eq, and, or }) =>
+				and(
+					or(eq(table.id, name), eq(table.targetId, name)),
+					type ? eq(table.type, type) : undefined
+				)
 		});
 
 		// If the vanity does not exist, throw an error.
