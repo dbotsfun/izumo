@@ -36,14 +36,14 @@ export class VanityResolver {
 		return this._vanityService.createVanity(input, user);
 	}
 
-	// @Mutation(() => VanityObject, {
-	// 	name: 'deleteVanity',
-	// 	description: 'Delete a vanity URL.'
-	// })
-	// @UseGuards(JwtAuthGuard)
-	// public async delete(
-	// 	@Args('input') input: GetVanityInput
-	// ): Promise<VanityObject> {
-	// 	return this._vanityService.deleteVanity(input.id);
-	// }
+	@Mutation(() => VanityObject, {
+		name: 'deleteVanity',
+		description: 'Delete a vanity URL.'
+	})
+	@UseGuards(JwtAuthGuard)
+	public async delete(
+		@Args('input') input: GetVanityInput
+	): Promise<VanityObject> {
+		return this._vanityService.deleteVanity(input.id);
+	}
 }
