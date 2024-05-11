@@ -123,12 +123,7 @@ export class VanityService {
 	 */
 	public async deleteVanity(name: string) {
 		// Check if the vanity exists.
-		const exists = await this.getVanity(name);
-
-		// If doesn't exists throw an error.
-		if (!exists) {
-			throw new NotFoundException(ErrorMessages.VANITY_NOT_FOUND);
-		}
+		await this.getVanity(name);
 
 		// Delete the vanity.
 		const [deletedVanity] = await this._drizzleService
