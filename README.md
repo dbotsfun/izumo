@@ -1,7 +1,5 @@
 # Izumo
-
-![](https://azurlane.netojuu.com/images/6/60/Izumo.png)
-
+<a href="https://azurlane.koumakan.jp/wiki/Izumo"><img align='right' src="https://azurlane.netojuu.com/images/8/87/IzumoShipyardIcon.png" width="230"></a>
 > Izumo is an API designed for managing a list of Discord bots. It provides queries for retrieving information about bots, their owners, tags, votes, webhooks, and more.
 
 ## Features
