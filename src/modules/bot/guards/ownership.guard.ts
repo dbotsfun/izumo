@@ -6,6 +6,7 @@ import {
 	Inject,
 	Injectable
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { BaseGuard } from '@utils/bases';
 import { JsonFind } from '@utils/common';
 
@@ -19,7 +20,8 @@ export class BotOwnershipGuard extends BaseGuard implements CanActivate {
 	 * @param _drizzleService - The injected instance of the DrizzleService.
 	 */
 	public constructor(
-		@Inject(DATABASE) private _drizzleService: DrizzleService
+		@Inject(DATABASE) private _drizzleService: DrizzleService,
+		public override reflector: Reflector
 	) {
 		super();
 	}

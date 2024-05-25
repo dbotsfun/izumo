@@ -15,12 +15,32 @@ export interface WebhookPayloadInterface {
 	[WebhookPayloadField.BOT]: string;
 
 	/**
-	 * The type of webhook event.
-	 */
-	[WebhookPayloadField.TYPE]: WebhookEvent;
-
-	/**
 	 * The query string associated with the webhook.
 	 */
 	[WebhookPayloadField.QUERY]: string;
+}
+
+/**
+ * Represents the webhook event interface.
+ */
+export interface WebhookEventInterface {
+	/**
+	 * The name of the event.
+	 */
+	name: string;
+
+	/**
+	 * The payload field associated with the event.
+	 */
+	payload: WebhookPayloadInterface & {
+		/**
+		 * Secret key provided by the bot owner.
+		 */
+		secret: string;
+
+		/**
+		 * The URL to send the webhook to.
+		 */
+		webhookUrl: string;
+	};
 }

@@ -12,6 +12,7 @@ import {
 	NotFoundException,
 	type OnModuleInit
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { seconds } from '@nestjs/throttler';
 import { arrayDedupe, cast } from '@utils/common';
@@ -19,7 +20,10 @@ import { eq } from 'drizzle-orm';
 import { firstValueFrom } from 'rxjs';
 import type { CreateWebhookInput } from '../inputs/webhook/create.input';
 import type { UpdateWebhookInput } from '../inputs/webhook/update.input';
-import type { WebhookPayloadInterface } from '../interfaces/webhook.interface';
+import type {
+	WebhookEventInterface,
+	WebhookPayloadInterface
+} from '../interfaces/webhook.interface';
 import { BotService } from './bot.service';
 
 /**
@@ -40,7 +44,8 @@ export class BotWebhookService implements OnModuleInit {
 	public constructor(
 		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		private _moduleRef: ModuleRef,
-		private _httpService: HttpService
+		private _httpService: HttpService,
+		private _configService: ConfigService
 	) {}
 
 	/**
@@ -169,10 +174,13 @@ export class BotWebhookService implements OnModuleInit {
 	 * @param payload - The payload to be sent.
 	 * @throws NotFoundException if the webhook with the specified ID is not found.
 	 */
-	public async sendWebhook(id: string, payload: WebhookPayloadInterface) {
+	public async sendWebhook(
+		event: WebhookEvent,
+		data: WebhookPayloadInterface
+	) {
 		// Retrieve the webhook by its ID
 		const webhook = await this._drizzleService.query.webhooks.findFirst({
-			where: (table, { eq }) => eq(table.id, id)
+			where: (table, { eq }) => eq(table.id, data.botId)
 		});
 
 		// Check if the webhook exists
@@ -181,34 +189,33 @@ export class BotWebhookService implements OnModuleInit {
 		}
 
 		// Check if the event is included in the webhook
-		if (!webhook.events?.includes(payload[WebhookPayloadField.TYPE])) {
+		if (!webhook.events?.includes(event)) {
 			return;
 		}
 
-		// Check if the payload fields are included in the webhook
-		const actualPayload = cast<Array<WebhookPayloadField>>(
-			Object.keys(payload)
-		).map((key) => {
-			if (webhook.payloadFields?.includes(key)) {
-				return {
-					[key]: payload[key]
-				};
+		for (const key of cast<WebhookPayloadField[]>(Object.keys(data))) {
+			if (!webhook.payloadFields?.includes(key)) {
+				delete data[key];
 			}
-		});
+		}
+
+		const webhookUrl = this._configService.getOrThrow('MS_WEBHOOK_URL');
 
 		// Send the webhook payload
-		await firstValueFrom(
+		return firstValueFrom(
 			this._httpService.post(
-				webhook.url,
+				`${webhookUrl}/event`,
 				{
-					...actualPayload,
-					secret: webhook.secret
-				},
+					name: event,
+					payload: {
+						...data,
+						secret: webhook.secret,
+						webhookUrl: webhook.url
+					}
+				} as WebhookEventInterface,
 				{
 					timeout: seconds(5), // If the webhook does not respond within 5 seconds, cancel the request
-					headers: {
-						'Content-Type': 'application/json'
-					}
+					headers: {}
 				}
 			)
 		).catch(() => null);

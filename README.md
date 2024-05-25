@@ -53,6 +53,7 @@ To get started with Izumo, follow these steps:
     NODE_ENV=
     API_PORT=
     INTERNAL_KEY=
+    MS_WEBHOOK_URL=
 
 	# Database
     DATABASE_URL=
@@ -62,7 +63,7 @@ To get started with Izumo, follow these steps:
     JWT_REFRESH_SECRET_KEY=
     JWT_APIKEY_SECRET_KEY=
 
-	# Discord stuff 
+	# Discord stuff
 	DISCORD_CLIENT_ID=
     DISCORD_CLIENT_SECRET=
     DISCORD_REDIRECT_URI=
@@ -71,7 +72,7 @@ To get started with Izumo, follow these steps:
 5. Start the server using `pnpm start:dev`.
 6. Access the GraphQL playground to explore and interact with the API queries.
 
-## Contributing	
+## Contributing
 
 Contributions to Izumo are welcome! If you find any bugs or want to suggest new features, feel free to open an issue or submit a pull request. Please ensure that your contributions align with the project's coding standards and follow the guidelines outlined in the CONTRIBUTING.md file.
 

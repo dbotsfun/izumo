@@ -1,3 +1,4 @@
+import { WebhookEvent } from '@database/enums';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
@@ -8,6 +9,7 @@ import { BotVoteCreateInput } from '../inputs/vote/create.input';
 import { BotCanVoteObject } from '../objects/vote/can-vote.object';
 import { BotVoteObject } from '../objects/vote/vote.object';
 import { BotVoteService } from '../services/vote.service';
+import { BotWebhookService } from '../services/webhook.service';
 
 /**
  * The resolver that contains mutations for bot votes.
@@ -18,9 +20,13 @@ import { BotVoteService } from '../services/vote.service';
 export class BotVoteResolver {
 	/**
 	 * Creates an instance of `BotVoteResolver`.
-	 * @param voteService - The vote service.
+	 * @param _voteService - The vote service.
+	 * @param _webhookService - The webhook service.
 	 */
-	public constructor(private readonly voteService: BotVoteService) {}
+	public constructor(
+		private readonly _voteService: BotVoteService,
+		private readonly _webhookService: BotWebhookService
+	) {}
 
 	/**
 	 * Checks if an user is able to vote a bot.
@@ -34,7 +40,7 @@ export class BotVoteResolver {
 		@Args('input') input: BotVoteCreateInput,
 		@User() user: JwtPayload
 	) {
-		return this.voteService.canVote(input.id, user.id);
+		return this._voteService.canVote(input.id, user.id);
 	}
 
 	/**
@@ -49,6 +55,16 @@ export class BotVoteResolver {
 		@Args('input') input: BotVoteCreateInput,
 		@User() user: JwtPayload
 	) {
-		return this.voteService.createVote(input.id, user.id);
+		const res = this._voteService.createVote(input.id, user.id);
+
+		await this._webhookService
+			.sendWebhook(WebhookEvent.NEW_VOTE, {
+				botId: input.id,
+				userId: user.id,
+				query: ''
+			})
+			.then(console.log);
+
+		return res;
 	}
 }

@@ -1,8 +1,10 @@
+import { DATABASE } from '@constants/tokens';
 import type { DrizzleService } from '@lib/types';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import {
 	type CanActivate,
 	type ExecutionContext,
+	Inject,
 	Injectable
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -27,7 +29,7 @@ export class BotOwnerPermissionsGuard
 	 * @param reflector - The reflector instance.
 	 */
 	public constructor(
-		private _drizzleService: DrizzleService,
+		@Inject(DATABASE) private _drizzleService: DrizzleService,
 		public override reflector: Reflector
 	) {
 		super(reflector);

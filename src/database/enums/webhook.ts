@@ -8,6 +8,5 @@ export enum WebhookEvent {
 export enum WebhookPayloadField {
 	BOT = 'botId',
 	USER = 'userId',
-	TYPE = 'type',
 	QUERY = 'query'
 }

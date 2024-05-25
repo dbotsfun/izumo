@@ -105,6 +105,12 @@ export class EnvironmentVariables {
 	 */
 	@IsString()
 	public INTERNAL_KEY!: string;
+
+	/**
+	 * Microservice for sending webhooks
+	 */
+	@IsUrl()
+	public MS_WEBHOOK_URL!: string;
 }
 
 /**

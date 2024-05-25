@@ -31,7 +31,7 @@ export class CreateWebhookInput
 	})
 	@IsUrl({
 		host_blacklist: ['discord.com', 'discordapp.com'],
-		protocols: ['https']
+		protocols: ['https', 'http']
 	})
 	public url!: string;
 
