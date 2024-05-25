@@ -62,9 +62,6 @@ registerEnumType(WebhookPayloadField, {
 		},
 		QUERY: {
 			description: 'Query string parameters found on the URL.'
-		},
-		TYPE: {
-			description: 'The type of webhook event.'
 		}
 	}
 });

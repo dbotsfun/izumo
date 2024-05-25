@@ -1,4 +1,4 @@
-import type { WebhookEvent, WebhookPayloadField } from '@database/enums';
+import type { WebhookPayloadField } from '@database/enums';
 
 /**
  * Represents the payload interface for a webhook.
