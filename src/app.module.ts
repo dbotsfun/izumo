@@ -4,6 +4,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { ErrorHttpStatusCode, getErrorStatus } from '@constants/errors';
 import { DATABASE } from '@constants/tokens';
 import { DrizzlePostgresModule } from '@knaadh/nestjs-drizzle-postgres';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { ApolloDriver, type ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -99,6 +100,15 @@ import { VanityModule } from './modules/vanity/vanity.module';
 					url: configService.getOrThrow('DATABASE_URL')
 				},
 				config: { schema }
+			})
+		}),
+
+		RedisModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (_configService: ConfigService) => ({
+				type: 'single',
+				url: _configService.getOrThrow('REDIS_URL')
 			})
 		}),
 

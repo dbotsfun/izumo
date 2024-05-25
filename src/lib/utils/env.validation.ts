@@ -111,6 +111,15 @@ export class EnvironmentVariables {
 	 */
 	@IsUrl()
 	public MS_WEBHOOK_URL!: string;
+
+	/**
+	 * Redis connection URL
+	 */
+	@IsString()
+	@Matches(/redis:\/\/(?<password>[^@]+)@(?<host>[^:]+):(?<port>\d+)/, {
+		message: 'REDIS_URL must be a valid Redis connection string.'
+	})
+	public REDIS_URL!: string;
 }
 
 /**
