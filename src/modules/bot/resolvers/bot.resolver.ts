@@ -142,4 +142,14 @@ export class BotResolver {
 	) {
 		return this._botService.deleteBot(user, input);
 	}
+
+	@Mutation(() => BotObject, {
+		name: 'syncBotInformation',
+		description: 'Syncs the information of a bot.'
+	})
+	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuard)
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.SyncStats])
+	public sync(@Args('input') input: GetBotInput) {
+		return this._botService.syncBotInformation(input.id);
+	}
 }

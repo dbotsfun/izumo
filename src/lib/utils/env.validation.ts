@@ -111,6 +111,16 @@ export class EnvironmentVariables {
 	 */
 	@IsUrl()
 	public MS_WEBHOOK_URL!: string;
+
+	/**
+	 * Discord webhook URL for logging
+	 */
+	@IsUrl({
+		protocols: ['http', 'https'],
+		require_tld: false,
+		require_host: false
+	})
+	public DISCORD_WEBHOOK_URL!: string;
 }
 
 /**
