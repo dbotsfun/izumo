@@ -72,10 +72,8 @@ import { VanityModule } from './modules/vanity/vanity.module';
 			formatError: (error) => {
 				let errorMessage =
 					'An unknown error occurred. Please try again.';
-				const originalError = error.extensions?.originalError as
-					| { message: string }
-					| string
-					| string[];
+				const originalError = (error.extensions?.originalError ||
+					error.message) as { message: string } | string | string[];
 				const isProd = process.env.NODE_ENV === 'production';
 
 				const commonErrors: Record<string, string> = {
@@ -86,6 +84,8 @@ import { VanityModule } from './modules/vanity/vanity.module';
 						'You are not authenticated to perform this action.'
 				};
 
+				console.log(error);
+
 				const {
 					stacktrace,
 					status,
@@ -95,17 +95,16 @@ import { VanityModule } from './modules/vanity/vanity.module';
 					status?: keyof typeof ErrorHttpStatusCode;
 					code?: string | number;
 				} = error.extensions || {};
+				const commonError = commonErrors[_code];
+
+				if (commonError) {
+					errorMessage = commonError;
+				}
 
 				if (typeof originalError === 'string') {
 					errorMessage = originalError;
 				} else if (typeof originalError === 'object') {
 					errorMessage = Object.values(originalError)[0];
-				}
-
-				const commonError = commonErrors[_code];
-
-				if (commonError) {
-					errorMessage = commonError;
 				}
 
 				const [code, face] = getErrorStatus(status || _code);
@@ -117,7 +116,8 @@ import { VanityModule } from './modules/vanity/vanity.module';
 						face,
 						originalError,
 						stacktrace: !isProd ? stacktrace : undefined,
-						status
+						status,
+						path: error.path
 					}
 				};
 			},
