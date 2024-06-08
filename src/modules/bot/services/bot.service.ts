@@ -240,8 +240,8 @@ export class BotService implements OnModuleInit {
 		await this._drizzleService
 			.update(schema.bots)
 			.set({
-				name: botApiInformation.application.name,
-				avatar: botApiInformation.application.icon,
+				name: botApiInformation.bot.username,
+				avatar: botApiInformation.bot.avatar,
 				guildCount: botApiInformation.bot.approximate_guild_count
 			})
 			.where(eq(schema.bots.id, id))
