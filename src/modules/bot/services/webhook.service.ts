@@ -96,14 +96,11 @@ export class BotWebhookService implements OnModuleInit {
 	 * @throws NotFoundException if the webhook does not exist.
 	 */
 	public async getWebhook(id: string) {
-		const webhook = await this._drizzleService.query.webhooks.findFirst({
-			where: (table, { eq }) => eq(table.id, id)
-		});
-
-		// If the webhook does not exist, throw an error
-		if (!webhook) {
-			throw new NotFoundException(ErrorMessages.WEBHOOK_NOT_FOUND);
-		}
+		const webhook = await this._drizzleService.query.webhooks
+			.findFirst({
+				where: (table, { eq }) => eq(table.id, id)
+			})
+			.catch(() => null);
 
 		return webhook;
 	}
