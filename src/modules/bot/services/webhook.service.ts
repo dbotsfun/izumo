@@ -184,7 +184,7 @@ export class BotWebhookService implements OnModuleInit {
 		});
 
 		// Check if the event is included in the webhook
-		if (!webhook.events?.includes(event) || !webhook) {
+		if (!webhook || !webhook.events?.includes(event)) {
 			return;
 		}
 
