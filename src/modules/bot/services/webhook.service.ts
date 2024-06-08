@@ -194,7 +194,8 @@ export class BotWebhookService implements OnModuleInit {
 			}
 		}
 
-		const webhookUrl = this._configService.getOrThrow('MS_WEBHOOK_URL');
+		const webhookUrl =
+			this._configService.getOrThrow<string>('MS_WEBHOOK_URL');
 
 		// Send the webhook payload
 		return firstValueFrom(
