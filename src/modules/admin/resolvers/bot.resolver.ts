@@ -1,3 +1,4 @@
+import { Throttlers } from '@constants/throttler';
 import { User } from '@modules/auth/decorators/user.decorator';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { DeleteBotInput } from '@modules/bot/inputs/bot/delete.input';
@@ -7,6 +8,7 @@ import { BotService } from '@modules/bot/services/bot.service';
 import { OrGuard } from '@nest-lab/or-guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { PaginationInput } from '@utils/graphql/pagination';
 import { InternalGuard } from '@utils/guards/internal.guard';
 import { UserPermissions } from '../decorators/permissions.decorator';
@@ -44,6 +46,7 @@ export class AdminBotResolver {
 		description: 'Gives a list of bots for the panel'
 	})
 	@UserPermissions([UserPermissionsFlags.ManageBots])
+	@SkipThrottle({ [Throttlers.DEFAULT]: true })
 	public getBots(
 		@Args('input', { nullable: true }) input?: FiltersBotInput,
 		@Args('pagination', { nullable: true }) pagination?: PaginationInput

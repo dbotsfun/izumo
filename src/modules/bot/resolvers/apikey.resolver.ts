@@ -1,8 +1,10 @@
+import { Throttlers } from '@constants/throttler';
 import { User } from '@modules/auth/decorators/user.decorator';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { OrGuard } from '@nest-lab/or-guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { InternalGuard } from '@utils/guards/internal.guard';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
@@ -17,6 +19,7 @@ import { ApiKeyService } from '../services/apikey.service';
 @Resolver(() => String)
 @UsePipes(ValidationTypes, ValidationPipe)
 @UseGuards(OrGuard([InternalGuard, BotOwnerPermissionsGuard]))
+@SkipThrottle({ [Throttlers.RESOURCE]: true })
 export class ApiKeyResolver {
 	/**
 	 * Creates an instance of the ApiKeyResolver class.

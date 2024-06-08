@@ -1,5 +1,6 @@
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ValidationTypes } from 'class-validator';
 import { User } from '../decorators/user.decorator';
 import { JwtRefreshAuthGuard } from '../guards/jwt-refresh.guard';
@@ -17,6 +18,7 @@ import { AuthService } from '../services/auth.service';
  */
 @Resolver()
 @UsePipes(ValidationTypes, ValidationPipe)
+@SkipThrottle()
 export class AuthResolver {
 	/**
 	 * AuthResolver constructor.
