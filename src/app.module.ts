@@ -32,6 +32,8 @@ import { VanityModule } from './modules/vanity/vanity.module';
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => ({
+				errorMessage:
+					'You are being rate limited. Please try again later.',
 				throttlers: [
 					{
 						name: Throttlers.DEFAULT,
