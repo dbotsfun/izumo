@@ -66,9 +66,12 @@ export class AdminBotResolver {
 		return this._adminBotService.setStatus(user, input);
 	}
 
-	@Mutation(() => BotObject)
+	@Mutation(() => BotObject, {
+		name: 'panelDeleteBot',
+		description: 'Deletes a bot.'
+	})
 	@UserPermissions([UserPermissionsFlags.ManageBots])
-	public deleteBot(
+	public delete(
 		@User() user: JwtPayload,
 		@Args('input') input: DeleteBotInput
 	) {
