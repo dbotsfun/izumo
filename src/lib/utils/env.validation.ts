@@ -121,6 +121,9 @@ export class EnvironmentVariables {
 		require_host: false
 	})
 	public DISCORD_WEBHOOK_URL!: string;
+
+	@IsString()
+	public MS_WEBHOOK_AUTH!: string;
 }
 
 /**

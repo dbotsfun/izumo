@@ -53,7 +53,10 @@ To get started with Izumo, follow these steps:
     NODE_ENV=
     API_PORT=
     INTERNAL_KEY=
+
+    # Microservices
     MS_WEBHOOK_URL=
+    MS_WEBHOOK_AUTH=
 
 	# Database
     DATABASE_URL=
