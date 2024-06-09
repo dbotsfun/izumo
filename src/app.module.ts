@@ -84,8 +84,6 @@ import { VanityModule } from './modules/vanity/vanity.module';
 						'You are not authenticated to perform this action.'
 				};
 
-				console.log(error);
-
 				const {
 					stacktrace,
 					status,
