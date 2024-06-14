@@ -183,13 +183,8 @@ export class BotWebhookService implements OnModuleInit {
 			where: (table, { eq }) => eq(table.id, data.botId)
 		});
 
-		// Check if the webhook exists
-		if (!webhook) {
-			throw new NotFoundException(ErrorMessages.WEBHOOK_NOT_FOUND);
-		}
-
 		// Check if the event is included in the webhook
-		if (!webhook.events?.includes(event)) {
+		if (!webhook || !webhook.events?.includes(event)) {
 			return;
 		}
 
@@ -199,7 +194,11 @@ export class BotWebhookService implements OnModuleInit {
 			}
 		}
 
-		const webhookUrl = this._configService.getOrThrow('MS_WEBHOOK_URL');
+		const webhookUrl =
+			this._configService.getOrThrow<string>('MS_WEBHOOK_URL');
+
+		const Authorization =
+			this._configService.getOrThrow<string>('MS_WEBHOOK_AUTH');
 
 		// Send the webhook payload
 		return firstValueFrom(
@@ -215,7 +214,9 @@ export class BotWebhookService implements OnModuleInit {
 				} as WebhookEventInterface,
 				{
 					timeout: seconds(5), // If the webhook does not respond within 5 seconds, cancel the request
-					headers: {}
+					headers: {
+						Authorization
+					}
 				}
 			)
 		).catch(() => null);

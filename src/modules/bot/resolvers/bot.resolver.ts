@@ -1,3 +1,4 @@
+import { Throttlers } from '@constants/throttler';
 import { BotStatus } from '@database/enums';
 import { PaginationInput } from '@gql/pagination';
 import { User } from '@modules/auth/decorators/user.decorator';
@@ -5,6 +6,7 @@ import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { SkipThrottle, Throttle, minutes } from '@nestjs/throttler';
 import { OmitGuards } from '@utils/decorators/omit-guards.decorator';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
@@ -42,6 +44,7 @@ export class BotResolver {
 		name: 'bots',
 		description: 'Gives a list of bots'
 	})
+	@SkipThrottle({ [Throttlers.DEFAULT]: true })
 	@OmitGuards([JwtAuthGuard])
 	public bots(
 		@Args('pagination', { nullable: true }) pagination: PaginationInput,
@@ -65,6 +68,7 @@ export class BotResolver {
 		name: 'getBot',
 		description: 'Gives the information about a bot.'
 	})
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	@OmitGuards([JwtAuthGuard])
 	public get(@Args('input') input: GetBotInput) {
 		return this._botService.getBot(input.id);
@@ -80,6 +84,7 @@ export class BotResolver {
 		name: 'createBot',
 		description: 'Creates a new bot.'
 	})
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	public create(
 		@User() user: JwtPayload,
 		@Args('input') input: CreateBotInput
@@ -99,6 +104,7 @@ export class BotResolver {
 	})
 	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuard)
 	@BotOwnerPermissions([BotOwnerPermissionsFlag.ManageBot])
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	public update(
 		@User() user: JwtPayload,
 		@Args('input') input: CreateBotInput
@@ -118,6 +124,7 @@ export class BotResolver {
 	})
 	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuard)
 	@BotOwnerPermissions([BotOwnerPermissionsFlag.Admin])
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	public updatePermissions(
 		@Args('input') input: UpdateBotOwnerPermisisionsInput
 	) {
@@ -136,10 +143,24 @@ export class BotResolver {
 	})
 	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuard)
 	@BotOwnerPermissions([BotOwnerPermissionsFlag.Admin])
+	@Throttle({ [Throttlers.DEFAULT]: { ttl: minutes(1), limit: 1 } })
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	public delete(
 		@User() user: JwtPayload,
 		@Args('input') input: DeleteBotInput
 	) {
 		return this._botService.deleteBot(user, input);
+	}
+
+	@Mutation(() => BotObject, {
+		name: 'syncBotInformation',
+		description: 'Syncs the information of a bot.'
+	})
+	@UseGuards(BotOwnershipGuard, BotOwnerPermissionsGuard)
+	@BotOwnerPermissions([BotOwnerPermissionsFlag.SyncStats])
+	@Throttle({ [Throttlers.DEFAULT]: { ttl: minutes(1), limit: 1 } })
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
+	public sync(@Args('input') input: GetBotInput) {
+		return this._botService.syncBotInformation(input.id);
 	}
 }

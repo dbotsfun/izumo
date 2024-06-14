@@ -1,7 +1,9 @@
+import { Throttlers } from '@constants/throttler';
 import { PaginationInput } from '@gql/pagination';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { CreateBotTagInput } from '../inputs/tag/create.input';
 import { FiltersBotTagInput } from '../inputs/tag/filters.input';
 import { GetBotTagInput } from '../inputs/tag/get.input';
@@ -30,6 +32,7 @@ export class BotTagResolver {
 	@Query(() => BotTagsConnection, {
 		description: 'Fetches a list of tags.'
 	})
+	@SkipThrottle({ [Throttlers.DEFAULT]: true })
 	public async tags(
 		@Args('pagination', { nullable: true }) pagination: PaginationInput,
 		@Args('input', { nullable: true }) input: FiltersBotTagInput
@@ -46,6 +49,7 @@ export class BotTagResolver {
 		name: 'getTag',
 		description: 'Fetches a tag by name.'
 	})
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	public async get(@Args('input') input: GetBotTagInput) {
 		return this._tagService.getTag(input.id);
 	}
@@ -59,6 +63,7 @@ export class BotTagResolver {
 		name: 'createTag',
 		description: 'Creates a new tag.'
 	})
+	@SkipThrottle({ [Throttlers.RESOURCE]: true })
 	@UseGuards(JwtAuthGuard)
 	public async create(@Args('input') input: CreateBotTagInput) {
 		return this._tagService.createTag(input.id);

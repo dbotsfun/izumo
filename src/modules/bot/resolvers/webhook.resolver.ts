@@ -1,8 +1,10 @@
+import { Throttlers } from '@constants/throttler';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ValidationTypes } from 'class-validator';
 import { BotOwnerPermissions } from '../decorators/permissions.decorator';
 import { BotOwnershipGuard } from '../guards/ownership.guard';
@@ -20,6 +22,7 @@ import { BotWebhookService } from '../services/webhook.service';
 @Resolver(() => WebhookObject)
 @UseGuards(JwtAuthGuard, BotOwnershipGuard, BotOwnerPermissionsGuard)
 @UsePipes(ValidationTypes, ValidationPipe)
+@SkipThrottle({ [Throttlers.RESOURCE]: true })
 export class BotWebhookResolver {
 	/**
 	 * Creates an instance of `BotWebhookResolver`.

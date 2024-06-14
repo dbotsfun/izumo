@@ -1,5 +1,7 @@
+import { Throttlers } from '@constants/throttler';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ValidationTypes } from 'class-validator';
 import { GetBotOwnerInput } from '../inputs/owner/get.input';
 import { BotOwnerObject } from '../objects/owner/owner.object';
@@ -10,6 +12,7 @@ import { BotOwnerService } from '../services/owner.service';
  */
 @Resolver(() => BotOwnerObject)
 @UsePipes(ValidationTypes, ValidationPipe)
+@SkipThrottle({ [Throttlers.RESOURCE]: true })
 export class BotOwnerResolver {
 	/**
 	 * Creates an instance of the OwnerResolver class.

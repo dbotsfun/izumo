@@ -1,9 +1,11 @@
+import { Throttlers } from '@constants/throttler';
 import { WebhookEvent } from '@database/enums';
 import { User } from '@modules/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ValidationTypes } from 'class-validator';
 import { BotVoteCreateInput } from '../inputs/vote/create.input';
 import { BotCanVoteObject } from '../objects/vote/can-vote.object';
@@ -17,6 +19,7 @@ import { BotWebhookService } from '../services/webhook.service';
 @Resolver(() => BotVoteObject)
 @UsePipes(ValidationTypes, ValidationPipe)
 @UseGuards(JwtAuthGuard)
+@SkipThrottle({ [Throttlers.RESOURCE]: true })
 export class BotVoteResolver {
 	/**
 	 * Creates an instance of `BotVoteResolver`.

@@ -53,7 +53,10 @@ To get started with Izumo, follow these steps:
     NODE_ENV=
     API_PORT=
     INTERNAL_KEY=
+
+    # Microservices
     MS_WEBHOOK_URL=
+    MS_WEBHOOK_AUTH=
 
 	# Database
     DATABASE_URL=
@@ -68,6 +71,12 @@ To get started with Izumo, follow these steps:
     DISCORD_CLIENT_SECRET=
     DISCORD_REDIRECT_URI=
     DISCORD_USER_TOKEN=
+
+    # Throttling
+    THROTTLE_TTL=1800000
+    THROTTLE_LIMIT=100
+    THROTTLE_RESOURCE_LIMIT=60
+    THROTTLE_RESOURCE_TTL=1800000
     ```
 5. Start the server using `pnpm start:dev`.
 6. Access the GraphQL playground to explore and interact with the API queries.

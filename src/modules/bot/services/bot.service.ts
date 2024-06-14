@@ -225,6 +225,32 @@ export class BotService implements OnModuleInit {
 	}
 
 	/**
+	 * Retrieves the API information for a bot.
+	 * @param id The ID of the bot.
+	 * @returns A Promise that resolves to an object containing the application and bot information.
+	 */
+	public async syncBotInformation(id: string) {
+		// Get the bot and its API information to check if it exists
+		const bot = await this.getBot(id);
+
+		// Get the bot information from the Discord API
+		const botApiInformation = await this.getBotApiInformation(id);
+
+		// Update the bot information
+		await this._drizzleService
+			.update(schema.bots)
+			.set({
+				name: botApiInformation.bot.username,
+				avatar: botApiInformation.bot.avatar,
+				guildCount: botApiInformation.bot.approximate_guild_count
+			})
+			.where(eq(schema.bots.id, id))
+			.execute();
+
+		return bot;
+	}
+
+	/**
 	 * Creates a new bot.
 	 * @param input - The input data for creating the bot.
 	 * @returns A promise that resolves to the newly created bot.

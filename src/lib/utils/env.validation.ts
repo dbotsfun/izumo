@@ -120,6 +120,22 @@ export class EnvironmentVariables {
 		message: 'REDIS_URL must be a valid Redis connection string.'
 	})
 	public REDIS_URL!: string;
+
+	/**
+	 * Discord webhook URL for logging
+	 */
+	@IsUrl({
+		protocols: ['http', 'https'],
+		require_tld: false,
+		require_host: false
+	})
+	public DISCORD_WEBHOOK_URL!: string;
+
+	/**
+	 * Webhook microservice auth
+	 */
+	@IsString()
+	public MS_WEBHOOK_AUTH!: string;
 }
 
 /**
