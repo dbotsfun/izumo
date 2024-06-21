@@ -6,14 +6,18 @@ import { Throttlers } from '@constants/throttler';
 import { DATABASE } from '@constants/tokens';
 import { DrizzlePostgresModule } from '@knaadh/nestjs-drizzle-postgres';
 import { ApolloDriver, type ApolloDriverConfig } from '@nestjs/apollo';
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+import { TerminusModule } from '@nestjs/terminus';
 import { ThrottlerModule, minutes } from '@nestjs/throttler';
 import { GqlThrottlerGuard } from '@utils/guards/throttler.guard';
 import { validate } from '@utils/index';
+import { DatabaseHealthIndicator } from '@utils/indicators/db-health.indicator';
 import type { Request, Response } from 'express';
+import { AppController } from './app.controller';
 import { schema } from './database/schema';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -134,17 +138,24 @@ import { VanityModule } from './modules/vanity/vanity.module';
 			})
 		}),
 
+		TerminusModule.forRoot({
+			errorLogStyle: 'pretty'
+		}),
+
+		HttpModule,
+
 		BotModule,
 		AuthModule,
 		VanityModule,
 		AdminModule
 	],
-	controllers: [],
+	controllers: [AppController],
 	providers: [
 		{
 			provide: APP_GUARD,
 			useClass: GqlThrottlerGuard
-		}
+		},
+		DatabaseHealthIndicator
 	]
 })
 export class AppModule {}
