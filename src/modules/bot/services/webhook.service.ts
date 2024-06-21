@@ -197,7 +197,7 @@ export class BotWebhookService implements OnModuleInit {
 		const webhookUrl =
 			this._configService.getOrThrow<string>('MS_WEBHOOK_URL');
 
-		const Authorization =
+		const authorization =
 			this._configService.getOrThrow<string>('MS_WEBHOOK_AUTH');
 
 		// Send the webhook payload
@@ -215,7 +215,7 @@ export class BotWebhookService implements OnModuleInit {
 				{
 					timeout: seconds(5), // If the webhook does not respond within 5 seconds, cancel the request
 					headers: {
-						Authorization
+						Authorization: `Bearer ${authorization}`
 					}
 				}
 			)
