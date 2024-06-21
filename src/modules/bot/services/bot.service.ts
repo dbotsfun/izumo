@@ -8,6 +8,7 @@ import { type PaginationInput } from '@gql/pagination';
 import { DrizzleService } from '@lib/types';
 import { ApiBot } from '@lib/types/apiBot';
 import type { JwtPayload } from '@modules/auth/interfaces/payload.interface';
+import { AuthUserService } from '@modules/auth/services/user.service';
 import { HttpService } from '@nestjs/axios';
 import {
 	BadRequestException,
@@ -50,6 +51,11 @@ export class BotService implements OnModuleInit {
 	private _tagService!: BotTagService;
 
 	/**
+	 * The injected AuthUserService instance.
+	 */
+	private _userService!: AuthUserService;
+
+	/**
 	 * Creates an instance of BotService.
 	 * @param {DrizzleService} _drizzleService - The DrizzleService instance.
 	 * @param {HttpService} _httpService - The HttpService instance.
@@ -72,6 +78,10 @@ export class BotService implements OnModuleInit {
 	 */
 	public onModuleInit() {
 		this._tagService = this._moduleRef.get(BotTagService, {
+			strict: false
+		});
+
+		this._userService = this._moduleRef.get(AuthUserService, {
 			strict: false
 		});
 	}
@@ -296,19 +306,34 @@ export class BotService implements OnModuleInit {
 				tagNames: input.tags
 			});
 
-			// Insert the bot into the botToUser table
-			await tx.insert(schema.botsTousers).values(
-				[owner.id, ...coOwners].map((userId) => {
-					const isOwner = userId === owner.id;
+			const owners = (
+				await Promise.all(
+					[owner.id, ...coOwners].map(async (userId) => {
+						const user = await this._userService
+							.getUser(userId)
+							.catch(() => null);
 
-					return {
-						botId: bot.id,
-						userId: userId,
-						isOwner,
-						permissions: isOwner ? BotOwnerPermissionsFlag.Admin : 0
-					} satisfies InferInsertModel<typeof schema.botsTousers>;
-				})
-			);
+						// if the user is not in our database, skip them
+						if (!user) {
+							return undefined;
+						}
+
+						const isOwner = userId === owner.id;
+
+						return {
+							botId: bot.id,
+							userId: userId,
+							isOwner,
+							permissions: isOwner
+								? BotOwnerPermissionsFlag.Admin
+								: 0
+						} satisfies InferInsertModel<typeof schema.botsTousers>;
+					})
+				)
+			).filter(Boolean);
+
+			// Insert the bot into the botToUser table
+			await tx.insert(schema.botsTousers).values(owners);
 
 			return bot;
 		});
@@ -432,7 +457,6 @@ export class BotService implements OnModuleInit {
 	/**
 	 * Updates the permissions of a bot owner.
 	 * @param {UpdateBotOwnerPermisisionsInput} input - The input object containing the new permissions and the owner's ID.
-	 * @param {string} botId - The ID of the bot.
 	 * @returns {Promise<Boolean>} - A promise that resolves to the updated bot object.
 	 */
 	public async updatePermissions({

@@ -1,6 +1,8 @@
 import { PaginatorService } from '@/services/paginator.service';
 import { WebhookService } from '@/services/webhook.service';
+import { AuthModule } from '@modules/auth/auth.module';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt.guard';
+import { AuthUserService } from '@modules/auth/services/user.service';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -25,6 +27,7 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 
 @Module({
 	providers: [
+		AuthUserService,
 		BotService,
 		BotResolver,
 		BotFields,
@@ -48,6 +51,7 @@ import { JwtApikeyStrategy } from './strategy/apikey.strategy';
 	],
 	imports: [
 		HttpModule,
+		AuthModule,
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],

@@ -60,13 +60,11 @@ export class BotVoteResolver {
 	) {
 		const res = this._voteService.createVote(input.id, user.id);
 
-		await this._webhookService
-			.sendWebhook(WebhookEvent.NEW_VOTE, {
-				botId: input.id,
-				userId: user.id,
-				query: ''
-			})
-			.then(console.log);
+		await this._webhookService.sendWebhook(WebhookEvent.NEW_VOTE, {
+			botId: input.id,
+			userId: user.id,
+			query: ''
+		});
 
 		return res;
 	}
