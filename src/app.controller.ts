@@ -1,3 +1,4 @@
+import { Throttlers } from '@constants/throttler';
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -5,6 +6,7 @@ import {
 	HealthCheckService,
 	HttpHealthIndicator
 } from '@nestjs/terminus';
+import { SkipThrottle } from '@nestjs/throttler';
 import { DatabaseHealthIndicator } from '@utils/indicators/db-health.indicator';
 
 @Controller()
@@ -16,6 +18,10 @@ export class AppController {
 		public _configService: ConfigService
 	) {}
 
+	@SkipThrottle({
+		[Throttlers.DEFAULT]: true,
+		[Throttlers.RESOURCE]: true
+	})
 	@Get('/health')
 	@HealthCheck()
 	public check() {
