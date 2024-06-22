@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { hours } from '@nestjs/throttler';
-import { isNullishOrEmpty, isNullishOrZero } from '@sapphire/utilities';
 import { and, eq, gt } from 'drizzle-orm';
 import type { BotCanVoteObject } from '../objects/vote/can-vote.object';
 import { BotService } from './bot.service';
@@ -110,7 +109,7 @@ export class BotVoteService implements OnModuleInit {
 		botId: string,
 		userId: string
 	): Promise<BotCanVoteObject> {
-		const userVotes = await this._drizzleService
+		const [userVotes] = await this._drizzleService
 			.select()
 			.from(schema.votes)
 			.where(
@@ -123,10 +122,8 @@ export class BotVoteService implements OnModuleInit {
 			.limit(1)
 			.execute();
 
-		const canVote = isNullishOrEmpty(userVotes) ? true : !userVotes.length;
-		const expires = isNullishOrZero(userVotes[0]?.expires)
-			? null
-			: Number(userVotes[0].expires);
+		const canVote = Boolean(userVotes);
+		const expires = canVote ? userVotes.expires : null;
 
 		return {
 			canVote,
