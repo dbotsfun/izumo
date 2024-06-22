@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { hours } from '@nestjs/throttler';
+import { isNullishOrEmpty, isNullishOrZero } from '@sapphire/utilities';
 import { and, eq, gt } from 'drizzle-orm';
 import type { BotCanVoteObject } from '../objects/vote/can-vote.object';
 import { BotService } from './bot.service';
@@ -122,9 +123,14 @@ export class BotVoteService implements OnModuleInit {
 			.limit(1)
 			.execute();
 
+		const canVote = isNullishOrEmpty(userVotes) ? true : !userVotes.length;
+		const expires = isNullishOrZero(userVotes[0]?.expires)
+			? null
+			: Number(userVotes[0].expires);
+
 		return {
-			canVote: !userVotes.length,
-			expires: Number(userVotes[0]?.expires)
+			canVote,
+			expires
 		};
 	}
 }

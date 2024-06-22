@@ -58,6 +58,9 @@ importers:
       '@sapphire/bitfield':
         specifier: ^1.2.2
         version: 1.2.2
+      '@sapphire/utilities':
+        specifier: ^3.16.2
+        version: 3.16.2
       argon2:
         specifier: ^0.40.1
         version: 0.40.1
@@ -1294,6 +1297,10 @@ packages:
   '@sapphire/bitfield@1.2.2':
     resolution: {integrity: sha512-tplAk8dXmeU11Kp8wKDEaTdSU+VaOyaM1c2rrnUVC21k8YV5pcFs4UfnHiIZKXrRNmeWoMGyY6BSJ9HTIP/DxQ==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+
+  '@sapphire/utilities@3.16.2':
+    resolution: {integrity: sha512-0gRyXPH0hbmfZXwgvCH1z9H/kQwOlLeui86zKafZENpdjmuZznSkDFHRSUksr8Y5W/BxkqnR2WbNEfululh20Q==}
+    engines: {node: '>=v14.0.0'}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -5674,6 +5681,8 @@ snapshots:
   '@protobufjs/utf8@1.1.0': {}
 
   '@sapphire/bitfield@1.2.2': {}
+
+  '@sapphire/utilities@3.16.2': {}
 
   '@sinclair/typebox@0.27.8': {}
 
