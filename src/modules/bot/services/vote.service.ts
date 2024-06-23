@@ -109,7 +109,7 @@ export class BotVoteService implements OnModuleInit {
 		botId: string,
 		userId: string
 	): Promise<BotCanVoteObject> {
-		const [userVotes] = await this._drizzleService
+		const [userVote] = await this._drizzleService
 			.select()
 			.from(schema.votes)
 			.where(
@@ -122,8 +122,8 @@ export class BotVoteService implements OnModuleInit {
 			.limit(1)
 			.execute();
 
-		const canVote = Boolean(userVotes);
-		const expires = canVote ? userVotes.expires : null;
+		const canVote = !userVote as boolean;
+		const expires = canVote ? userVote.expires : null;
 
 		return {
 			canVote,
