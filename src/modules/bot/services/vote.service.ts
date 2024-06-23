@@ -123,7 +123,7 @@ export class BotVoteService implements OnModuleInit {
 			.execute();
 
 		const canVote = !userVote as boolean;
-		const expires = canVote ? userVote.expires : null;
+		const expires = canVote ? null : userVote.expires;
 
 		return {
 			canVote,
