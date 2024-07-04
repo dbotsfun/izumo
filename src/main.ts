@@ -13,7 +13,7 @@ async function bootstrap() {
 		preflightContinue: false,
 		credentials: true,
 		allowedHeaders:
-			'Origin,X-Requested-With,Content-Type,Accept,Authorization,authorization,X-Forwarded-for'
+			'Origin,X-Requested-With,Content-Type,Accept,Authorization,authorization,X-Forwarded-for,apollographql-client-name'
 	});
 
 	await app.listen(process.env.API_PORT || 3000);
