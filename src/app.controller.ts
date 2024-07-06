@@ -31,14 +31,13 @@ export class AppController {
 			this._configService.getOrThrow<string>('MS_WEBHOOK_AUTH');
 
 		return this.health.check([
-			() => this.http.pingCheck('Unzen', 'https://dbots.fun'),
 			() =>
 				this.http.pingCheck('Yoizuki', yoizukiUrl, {
 					headers: {
 						Authorization: `Bearer ${yoizukiAuth}`
 					}
 				}),
-			() => this.db.isHealthy('database')
+			() => this.db.isHealthy('Database')
 		]);
 	}
 }
