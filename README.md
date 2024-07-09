@@ -11,40 +11,27 @@
 - **Webhooks:** Create, update, and delete webhooks for bot events.
 - **Sessions:** Create and manage user sessions for authentication.
 - **Vanity URLs:** Create and retrieve vanity URLs for users and bots.
+- **Throttling:** Prevent abuse by limiting the number of requests per user.
+
+## In progress
+
+- **Bot packs:** Create and retrieve bot packs containing multiple bots.
+- **Statistics:** Retrieve statistics about bots, users, and votes.
 
 ## Stack
 
 Izumo is built using the following technologies:
 
-- **TypeScript:** A statically typed superset of JavaScript that compiles to plain JavaScript.
-- **NestJS:** A progressive Node.js framework for building efficient, reliable, and scalable server-side applications.
-- **Express:** A fast, unopinionated, minimalist web framework for Node.js.
-- **GraphQL:** A query language for APIs and a runtime for executing those queries.
-- **PostgreSQL:** A powerful, open-source relational database system.
-- **Drizzle-ORM:** A TypeScript-first Object-Relational Mapping (ORM) library for Node.js and TypeScript.
-
-## GraphQL Schema
-
-The Izumo API follows a GraphQL schema to define its operations and data types. Here's an overview of the schema:
-
-- **Bots:** Retrieve information about bots, including their ID, name, description, status, and more.
-- **Bot Owners:** Get details about bot owners, such as their ID, username, bio, and owned bots.
-- **Bot Tags:** Create and retrieve tags associated with bots.
-- **Votes:** View votes for bots and check if a user can vote for a bot.
-- **Webhooks:** Create, update, and delete webhooks for bot events.
-- **Sessions:** Create and manage user sessions for authentication.
-- **Vanity URLs:** Create and retrieve vanity URLs for users and bots.
-
-## Usage
-
-To use Izumo, you can interact with its GraphQL endpoints using tools like GraphiQL or Apollo Client. Ensure that you have the necessary permissions and authentication tokens to access the API's functionalities.
+- **[Rust]** - Programming language used to develop the API.
+- **[Diesel]** - ORM and query builder for Rust, used for database operations.
+- **[Actix-Web]** - Web framework for Rust, used to create the API server.
 
 ## Getting Started
 
 To get started with Izumo, follow these steps:
 
 1. Clone the repository.
-2. Install dependencies using `pnpm install`.
+2. Make sure you have Rust installed on your system.
 3. Set up your PostgreSQL database and configure the connection in the application.
 4. Create a `.env` file in the root directory of the project and define the following environment variables:
 
@@ -78,8 +65,8 @@ To get started with Izumo, follow these steps:
     THROTTLE_RESOURCE_LIMIT=60
     THROTTLE_RESOURCE_TTL=1800000
     ```
-5. Start the server using `pnpm start:dev`.
-6. Access the GraphQL playground to explore and interact with the API queries.
+5. Start the server by running `cargo run`.
+6. You can now access the API at `http://localhost:{API_PORT}`.
 
 ## Contributing
 
@@ -88,3 +75,7 @@ Contributions to Izumo are welcome! If you find any bugs or want to suggest new 
 ## License
 
 Izumo API is open-source software licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute the software as per the terms of the license.
+
+[rust]: https://www.rust-lang.org/
+[diesel]: https://diesel.rs/
+[actix-web]: https://actix.rs/

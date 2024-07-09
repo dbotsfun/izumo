@@ -4,20 +4,9 @@
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": true,
 	"files.eol": "\n",
-	"editor.codeActionsOnSave": {
-		"source.organizeImports.biome": "explicit",
-		"quickFix.biome": "explicit"
-	},
 	"search.exclude": {
-		"**/node_modules": true,
 		"**/bower_components": true,
 		"**/*.code-search": true,
-		"**/dist/": true,
 		"**/.git/": true
-	},
-	"[javascript][json][jsonc][typescript][typescriptreact]": {
-		"editor.defaultFormatter": "biomejs.biome"
-	},
-
-	"typescript.preferences.preferTypeOnlyAutoImports": true
+	}
 }
