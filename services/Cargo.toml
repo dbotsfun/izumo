@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+actix-web.workspace = true
+tracing.workspace = true
 
 [features]
 votes = []

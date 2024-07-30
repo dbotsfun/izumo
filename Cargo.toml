@@ -4,6 +4,20 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["middlewares", "services"]
+members = ["database", "middlewares", "services"]
 
 [dependencies]
+actix-web.workspace = true
+diesel.workspace = true
+dotenvy.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[workspace.dependencies]
+actix-web = "4"
+diesel = { version = "2", features = ["postgres", "r2d2", "chrono"] }
+chrono = { version = "0.4.10", features = ["serde"] }
+dotenvy = "0.15"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
