@@ -9,15 +9,27 @@ members = ["database", "middlewares", "services"]
 [dependencies]
 actix-web.workspace = true
 diesel.workspace = true
-dotenvy.workspace = true
+diesel-async.workspace = true
+futures-util.workspace = true
 tracing.workspace = true
-tracing-subscriber.workspace = true
+database = { path = "database" }
+dotenvy = "0.15"
+deadpool-diesel = { version = "=0.6.1", features = ["postgres", "tracing"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [workspace.dependencies]
-actix-web = "4"
-diesel = { version = "2", features = ["postgres", "r2d2", "chrono"] }
+actix-web = "4.8.0"
+diesel = { version = "2.2.2", features = ["postgres", "chrono"] }
+diesel-async = { version = "0.5.0", features = [
+  "postgres",
+  "async-connection-wrapper",
+  "deadpool",
+] }
 chrono = { version = "0.4.10", features = ["serde"] }
-dotenvy = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+futures-util = "0.3.30"
+tokio = { version = "1.39.2", default-features = false, features = [
+  "macros",
+  "rt-multi-thread",
+] }

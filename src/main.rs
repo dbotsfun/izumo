@@ -1,5 +1,9 @@
 use actix_web::{middleware, web, App, HttpServer};
-use diesel::{prelude::*, r2d2};
+use database::{connection_url, make_manager_config};
+use deadpool_diesel::Runtime;
+use diesel_async::pooled_connection::deadpool::Pool as DeadpoolPool;
+use diesel_async::pooled_connection::AsyncDieselConnectionManager;
+use std::time::Duration;
 use tracing::info;
 
 #[actix_web::main]
@@ -9,7 +13,18 @@ async fn main() -> std::io::Result<()> {
 	initialize_tracing();
 
 	// initialize DB pool outside of `HttpServer::new` so that it is shared across all workers
-	let pool = initialize_db_pool();
+	let pool = {
+		let url = connection_url();
+		let manager_config = make_manager_config();
+		let manager = AsyncDieselConnectionManager::new_with_config(url, manager_config);
+
+		DeadpoolPool::builder(manager)
+			.runtime(Runtime::Tokio1)
+			.max_size(16)
+			.wait_timeout(Some(Duration::from_secs(30)))
+			.build()
+			.unwrap()
+	};
 
 	let port = std::env::var("PORT")
 		.unwrap_or(String::from("8080"))
@@ -33,20 +48,7 @@ async fn main() -> std::io::Result<()> {
 	.await
 }
 
-/// Short-hand for the database pool type to use throughout the app.
-type DbPool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
-
-/// Initialize database connection pool based on `DATABASE_URL` environment variable.
-///
-/// See more: <https://docs.rs/diesel/latest/diesel/r2d2/index.html>.
-fn initialize_db_pool() -> DbPool {
-	let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL should be set");
-	let manager = r2d2::ConnectionManager::<PgConnection>::new(conn_spec);
-	r2d2::Pool::builder()
-		.build(manager)
-		.expect("database URL should be valid path to SQLite DB file")
-}
-
+/// Initialize tracing subscriber with default configuration.
 fn initialize_tracing() {
 	tracing_subscriber::fmt()
 		.with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
