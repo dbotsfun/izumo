@@ -19,7 +19,8 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [workspace.dependencies]
 actix-web = "4.8.0"
-diesel = { version = "2.2.2", features = ["postgres", "chrono"] }
+derivative = "=2.2.0"
+diesel = { version = "2.2.2", features = ["postgres", "chrono", "uuid"] }
 diesel-async = { version = "0.5.0", features = [
   "postgres",
   "async-connection-wrapper",

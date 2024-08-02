@@ -1,5 +1,5 @@
-CREATE TABLE users (
-    id TEXT NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR NOT NULL PRIMARY KEY,
     username VARCHAR NOT NULL,
     avatar TEXT,
     banner TEXT,

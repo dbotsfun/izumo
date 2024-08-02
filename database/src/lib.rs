@@ -6,6 +6,7 @@ use url::Url;
 
 pub mod models;
 pub mod schema;
+pub mod util;
 
 /// Create a new [ManagerConfig] for the database connection pool, which can
 /// be used with [diesel_async::pooled_connection::AsyncDieselConnectionManager::new_with_config()].
