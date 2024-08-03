@@ -182,9 +182,11 @@ impl Bot {
 	}
 
 	pub fn owners(&self, conn: &mut impl Conn) -> QueryResult<Vec<User>> {
-		BotToUser::by_bot_id(self.id)
+		let owners = BotToUser::by_bot_id(&self.id)
 			.inner_join(users::table)
 			.select(users::all_columns)
-			.load(conn)?
+			.load(conn)?;
+
+		Ok(owners)
 	}
 }

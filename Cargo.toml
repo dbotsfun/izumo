@@ -12,15 +12,22 @@ diesel.workspace = true
 diesel-async.workspace = true
 futures-util.workspace = true
 tracing.workspace = true
+sentry.workspace = true
+crates_io_env_vars.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
 database = { path = "database" }
 dotenvy = "0.15"
 deadpool-diesel = { version = "=0.6.1", features = ["postgres", "tracing"] }
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 
 [workspace.dependencies]
+anyhow = "1.0.86"
 actix-web = "4.8.0"
 derivative = "=2.2.0"
 diesel = { version = "2.2.2", features = ["postgres", "chrono", "uuid"] }
+sentry = { version = "=0.34.0", features = ["tracing"] }
+crates_io_env_vars = { git = "https://github.com/rust-lang/crates.io.git", branch = "main" }
 diesel-async = { version = "0.5.0", features = [
   "postgres",
   "async-connection-wrapper",
@@ -28,7 +35,7 @@ diesel-async = { version = "0.5.0", features = [
 ] }
 chrono = { version = "0.4.10", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
-tracing = "0.1"
+tracing = "0.1.40"
 futures-util = "0.3.30"
 tokio = { version = "1.39.2", default-features = false, features = [
   "macros",

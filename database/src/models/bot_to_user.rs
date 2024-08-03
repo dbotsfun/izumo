@@ -11,13 +11,12 @@ use diesel::{pg::Pg, prelude::*};
     belongs_to(Bot, foreign_key = B),
     primary_key(A, B)
 )]
+#[allow(dead_code)] // Not used yet
 pub struct BotToUser {
-	/// Bot ID
-	#[allow(non_snake_case)]
-	A: String,
-	/// Owner ID
-	#[allow(non_snake_case)]
-	B: String,
+	#[diesel(column_name = "A")]
+	bot_id: String,
+	#[diesel(column_name = "B")]
+	user_id: String,
 	is_owner: bool,
 	permissions: i32,
 	created_at: chrono::NaiveDateTime,
@@ -26,9 +25,9 @@ pub struct BotToUser {
 type BoxedQuery<'a> = bot_to_user::BoxedQuery<'a, Pg, bot_to_user::SqlType>;
 
 impl BotToUser {
-	pub fn by_bot_id(bot_id: String) -> BoxedQuery<'static> {
+	pub fn by_bot_id(bot_id: &String) -> BoxedQuery<'static> {
 		bot_to_user::table
-			.filter(bot_to_user::A.eq(bot_id))
+			.filter(bot_to_user::A.eq(bot_id.to_owned()))
 			.into_boxed()
 	}
 }

@@ -120,6 +120,8 @@ diesel::table! {
 	}
 }
 
+diesel::joinable!(bot_to_user -> bots (A));
+diesel::joinable!(bot_to_user -> users (B));
 diesel::joinable!(reviews -> bots (bot_id));
 diesel::joinable!(reviews -> users (user_id));
 diesel::joinable!(sessions -> users (user_id));
@@ -127,9 +129,16 @@ diesel::joinable!(vanities -> users (user_id));
 diesel::joinable!(votes -> bots (bot_id));
 diesel::joinable!(votes -> users (user_id));
 diesel::joinable!(webhooks -> bots (id));
-diesel::joinable!(bot_to_user -> bots (A));
-diesel::joinable!(bot_to_user -> users (B));
 
 diesel::allow_tables_to_appear_in_same_query!(
-	badges, bots, reviews, sessions, tags, users, vanities, votes, webhooks,
+	badges,
+	bots,
+	reviews,
+	sessions,
+	tags,
+	users,
+	vanities,
+	votes,
+	webhooks,
+	bot_to_user
 );
