@@ -1,5 +1,5 @@
 use actix_web::{middleware, web, App, HttpServer};
-use crates_io_env_vars::var;
+use crates_io_env_vars::var_parsed;
 use database::{connection_url, make_manager_config};
 use deadpool_diesel::Runtime;
 use diesel_async::pooled_connection::deadpool::Pool as DeadpoolPool;
@@ -11,10 +11,12 @@ mod config;
 mod sentry;
 mod util;
 
-fn main() -> std::io::Result<()> {
+extern crate sentry as sentry_crate;
+
+fn main() -> anyhow::Result<()> {
 	dotenvy::dotenv().ok();
 
-	let _sentry = sentry::init();
+	let _guard = sentry::init();
 
 	// initialize tracing subscriber
 	util::tracing::init();
@@ -33,9 +35,13 @@ fn main() -> std::io::Result<()> {
 			.unwrap()
 	};
 
-	let port = match var("PORT").expect("PORT should be defined") {
-		Some(port) => port.parse::<u16>().unwrap(),
-		_ => 8080,
+	let port = match var_parsed("PORT")? {
+		Some(port) => port,
+		_ => {
+			info!("PORT environment variable not set; defaulting to 8080");
+
+			8080
+		}
 	};
 
 	let runtime = tokio::runtime::Builder::new_multi_thread()
@@ -50,13 +56,15 @@ fn main() -> std::io::Result<()> {
 				// add DB pool handle to app data; enables use of `web::Data<DbPool>` extractor
 				.app_data(web::Data::new(pool.clone()))
 				// add request logger middleware
+				.wrap(sentry_actix::Sentry::with_transaction())
 				.wrap(middleware::Logger::default())
 			// add route handlers
-			// .service(get_user)
 			// .service(add_user)
 		})
 		.bind(("127.0.0.1", port))?
 		.run()
 		.await
-	})
+	})?;
+
+	Ok(())
 }

@@ -1,5 +1,5 @@
 use anyhow::Context;
-use crates_io_env_vars::{var, var_parsed};
+use crates_io_env_vars::{required_var, var, var_parsed};
 use sentry::types::Dsn;
 use sentry::IntoDsn;
 
@@ -19,16 +19,16 @@ impl SentryConfig {
 		let environment = match dsn {
 			None => None,
 			Some(_) => Some(
-				var("SENTRY_ENV_API")
+				required_var("SENTRY_ENV_API")
 					.context("SENTRY_ENV_API must be set when using SENTRY_DSN_API")?,
 			),
 		};
 
 		Ok(Self {
 			dsn,
-			environment: environment.unwrap(),
-			release: var("SOURCE_COMMIT")?,
-			traces_sample_rate: var_parsed("SENTRY_TRACES_SAMPLE_RATE")?.unwrap_or(0.0),
+			environment,
+			release: var("SOURCE_COMMIT")?, // https://coolify.io/docs/knowledge-base/environment-variables#source-commit
+			traces_sample_rate: var_parsed("SENTRY_TRACES_SAMPLE_RATE")?.unwrap_or(1.0),
 		})
 	}
 }
