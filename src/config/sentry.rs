@@ -28,7 +28,7 @@ impl SentryConfig {
 			dsn,
 			environment,
 			release: var("SOURCE_COMMIT")?, // https://coolify.io/docs/knowledge-base/environment-variables#source-commit
-			traces_sample_rate: var_parsed("SENTRY_TRACES_SAMPLE_RATE")?.unwrap_or(1.0),
+			traces_sample_rate: var_parsed("SENTRY_TRACES_SAMPLE_RATE")?.unwrap_or(0.0),
 		})
 	}
 }

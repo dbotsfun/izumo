@@ -1,70 +1,58 @@
-use actix_web::{middleware, web, App, HttpServer};
-use crates_io_env_vars::var_parsed;
-use database::{connection_url, make_manager_config};
-use deadpool_diesel::Runtime;
-use diesel_async::pooled_connection::deadpool::Pool as DeadpoolPool;
-use diesel_async::pooled_connection::AsyncDieselConnectionManager;
-use std::time::Duration;
+use std::sync::Arc;
+use tokio::net::TcpListener;
 use tracing::info;
 
+use crate::app::App;
+use crate::config::server;
+use crate::router::build_handler;
+use crate::util::signals::shutdown_signal;
+
+mod app;
 mod config;
+mod middleware;
+mod router;
 mod sentry;
 mod util;
 
-extern crate sentry as sentry_crate;
+const CORE_THREADS: usize = 4;
 
 fn main() -> anyhow::Result<()> {
 	dotenvy::dotenv().ok();
 
-	let _guard = sentry::init();
-
 	// initialize tracing subscriber
 	util::tracing::init();
 
-	// initialize DB pool outside of `HttpServer::new` so that it is shared across all workers
-	let pool = {
-		let url = connection_url();
-		let manager_config = make_manager_config();
-		let manager = AsyncDieselConnectionManager::new_with_config(url, manager_config);
+	// initialize sentry
+	let _guard = sentry::init();
 
-		DeadpoolPool::builder(manager)
-			.runtime(Runtime::Tokio1)
-			.max_size(16)
-			.wait_timeout(Some(Duration::from_secs(30)))
-			.build()
-			.unwrap()
-	};
+	let config = server::Server::from_environment()?;
+	let app = Arc::new(App::new(config));
 
-	let port = match var_parsed("PORT")? {
-		Some(port) => port,
-		_ => {
-			info!("PORT environment variable not set; defaulting to 8080");
+	let mut builder = tokio::runtime::Builder::new_multi_thread();
+	builder.enable_all();
+	builder.worker_threads(CORE_THREADS);
 
-			8080
-		}
-	};
+	if let Some(threads) = app.config.max_blocking_threads {
+		builder.max_blocking_threads(threads);
+	}
 
-	let runtime = tokio::runtime::Builder::new_multi_thread()
-		.enable_all()
-		.build()?;
+	let rt = builder.build()?;
 
-	info!("starting HTTP server at http://localhost:{:?}", port);
+	rt.block_on(async move {
+		let listener = TcpListener::bind((app.config.ip, app.config.port)).await?;
 
-	runtime.block_on(async move {
-		HttpServer::new(move || {
-			App::new()
-				// add DB pool handle to app data; enables use of `web::Data<DbPool>` extractor
-				.app_data(web::Data::new(pool.clone()))
-				// add request logger middleware
-				.wrap(sentry_actix::Sentry::with_transaction())
-				.wrap(middleware::Logger::default())
-			// add route handlers
-			// .service(add_user)
-		})
-		.bind(("127.0.0.1", port))?
-		.run()
-		.await
+		let addr = listener.local_addr()?;
+
+		info!("listening on {addr}");
+
+		let axum_router = build_handler(app);
+
+		axum::serve(listener, axum_router.into_make_service())
+			.with_graceful_shutdown(shutdown_signal())
+			.await
 	})?;
+
+	info!("Server has gracefully shutdown!");
 
 	Ok(())
 }

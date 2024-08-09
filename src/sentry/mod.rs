@@ -1,7 +1,7 @@
 use crate::config::sentry::SentryConfig;
 use sentry::{ClientInitGuard, ClientOptions, TransactionContext};
 use std::sync::Arc;
-use tracing::warn;
+use tracing::{info, warn};
 
 /// Taken from https://github.com/rust-lang/crates.io/blob/main/src/sentry/mod.rs
 /// Initializes the Sentry SDK from the environment variables.
@@ -38,6 +38,8 @@ pub fn init() -> Option<ClientInitGuard> {
 		traces_sampler: Some(Arc::new(traces_sampler)),
 		..Default::default()
 	};
+
+	info!("Sentry SDK initialized");
 
 	Some(sentry::init(opts))
 }

@@ -4,19 +4,24 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["database", "middlewares", "services"]
+members = ["database", "services"]
 
 [dependencies]
-actix-web.workspace = true
+axum.workspace = true
 diesel.workspace = true
 diesel-async.workspace = true
 futures-util.workspace = true
 tracing.workspace = true
 sentry.workspace = true
-sentry-actix = "0.34"
 crates_io_env_vars.workspace = true
 tokio.workspace = true
 anyhow.workspace = true
+reqwest.workspace = true
+tower-http.workspace = true
+tower.workspace = true
+axum-extra.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 database = { path = "database" }
 services = { path = "services" }
 dotenvy = "0.15"
@@ -24,12 +29,35 @@ deadpool-diesel = { version = "=0.6.1", features = ["postgres", "tracing"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 
 [workspace.dependencies]
+reqwest = { version = "=0.12.5", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "9.3"
 anyhow = "1.0.86"
-actix-web = "4.8.0"
+axum = { version = "=0.7.5", features = ["macros", "matched-path"] }
+axum-extra = { version = "=0.9.3", features = [
+  "cookie-signed",
+  "typed-header",
+] }
 derivative = "=2.2.0"
-diesel = { version = "2.2.2", features = ["postgres", "chrono", "uuid"] }
-sentry = { version = "=0.34.0", features = ["tracing"] }
+diesel = { version = "2.2.2", features = [
+  "postgres",
+  "chrono",
+  "uuid",
+  "serde_json",
+] }
+tower = "=0.4.13"
+tower-http = { version = "=0.5.2", features = [
+  "add-extension",
+  "fs",
+  "catch-panic",
+  "timeout",
+  "compression-full",
+] }
+sentry = { version = "=0.34.0", features = [
+  "tracing",
+  "tower",
+  "tower-axum-matched-path",
+  "tower-http",
+] }
 crates_io_env_vars = { git = "https://github.com/rust-lang/crates.io.git", branch = "main" }
 diesel-async = { version = "0.5.0", features = [
   "postgres",
@@ -38,9 +66,11 @@ diesel-async = { version = "0.5.0", features = [
 ] }
 chrono = { version = "0.4.10", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "=1.0.122"
 tracing = "0.1.40"
 futures-util = "0.3.30"
 tokio = { version = "=1.39.2", default-features = false, features = [
   "macros",
   "rt-multi-thread",
+  "signal",
 ] }
