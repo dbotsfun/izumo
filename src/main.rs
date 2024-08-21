@@ -9,6 +9,7 @@ use crate::util::signals::shutdown_signal;
 
 mod app;
 mod config;
+mod controllers;
 mod middleware;
 mod router;
 mod sentry;

@@ -4,15 +4,16 @@ use crates_io_env_vars::{list_parsed, var, var_parsed};
 
 use crate::util::env::Env;
 
-use super::{base::Base, discord::DiscordConfig};
+use super::{base::Base, discord::DiscordConfig, redis::RedisConfig};
 
 pub struct Server {
 	pub base: Base,
 	pub ip: IpAddr,
 	pub port: u16,
 	pub max_blocking_threads: Option<usize>,
-	pub discord_config: DiscordConfig,
+	pub discord: DiscordConfig,
 	pub blocked_ips: HashSet<IpAddr>,
+	pub redis: RedisConfig,
 }
 
 impl Server {
@@ -32,15 +33,18 @@ impl Server {
 		let max_blocking_threads = var_parsed("SERVER_THREADS")?;
 
 		let base = Base::from_environment()?;
-		let discord_config = DiscordConfig::from_environment()?;
+		let discord = DiscordConfig::from_environment()?;
+
+		let redis = RedisConfig::from_environment()?;
 
 		Ok(Self {
 			base,
 			ip,
 			port,
 			max_blocking_threads,
-			discord_config,
+			discord,
 			blocked_ips,
+			redis,
 		})
 	}
 }

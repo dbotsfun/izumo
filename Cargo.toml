@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["database", "services"]
+members = ["database", "oauth"]
 
 [dependencies]
 axum.workspace = true
@@ -23,9 +23,9 @@ axum-extra.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 database = { path = "database" }
-services = { path = "services" }
 dotenvy = "0.15"
 deadpool-diesel = { version = "=0.6.1", features = ["postgres", "tracing"] }
+deadpool-redis = "=0.16.0"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 
 [workspace.dependencies]

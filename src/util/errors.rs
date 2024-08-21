@@ -1,14 +1,46 @@
-use axum::Json;
-use serde_json::json;
 use std::{
 	any::{Any, TypeId},
 	borrow::Cow,
 	fmt,
 };
 
-use axum::response::{IntoResponse, Response};
+mod json;
+
+use axum::response::IntoResponse;
+use json::custom;
 use reqwest::StatusCode;
 pub type BoxedAppError = Box<dyn AppError>;
+
+/// Return an error with status 400 and the provided description as JSON
+pub fn bad_request<S: ToString>(error: S) -> BoxedAppError {
+	custom(StatusCode::BAD_REQUEST, error.to_string())
+}
+
+pub fn forbidden(detail: impl Into<Cow<'static, str>>) -> BoxedAppError {
+	custom(StatusCode::FORBIDDEN, detail)
+}
+
+pub fn not_found() -> BoxedAppError {
+	custom(StatusCode::NOT_FOUND, "Not Found")
+}
+
+/// Returns an error with status 500 and the provided description as JSON
+pub fn server_error<S: ToString>(error: S) -> BoxedAppError {
+	custom(StatusCode::INTERNAL_SERVER_ERROR, error.to_string())
+}
+
+/// Returns an error with status 503 and the provided description as JSON
+pub fn service_unavailable() -> BoxedAppError {
+	custom(StatusCode::SERVICE_UNAVAILABLE, "Service unavailable")
+}
+
+pub fn bot_not_found(bot: &str) -> BoxedAppError {
+	let detail = format!("crate `{bot}` does not exist");
+	custom(StatusCode::NOT_FOUND, detail)
+}
+
+// =============================================================================
+// AppError trait
 
 pub trait AppError: Send + fmt::Display + fmt::Debug + 'static {
 	/// Generate an HTTP response for the error
@@ -45,38 +77,3 @@ impl IntoResponse for BoxedAppError {
 }
 
 pub type AppResult<T> = Result<T, BoxedAppError>;
-
-pub fn not_found() -> BoxedAppError {
-	custom(StatusCode::NOT_FOUND, "Not Found")
-}
-
-pub fn custom(status: StatusCode, detail: impl Into<Cow<'static, str>>) -> BoxedAppError {
-	Box::new(CustomApiError {
-		status,
-		detail: detail.into(),
-	})
-}
-
-#[derive(Debug, Clone)]
-pub struct CustomApiError {
-	status: StatusCode,
-	detail: Cow<'static, str>,
-}
-
-impl fmt::Display for CustomApiError {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		self.detail.fmt(f)
-	}
-}
-
-impl AppError for CustomApiError {
-	fn response(&self) -> Response {
-		json_error(&self.detail, self.status)
-	}
-}
-
-/// Generates a response with the provided status and description as JSON
-fn json_error(detail: &str, status: StatusCode) -> Response {
-	let json = json!({ "errors": [{ "detail": detail }] });
-	(status, Json(json)).into_response()
-}
