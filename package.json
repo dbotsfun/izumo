@@ -40,7 +40,7 @@
 		"@nestjs/passport": "^10.0.3",
 		"@nestjs/platform-express": "^10.3.8",
 		"@nestjs/terminus": "^10.2.3",
-		"@nestjs/throttler": "^5.1.2",
+		"@nestjs/throttler": "^6.2.1",
 		"@sapphire/bitfield": "^1.2.2",
 		"argon2": "^0.40.1",
 		"axios": "^1.6.8",
