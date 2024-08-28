@@ -1,4 +1,4 @@
-use crate::schema::users;
+use super::{schema::users, util::diesel::Conn};
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -33,4 +33,11 @@ pub struct User {
 	pub created_at: chrono::NaiveDateTime,
 	/// Last time the user changed something.
 	pub updated_at: chrono::NaiveDateTime,
+}
+
+impl User {
+	/// Get the user by their ID.
+	pub fn find(conn: &mut impl Conn, id: &str) -> QueryResult<User> {
+		users::table.find(id).first(conn)
+	}
 }

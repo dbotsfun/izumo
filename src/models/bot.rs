@@ -1,62 +1,45 @@
-use std::io::Write;
-
-use crate::{
-	models::BotToUser,
-	schema::{bots, users},
-	util::diesel::Conn,
-};
+use super::schema::{bots, users};
+use super::sql::pg_enum;
+use super::util::diesel::Conn;
+use super::{BotToUser, User};
+use crate::util::errors::AppResult;
 use derivative::Derivative;
-use diesel::{
-	deserialize::{self, FromSql, FromSqlRow},
-	expression::AsExpression,
-	pg::{Pg, PgValue},
-	prelude::*,
-	serialize::{self, IsNull, Output, ToSql},
-	sql_types::SqlType,
-};
+use diesel::prelude::*;
+use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 use serde::{Deserialize, Serialize};
 
-use super::User;
-
-#[derive(SqlType)]
-#[diesel(postgres_type(name = "BotStatus"))]
-pub struct BotStatus;
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, FromSqlRow, AsExpression, Eq, Default)]
-#[diesel(sql_type = BotStatus)]
-pub enum BotStatusEnum {
-	#[default]
-	PENDING,
-	DENIED,
-	APPROVED,
-}
-
-impl ToSql<BotStatus, Pg> for BotStatusEnum {
-	fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
-		match *self {
-			BotStatusEnum::DENIED => out.write_all(b"DENIED")?,
-			BotStatusEnum::PENDING => out.write_all(b"PENDING")?,
-			BotStatusEnum::APPROVED => out.write_all(b"APPROVED")?,
-		}
-		Ok(IsNull::No)
+pg_enum! {
+	pub enum BotStatus {
+		PENDING = 0,
+		DENIED = 1,
+		APPROVED = 2,
 	}
 }
 
-impl FromSql<BotStatus, Pg> for BotStatusEnum {
-	fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
-		match bytes.as_bytes() {
-			b"DENIED" => Ok(BotStatusEnum::DENIED),
-			b"PENDING" => Ok(BotStatusEnum::PENDING),
-			b"APPROVED" => Ok(BotStatusEnum::APPROVED),
-			_ => Err("Unrecognized enum variant".into()),
+impl From<BotStatus> for &'static str {
+	fn from(status: BotStatus) -> Self {
+		match status {
+			BotStatus::PENDING => "PENDING",
+			BotStatus::DENIED => "DENIED",
+			BotStatus::APPROVED => "APPROVED",
 		}
+	}
+}
+
+impl From<BotStatus> for String {
+	fn from(status: BotStatus) -> Self {
+		let string: &'static str = status.into();
+
+		string.into()
 	}
 }
 
 /// Bot model
-#[derive(Debug, Serialize, Deserialize, Queryable, Identifiable, PartialEq, Selectable)]
-#[diesel(belongs_to(BotToUser))]
-#[diesel(table_name = bots)]
+#[derive(Clone, Debug, PartialEq, Eq, Queryable)]
+#[diesel(
+    table_name = bots,
+    check_for_backend(diesel::pg::Pg),
+)]
 pub struct Bot {
 	/// Unique identifier
 	pub id: String,
@@ -69,7 +52,7 @@ pub struct Bot {
 	/// Banner URL
 	pub banner: Option<String>,
 	/// Status of the bot
-	pub status: BotStatusEnum,
+	pub status: BotStatus,
 	/// Description of the bot
 	pub description: String,
 	/// Short description of the bot
@@ -96,15 +79,41 @@ pub struct Bot {
 	pub updated_at: chrono::NaiveDateTime,
 }
 
+impl Bot {
+	pub fn find(conn: &mut impl Conn, id: &str) -> QueryResult<Bot> {
+		bots::table.find(id).first(conn)
+	}
+
+	pub fn owners(&self, conn: &mut impl Conn) -> AppResult<Vec<User>> {
+		let owners = BotToUser::by_bot_id(&self.id)
+			.inner_join(users::table)
+			.select(users::all_columns)
+			.load(conn)?;
+
+		Ok(owners)
+	}
+}
+
+impl From<Bot> for crate::views::OwnedBot {
+	fn from(btu: Bot) -> Self {
+		crate::views::OwnedBot {
+			id: btu.id,
+			name: btu.name,
+		}
+	}
+}
+
 #[derive(Insertable, Debug, Default)]
-#[diesel(table_name = bots, check_for_backend(diesel::pg::Pg))]
+#[diesel(
+    table_name = bots,
+    check_for_backend(diesel::pg::Pg)
+)]
 pub struct NewBot<'a> {
 	pub id: &'a str,
 	pub name: &'a str,
 	pub avatar: Option<&'a str>,
 	pub certified: bool,
 	pub banner: Option<&'a str>,
-	pub status: BotStatusEnum,
 	pub description: &'a str,
 	pub short_description: &'a str,
 	pub prefix: &'a str,
@@ -159,7 +168,6 @@ impl<'a> NewBot<'a> {
 			avatar,
 			banner: None,
 			certified: false,
-			status: BotStatusEnum::PENDING,
 			description,
 			short_description,
 			prefix,
@@ -173,20 +181,5 @@ impl<'a> NewBot<'a> {
 			created_at: chrono::Utc::now().naive_utc(),
 			updated_at: chrono::Utc::now().naive_utc(),
 		}
-	}
-}
-
-impl Bot {
-	pub fn find(conn: &mut impl Conn, id: &str) -> QueryResult<Bot> {
-		bots::table.find(id).first(conn)
-	}
-
-	pub fn owners(&self, conn: &mut impl Conn) -> QueryResult<Vec<User>> {
-		let owners = BotToUser::by_bot_id(&self.id)
-			.inner_join(users::table)
-			.select(users::all_columns)
-			.load(conn)?;
-
-		Ok(owners)
 	}
 }

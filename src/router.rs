@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use super::controllers::*;
 use crate::{
 	middleware,
 	util::errors::{not_found, AppResult},
@@ -17,7 +18,9 @@ pub fn build_handler(app: Arc<App>) -> axum::Router {
 }
 
 pub fn build_axum_router(state: AppState) -> Router<()> {
-	let router = Router::new().route("/", get(handler));
+	let router = Router::new()
+		.route("/", get(handler))
+		.route("/me", get(user::me::me));
 
 	router
 		.fallback(|method: Method| async move {

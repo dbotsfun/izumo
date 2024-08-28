@@ -1,8 +1,4 @@
-DO $$ BEGIN
-  CREATE TYPE BotStatus AS ENUM ('PENDING', 'DENIED', 'APPROVED');
-EXCEPTION
-  WHEN duplicate_object THEN null;
-THEN $$;
+CREATE TYPE bot_status AS ENUM ('PENDING', 'DENIED', 'APPROVED');
 
 CREATE TABLE IF NOT EXISTS bots (
     id VARCHAR NOT NULL PRIMARY KEY,
@@ -10,7 +6,7 @@ CREATE TABLE IF NOT EXISTS bots (
     avatar TEXT,
     certified BOOLEAN NOT NULL,
     banner TEXT,
-    status BotStatus NOT NULL,
+    status bot_status NOT NULL DEFAULT 'PENDING',
     description TEXT NOT NULL,
     short_description TEXT NOT NULL,
     prefix TEXT NOT NULL,
@@ -21,17 +17,17 @@ CREATE TABLE IF NOT EXISTS bots (
     support_server TEXT,
     api_key TEXT,
     imported_from TEXT,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS bot_to_user (
-    A VARCHAR REFERENCES bots(id),
-    B VARCHAR REFERENCES users(id)
+    bot_id VARCHAR REFERENCES bots(id),
+    user_id VARCHAR REFERENCES users(id),
     is_owner BOOLEAN NOT NULL,
     permissions INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    PRIMARY KEY (A, B),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (bot_id, user_id)
 );
 
 SELECT diesel_manage_updated_at('bots');

@@ -8,12 +8,18 @@ use crate::router::build_handler;
 use crate::util::signals::shutdown_signal;
 
 mod app;
+mod auth;
 mod config;
 mod controllers;
+mod db;
+mod headers;
 mod middleware;
+mod models;
+mod redis;
 mod router;
 mod sentry;
 mod util;
+mod views;
 
 const CORE_THREADS: usize = 4;
 

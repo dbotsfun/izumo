@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     banner TEXT,
     bio TEXT,
     permissions INT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 SELECT diesel_manage_updated_at('users');

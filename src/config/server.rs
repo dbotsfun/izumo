@@ -4,7 +4,9 @@ use crates_io_env_vars::{list_parsed, var, var_parsed};
 
 use crate::util::env::Env;
 
-use super::{base::Base, discord::DiscordConfig, redis::RedisConfig};
+use super::{
+	base::Base, database_pools::DatabasePools, discord::DiscordConfig, redis::RedisConfig,
+};
 
 pub struct Server {
 	pub base: Base,
@@ -14,6 +16,7 @@ pub struct Server {
 	pub discord: DiscordConfig,
 	pub blocked_ips: HashSet<IpAddr>,
 	pub redis: RedisConfig,
+	pub db: DatabasePools,
 }
 
 impl Server {
@@ -38,6 +41,7 @@ impl Server {
 		let redis = RedisConfig::from_environment()?;
 
 		Ok(Self {
+			db: DatabasePools::full_from_environment(&base)?,
 			base,
 			ip,
 			port,

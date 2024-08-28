@@ -13,6 +13,9 @@ use tower_http::compression::{CompressionLayer, CompressionLevel};
 use tower_http::timeout::{RequestBodyTimeoutLayer, TimeoutLayer};
 
 pub mod debug;
+pub mod log_request;
+pub mod normalize_path;
+pub mod session;
 
 pub fn apply_middleware(state: AppState, router: Router<()>) -> Router {
 	let config = &state.config;
@@ -22,6 +25,7 @@ pub fn apply_middleware(state: AppState, router: Router<()>) -> Router {
 		.layer(sentry_tower::NewSentryLayer::new_from_top())
 		.layer(sentry_tower::SentryHttpLayer::with_transaction())
 		.layer(CatchPanicLayer::new())
+		.layer(from_fn(log_request::log_requests))
 		.layer(conditional_layer(env == Env::Development, || {
 			from_fn(debug::debug_requests)
 		}));

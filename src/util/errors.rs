@@ -1,14 +1,23 @@
 use std::{
 	any::{Any, TypeId},
 	borrow::Cow,
+	error::Error,
 	fmt,
 };
 
 mod json;
 
-use axum::response::IntoResponse;
+use axum::{response::IntoResponse, Extension};
+use deadpool_redis::PoolError as RedisPoolError;
+use diesel::result::{DatabaseErrorKind, Error as DieselError};
 use json::custom;
 use reqwest::StatusCode;
+use tokio::task::JoinError;
+use tracing::error;
+
+use crate::middleware::log_request::ErrorField;
+
+use self::json::ReadOnlyMode;
 pub type BoxedAppError = Box<dyn AppError>;
 
 /// Return an error with status 400 and the provided description as JSON
@@ -77,3 +86,122 @@ impl IntoResponse for BoxedAppError {
 }
 
 pub type AppResult<T> = Result<T, BoxedAppError>;
+
+// =============================================================================
+// Error impls
+
+impl<E: Error + Send + 'static> AppError for E {
+	fn response(&self) -> axum::response::Response {
+		error!(error = %self, "Internal Server Error");
+
+		sentry::capture_error(self);
+
+		server_error_response(self.to_string())
+	}
+}
+
+impl From<diesel::ConnectionError> for BoxedAppError {
+	fn from(err: diesel::ConnectionError) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+impl From<RedisPoolError> for BoxedAppError {
+	fn from(err: RedisPoolError) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+impl From<DieselError> for BoxedAppError {
+	fn from(err: DieselError) -> BoxedAppError {
+		match err {
+			DieselError::NotFound => not_found(),
+			DieselError::DatabaseError(_, info)
+				if info.message().ends_with("read-only transaction") =>
+			{
+				Box::new(ReadOnlyMode)
+			}
+			DieselError::DatabaseError(DatabaseErrorKind::ClosedConnection, _) => {
+				service_unavailable()
+			}
+			_ => Box::new(err),
+		}
+	}
+}
+
+impl From<diesel_async::pooled_connection::deadpool::PoolError> for BoxedAppError {
+	fn from(err: diesel_async::pooled_connection::deadpool::PoolError) -> BoxedAppError {
+		error!("Database pool error: {err}");
+		service_unavailable()
+	}
+}
+
+// impl From<prometheus::Error> for BoxedAppError {
+//     fn from(err: prometheus::Error) -> BoxedAppError {
+//         Box::new(err)
+//     }
+// }
+
+impl From<reqwest::Error> for BoxedAppError {
+	fn from(err: reqwest::Error) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+impl From<serde_json::Error> for BoxedAppError {
+	fn from(err: serde_json::Error) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+impl From<std::io::Error> for BoxedAppError {
+	fn from(err: std::io::Error) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+impl From<JoinError> for BoxedAppError {
+	fn from(err: JoinError) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+// =============================================================================
+// Internal error for use with `chain_error`
+
+#[derive(Debug)]
+struct InternalAppError {
+	description: String,
+}
+
+impl fmt::Display for InternalAppError {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{}", self.description)?;
+		Ok(())
+	}
+}
+
+impl AppError for InternalAppError {
+	fn response(&self) -> axum::response::Response {
+		error!(error = %self.description, "Internal Server Error");
+
+		sentry::capture_message(&self.description, sentry::Level::Error);
+
+		server_error_response(self.description.to_string())
+	}
+}
+
+pub fn internal<S: ToString>(error: S) -> BoxedAppError {
+	Box::new(InternalAppError {
+		description: error.to_string(),
+	})
+}
+
+fn server_error_response(error: String) -> axum::response::Response {
+	(
+		StatusCode::INTERNAL_SERVER_ERROR,
+		Extension(ErrorField(error)),
+		"Internal Server Error",
+	)
+		.into_response()
+}

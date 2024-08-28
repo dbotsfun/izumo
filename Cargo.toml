@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["database", "oauth"]
+members = ["oauth"]
 
 [dependencies]
 axum.workspace = true
@@ -22,14 +22,21 @@ tower.workspace = true
 axum-extra.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-database = { path = "database" }
+chrono.workspace = true
 dotenvy = "0.15"
+secrecy = "=0.8.0"
+url = "2.5.2"
 deadpool-diesel = { version = "=0.6.1", features = ["postgres", "tracing"] }
 deadpool-redis = "=0.16.0"
+http-body-util = "=0.1.2"
+parking_lot = "=0.12.3"
+tokio-postgres = "0.7.11"
+derivative = "=2.2.0"
+tokio-postgres-rustls = "0.12.0"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 
 [workspace.dependencies]
-reqwest = { version = "=0.12.5", features = ["blocking", "gzip", "json"] }
+reqwest = { version = "=0.12.7", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "9.3"
 anyhow = "1.0.86"
 axum = { version = "=0.7.5", features = ["macros", "matched-path"] }
@@ -37,7 +44,6 @@ axum-extra = { version = "=0.9.3", features = [
   "cookie-signed",
   "typed-header",
 ] }
-derivative = "=2.2.0"
 diesel = { version = "2.2.2", features = [
   "postgres",
   "chrono",
@@ -66,7 +72,7 @@ diesel-async = { version = "0.5.0", features = [
 ] }
 chrono = { version = "0.4.10", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "=1.0.122"
+serde_json = "=1.0.127"
 tracing = "0.1.40"
 futures-util = "0.3.30"
 tokio = { version = "=1.39.2", default-features = false, features = [
@@ -74,3 +80,6 @@ tokio = { version = "=1.39.2", default-features = false, features = [
   "rt-multi-thread",
   "signal",
 ] }
+
+[dev-dependencies]
+claims = "=0.7.1"
