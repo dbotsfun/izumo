@@ -1,4 +1,4 @@
-use super::sql::pg_enum;
+use crate::sql::pg_enum;
 use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 use serde::{Deserialize, Serialize};
 

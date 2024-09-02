@@ -17,7 +17,9 @@ mod middleware;
 mod models;
 mod redis;
 mod router;
+mod schema;
 mod sentry;
+mod sql;
 mod util;
 mod views;
 

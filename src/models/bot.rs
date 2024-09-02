@@ -1,7 +1,7 @@
-use super::schema::{bots, users};
-use super::sql::pg_enum;
-use super::util::diesel::Conn;
-use super::{BotOwner, User};
+use crate::models::util::diesel::Conn;
+use crate::models::{BotOwner, User};
+use crate::schema::{bots, users};
+use crate::sql::pg_enum;
 use crate::util::errors::AppResult;
 use derivative::Derivative;
 use diesel::prelude::*;

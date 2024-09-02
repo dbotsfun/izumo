@@ -1,4 +1,5 @@
-use super::{schema::users, util::diesel::Conn};
+use crate::models::util::diesel::Conn;
+use crate::schema::users;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 

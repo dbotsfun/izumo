@@ -1,4 +1,6 @@
-use super::{bot::Bot, schema::bot_owners, user::User, util::diesel::Conn};
+use crate::models::util::diesel::Conn;
+use crate::models::{Bot, User};
+use crate::schema::{bot_owners, bots};
 use diesel::{pg::Pg, prelude::*};
 
 #[derive(Identifiable, Selectable, Queryable, Associations, Debug, Clone)]
@@ -8,7 +10,6 @@ use diesel::{pg::Pg, prelude::*};
     belongs_to(Bot, foreign_key = bot_id),
     primary_key(bot_id, user_id)
 )]
-#[allow(dead_code)] // Not used yet
 pub struct BotOwner {
 	bot_id: String,
 	user_id: String,
@@ -29,8 +30,8 @@ impl BotOwner {
 	pub fn find_owned_bots(conn: &mut impl Conn, user_id: &str) -> QueryResult<Vec<Bot>> {
 		let bots = bot_owners::table
 			.filter(bot_owners::user_id.eq(user_id))
-			.inner_join(super::schema::bots::table)
-			.select(super::schema::bots::all_columns)
+			.inner_join(bots::table)
+			.select(bots::all_columns)
 			.load(conn)?;
 		Ok(bots)
 	}
