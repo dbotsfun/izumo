@@ -1,7 +1,7 @@
 use super::schema::{bots, users};
 use super::sql::pg_enum;
 use super::util::diesel::Conn;
-use super::{BotToUser, User};
+use super::{BotOwner, User};
 use crate::util::errors::AppResult;
 use derivative::Derivative;
 use diesel::prelude::*;
@@ -85,7 +85,7 @@ impl Bot {
 	}
 
 	pub fn owners(&self, conn: &mut impl Conn) -> AppResult<Vec<User>> {
-		let owners = BotToUser::by_bot_id(&self.id)
+		let owners = BotOwner::by_bot_id(&self.id)
 			.inner_join(users::table)
 			.select(users::all_columns)
 			.load(conn)?;

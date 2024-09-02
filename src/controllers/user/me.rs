@@ -4,7 +4,7 @@ use crate::{
 	views::{EncodableMe, EncodablePrivateUser},
 };
 use crate::{
-	models::{BotToUser, User},
+	models::{BotOwner, User},
 	views::OwnedBot,
 };
 use axum::{http::request::Parts, Json};
@@ -19,7 +19,7 @@ pub async fn me(app: AppState, req: Parts) -> AppResult<Json<EncodableMe>> {
 		let id = "462780441594822687";
 		let user = User::find(conn, id)?;
 
-		let owned_bots = BotToUser::find_owned_bots(conn, id)?;
+		let owned_bots = BotOwner::find_owned_bots(conn, id)?;
 		let owned_bots: Vec<OwnedBot> = owned_bots.into_iter().map(OwnedBot::from).collect();
 
 		Ok(Json(EncodableMe {

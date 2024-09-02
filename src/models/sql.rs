@@ -25,6 +25,7 @@ macro_rules! pg_enum {
         #[diesel(sql_type = diesel::sql_types::Integer)]
         #[serde(rename_all = "snake_case")]
         #[repr(i32)]
+		#[allow(clippy::upper_case_acronyms)]
         $vis enum $name {
             $($item = $int,)*
         }
