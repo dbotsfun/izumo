@@ -35,7 +35,7 @@ impl From<BotStatus> for String {
 }
 
 /// Bot model
-#[derive(Clone, Debug, PartialEq, Eq, Queryable)]
+#[derive(Debug, Clone, Queryable, Identifiable, AsChangeset, QueryableByName, Selectable)]
 #[diesel(
     table_name = bots,
     check_for_backend(diesel::pg::Pg),
@@ -124,8 +124,6 @@ pub struct NewBot<'a> {
 	pub support_server: Option<&'a str>,
 	pub api_key: Option<&'a str>,
 	pub imported_from: Option<&'a str>,
-	pub created_at: chrono::NaiveDateTime,
-	pub updated_at: chrono::NaiveDateTime,
 }
 
 #[derive(Debug, Default, Derivative)]
@@ -178,8 +176,6 @@ impl<'a> NewBot<'a> {
 			support_server,
 			api_key: None,
 			imported_from,
-			created_at: chrono::Utc::now().naive_utc(),
-			updated_at: chrono::Utc::now().naive_utc(),
 		}
 	}
 }

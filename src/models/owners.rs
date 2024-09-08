@@ -35,4 +35,8 @@ impl BotOwner {
 			.load(conn)?;
 		Ok(bots)
 	}
+
+	pub fn boxed() -> BoxedQuery<'static> {
+		bot_owners::table.into_boxed()
+	}
 }
