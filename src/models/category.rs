@@ -19,7 +19,7 @@ pub struct Category {
 
 type WithSlug<'a> = dsl::Eq<categories::slug, crate::sql::lower<&'a str>>;
 
-#[derive(Associations, Insertable, Identifiable, Debug, Clone, Copy)]
+#[derive(Associations, Insertable, Identifiable, Debug, Clone)]
 #[diesel(
     table_name = bots_categories,
     check_for_backend(pg::Pg),
@@ -28,7 +28,7 @@ type WithSlug<'a> = dsl::Eq<categories::slug, crate::sql::lower<&'a str>>;
     belongs_to(Bot),
 )]
 pub struct BotCategory {
-	bot_id: &'static str,
+	bot_id: String,
 	category_id: i32,
 }
 
@@ -64,7 +64,7 @@ impl Category {
 				.iter()
 				.map(|c| BotCategory {
 					category_id: c.id,
-					bot_id: bot.id.as_str(),
+					bot_id: bot.id.to_owned(),
 				})
 				.collect::<Vec<_>>();
 

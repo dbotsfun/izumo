@@ -33,6 +33,7 @@ impl BotOwner {
 			.inner_join(bots::table)
 			.select(bots::all_columns)
 			.load(conn)?;
+
 		Ok(bots)
 	}
 
