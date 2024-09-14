@@ -1,0 +1,24 @@
+name: "Sync labels"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * *'
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Refactor labels
+        uses: EndBug/label-sync@v2
+        with:
+          config-file: ${{ github.workspace }}/.github/labels.yml
+          delete-other-labels: true

@@ -1,81 +1,30 @@
-# Izumo
-<a href="https://azurlane.koumakan.jp/wiki/Izumo"><img align='right' src="https://azurlane.netojuu.com/images/8/87/IzumoShipyardIcon.png" width="230"></a>
-> Izumo is an API designed for managing a list of Discord bots. It provides queries for retrieving information about bots, their owners, tags, votes, webhooks, and more.
+<div align="center">
+<picture>
+    <img alt="izumo image" src="https://azurlane.netojuu.com/images/8/87/IzumoShipyardIcon.png" width="200">
+</picture>
+</div>
 
-## Features
+---
 
-- **Bots Management:** Retrieve information about bots, update their details, and delete bots.
-- **Bot Owners:** Get details about bot owners, including their biography and owned bots.
-- **Bot Tags:** Create and retrieve tags associated with bots.
-- **Votes:** View votes for bots and check if a user can vote for a bot.
-- **Webhooks:** Create, update, and delete webhooks for bot events.
-- **Sessions:** Create and manage user sessions for authentication.
-- **Vanity URLs:** Create and retrieve vanity URLs for users and bots.
-- **Throttling:** Prevent abuse by limiting the number of requests per user.
+<div align="center">
 
-## In progress
+[Homepage](https://api.dbots.fun)
+| [API Documentation](https://api.dbots.fun/docs)
+| [Discord](https://discord.gg/XaSVMz7eng)
+| [Contributing](#️-contributing)
 
-- **Bot packs:** Create and retrieve bot packs containing multiple bots.
-- **Statistics:** Retrieve statistics about bots, users, and votes.
+</div>
 
-## Stack
+## 📚 Overview
 
-Izumo is built using the following technologies:
+Welcome to the Izumo API repository!
 
-- **[Rust]** - Programming language used to develop the API.
-- **[Diesel]** - ORM and query builder for Rust, used for database operations.
-- **[Actix-Web]** - Web framework for Rust, used to create the API server.
+Izumo is an API designed for managing a list of Discord bots. It provides queries for retrieving information about bots, their owners, tags, votes, webhooks, and more cool stuff coming soon!
 
-## Getting Started
+## ⚙️  Contributing
 
-To get started with Izumo, follow these steps:
+Contributions to Izumo are welcome! If you find any bugs or want to suggest new features, feel free to open an issue or submit a pull request. Please ensure that your contributions align with the project's coding standards and follow the guidelines outlined in the CONTRIBUTING file.
 
-1. Clone the repository.
-2. Make sure you have Rust installed on your system.
-3. Set up your PostgreSQL database and configure the connection in the application.
-4. Create a `.env` file in the root directory of the project and define the following environment variables:
-
-    ```plaintext
-	# Misc
-    NODE_ENV=
-    API_PORT=
-    INTERNAL_KEY=
-
-    # Microservices
-    MS_WEBHOOK_URL=
-    MS_WEBHOOK_AUTH=
-
-	# Database
-    DATABASE_URL=
-
-	# JWT secrets
-    JWT_SECRET_KEY=
-    JWT_REFRESH_SECRET_KEY=
-    JWT_APIKEY_SECRET_KEY=
-
-	# Discord stuff
-	DISCORD_CLIENT_ID=
-    DISCORD_CLIENT_SECRET=
-    DISCORD_REDIRECT_URI=
-    DISCORD_USER_TOKEN=
-
-    # Throttling
-    THROTTLE_TTL=1800000
-    THROTTLE_LIMIT=100
-    THROTTLE_RESOURCE_LIMIT=60
-    THROTTLE_RESOURCE_TTL=1800000
-    ```
-5. Start the server by running `cargo run`.
-6. You can now access the API at `http://localhost:{API_PORT}`.
-
-## Contributing
-
-Contributions to Izumo are welcome! If you find any bugs or want to suggest new features, feel free to open an issue or submit a pull request. Please ensure that your contributions align with the project's coding standards and follow the guidelines outlined in the CONTRIBUTING.md file.
-
-## License
+## ⚖️  License
 
 Izumo API is open-source software licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute the software as per the terms of the license.
-
-[rust]: https://www.rust-lang.org/
-[diesel]: https://diesel.rs/
-[actix-web]: https://actix.rs/
