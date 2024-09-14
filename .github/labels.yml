@@ -1,0 +1,99 @@
+# Categories for Issues
+- name: "🐛 bug"
+  color: "d73a4a"
+  description: "Something isn't working as expected"
+
+- name: "✨ enhancement"
+  color: "a2eeef"
+  description: "New feature or request"
+
+- name: "📡 api"
+  color: "1d76db"
+  description: "API-related issue or improvement"
+
+- name: "⚡ performance"
+  color: "e4e669"
+  description: "Improvement related to performance"
+
+- name: "📚 documentation"
+  color: "0075ca"
+  description: "Improvements or additions to documentation"
+
+# Categories for Priority Levels
+- name: "🚨 priority: high"
+  color: "ff0000"
+  description: "High priority issue"
+
+- name: "⚠️ priority: medium"
+  color: "ffa500"
+  description: "Medium priority issue"
+
+- name: "🟢 priority: low"
+  color: "00ff00"
+  description: "Low priority issue"
+
+# Categories for Stages
+- name: "📝 stage: planning"
+  color: "cfd3d7"
+  description: "In planning stage"
+
+- name: "🛠️ stage: development"
+  color: "b60205"
+  description: "In development stage"
+
+- name: "🧐 stage: review"
+  color: "fbca04"
+  description: "In review stage"
+
+- name: "✅ stage: completed"
+  color: "0e8a16"
+  description: "Completed work"
+
+# Categories for Status
+- name: "⛔ status: blocked"
+  color: "f9d0c4"
+  description: "Issue is currently blocked"
+
+- name: "🚧 status: in progress"
+  color: "c2e0c6"
+  description: "Work is currently being done"
+
+- name: "⏸️ status: on hold"
+  color: "e99695"
+  description: "Issue is on hold"
+
+- name: "🔍 status: ready for review"
+  color: "d4c5f9"
+  description: "Ready to be reviewed by maintainers"
+
+# Categories for Types of Work
+- name: "🆕 type: feature"
+  color: "0052cc"
+  description: "New feature"
+
+- name: "🐞 type: bug"
+  color: "d73a4a"
+  description: "Bug fix"
+
+- name: "🔨 type: refactor"
+  color: "fbca04"
+  description: "Refactoring code"
+
+- name: "🧪 type: test"
+  color: "ffbfae"
+  description: "Adding or improving tests"
+
+- name: "❓ type: question"
+  color: "d876e3"
+  description: "A question or clarification"
+
+# Miscellaneous
+- name: "🙏 help wanted"
+  color: "008672"
+  description: "Community help wanted"
+
+- name: "🌱 good first issue"
+  color: "7057ff"
+  description: "Good for newcomers"
+
+- name: ""
