@@ -87,6 +87,10 @@
   color: "d876e3"
   description: "A question or clarification"
 
+- name: "📦 type: update deps"
+  color: "f0ad4e"
+  description: "Updating dependencies or libraries"
+
 # Miscellaneous
 - name: "🙏 help wanted"
   color: "008672"
@@ -96,4 +100,3 @@
   color: "7057ff"
   description: "Good for newcomers"
 
-- name: ""

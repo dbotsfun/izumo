@@ -13,6 +13,9 @@
     "customManagers:githubActionsVersions",
     "github>Turbo87/renovate-config//rust/updateToolchain"
   ],
+  "labels": [
+    "📦 type: update deps"
+  ],
   "packageRules": [
     {
       "matchDepNames": [
