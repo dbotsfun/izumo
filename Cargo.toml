@@ -39,7 +39,7 @@ serenity-oauth = { git = "https://github.com/dbotsfun/oauth" }
 [workspace.dependencies]
 reqwest = { version = "=0.12.7", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "=9.3.0"
-anyhow = "^1.0.86"
+anyhow = "=1.0.87"
 axum = { version = "=0.7.5", features = ["macros", "matched-path"] }
 axum-extra = { version = "=0.9.3", features = [
     "cookie-signed",
@@ -71,7 +71,7 @@ diesel-async = { version = "=0.5.0", features = [
     "async-connection-wrapper",
     "deadpool",
 ] }
-chrono = { version = "^0.4.10", features = ["serde"] }
+chrono = { version = "=0.4.38", features = ["serde"] }
 serde = { version = "=1.0.210", features = ["derive"] }
 serde_json = "=1.0.128"
 tracing = "=0.1.40"
