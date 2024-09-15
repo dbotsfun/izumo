@@ -39,47 +39,47 @@ serenity-oauth = { git = "https://github.com/dbotsfun/oauth" }
 [workspace.dependencies]
 reqwest = { version = "=0.12.7", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "=9.3.0"
-anyhow = "=1.0.86"
+anyhow = "^1.0.86"
 axum = { version = "=0.7.5", features = ["macros", "matched-path"] }
 axum-extra = { version = "=0.9.3", features = [
-  "cookie-signed",
-  "typed-header",
+    "cookie-signed",
+    "typed-header",
 ] }
 diesel = { version = "2.2.2", features = [
-  "postgres",
-  "chrono",
-  "uuid",
-  "serde_json",
+    "postgres",
+    "chrono",
+    "uuid",
+    "serde_json",
 ] }
 tower = "=0.4.13"
 tower-http = { version = "=0.5.2", features = [
-  "add-extension",
-  "fs",
-  "catch-panic",
-  "timeout",
-  "compression-full",
+    "add-extension",
+    "fs",
+    "catch-panic",
+    "timeout",
+    "compression-full",
 ] }
 sentry = { version = "=0.34.0", features = [
-  "tracing",
-  "tower",
-  "tower-axum-matched-path",
-  "tower-http",
+    "tracing",
+    "tower",
+    "tower-axum-matched-path",
+    "tower-http",
 ] }
 crates_io_env_vars = { git = "https://github.com/rust-lang/crates.io.git", branch = "main" }
 diesel-async = { version = "=0.5.0", features = [
-  "postgres",
-  "async-connection-wrapper",
-  "deadpool",
+    "postgres",
+    "async-connection-wrapper",
+    "deadpool",
 ] }
-chrono = { version = "=0.4.10", features = ["serde"] }
+chrono = { version = "^0.4.10", features = ["serde"] }
 serde = { version = "=1.0.210", features = ["derive"] }
 serde_json = "=1.0.128"
 tracing = "=0.1.40"
 futures-util = "=0.3.30"
 tokio = { version = "=1.39.2", default-features = false, features = [
-  "macros",
-  "rt-multi-thread",
-  "signal",
+    "macros",
+    "rt-multi-thread",
+    "signal",
 ] }
 
 [dev-dependencies]
