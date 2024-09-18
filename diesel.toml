@@ -4,8 +4,7 @@
 [print_schema]
 file = "src/schema.rs"
 with_docs = true
-custom_type_derives = ["diesel::query_builder::QueryId"]
-# filter = { except_tables = ["_BadgeToUser", "_BotToTag", "_BotToUser"] }
+patch_file = "src/schema.patch"
 
 [migrations_directory]
 dir = "migrations"
