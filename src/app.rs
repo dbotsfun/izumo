@@ -1,11 +1,10 @@
 use crate::db::{connection_url, make_manager_config, ConnectionConfig};
-use axum::extract::{FromRequestParts, State};
+use axum::extract::{FromRef, FromRequestParts, State};
 use deadpool_diesel::Runtime;
-use deadpool_redis::{Config as RedisConfig, Pool as RedisPool};
 use diesel_async::pooled_connection::deadpool::Pool as DeadpoolPool;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::AsyncPgConnection;
-use reqwest::Client as ReqwestClient;
+use reqwest::blocking::Client as ReqwestClient;
 use std::ops::Deref;
 use std::sync::Arc;
 use tracing::{instrument, warn};
@@ -17,7 +16,6 @@ type DeadpoolResult = Result<
 	diesel_async::pooled_connection::deadpool::Object<AsyncPgConnection>,
 	diesel_async::pooled_connection::deadpool::PoolError,
 >;
-pub type RedisResult = Result<deadpool_redis::Connection, deadpool_redis::PoolError>;
 
 pub struct App {
 	/// Database connection pool connected to the primary database
@@ -28,7 +26,6 @@ pub struct App {
 
 	pub http: ReqwestClient,
 	pub config: Arc<server::Server>,
-	pub redis: RedisPool,
 }
 
 impl App {
@@ -81,32 +78,23 @@ impl App {
 
 		let http = ReqwestClient::new();
 
-		// Create a new redis pool
-		let redis = {
-			let url = config.redis.url.clone();
-			let cfg = RedisConfig::from_url(url);
-			cfg.create_pool(Some(Runtime::Tokio1)).unwrap()
-		};
-
 		App {
 			primary_database,
 			replica_database,
 			http,
 			config: Arc::new(config),
-			redis,
 		}
+	}
+
+	/// A unique key to generate signed cookies
+	pub fn session_key(&self) -> &cookie::Key {
+		&self.config.session_key
 	}
 
 	/// Obtain a read/write database connection from the async primary pool
 	#[instrument(skip_all)]
 	pub async fn db_write(&self) -> DeadpoolResult {
 		self.primary_database.get().await
-	}
-
-	/// Obtain a read/write redis connection from the async primary pool
-	#[instrument(skip_all)]
-	pub async fn rd_write(&self) -> RedisResult {
-		self.redis.get().await
 	}
 
 	/// Obtain a readonly database connection from the primary pool
@@ -147,5 +135,11 @@ impl Deref for AppState {
 
 	fn deref(&self) -> &Self::Target {
 		&self.0
+	}
+}
+
+impl FromRef<AppState> for cookie::Key {
+	fn from_ref(app: &AppState) -> Self {
+		app.session_key().clone()
 	}
 }

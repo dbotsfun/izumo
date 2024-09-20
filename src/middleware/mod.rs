@@ -1,7 +1,14 @@
+pub mod app;
+pub mod debug;
+pub mod log_request;
+pub mod normalize_path;
+mod require_user_agent;
+pub mod session;
+
 use crate::app::AppState;
 use crate::util::env::Env;
 use ::sentry::integrations::tower as sentry_tower;
-use axum::middleware::from_fn;
+use axum::middleware::{from_fn, from_fn_with_state};
 use axum::Router;
 use axum_extra::either::Either;
 use axum_extra::middleware::option_layer;
@@ -11,11 +18,6 @@ use tower_http::add_extension::AddExtensionLayer;
 use tower_http::catch_panic::CatchPanicLayer;
 use tower_http::compression::{CompressionLayer, CompressionLevel};
 use tower_http::timeout::{RequestBodyTimeoutLayer, TimeoutLayer};
-
-pub mod debug;
-pub mod log_request;
-pub mod normalize_path;
-pub mod session;
 
 pub fn apply_middleware(state: AppState, router: Router<()>) -> Router {
 	let config = &state.config;
@@ -30,9 +32,15 @@ pub fn apply_middleware(state: AppState, router: Router<()>) -> Router {
 			from_fn(debug::debug_requests)
 		}));
 
+	let middlewares_2 = tower::ServiceBuilder::new()
+		.layer(from_fn_with_state(state.clone(), session::attach_session))
+		.layer(from_fn(require_user_agent::require_user_agent))
+		// .layer(from_fn_with_state(state.clone(), block_traffic::middleware))
+		.layer(AddExtensionLayer::new(state.clone()));
+
 	router
+		.layer(middlewares_2)
 		.layer(middlewares_1)
-		.layer(AddExtensionLayer::new(state.clone()))
 		.layer(TimeoutLayer::new(Duration::from_secs(30)))
 		.layer(RequestBodyTimeoutLayer::new(Duration::from_secs(30)))
 		.layer(CompressionLayer::new().quality(CompressionLevel::Fastest))

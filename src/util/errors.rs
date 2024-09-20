@@ -1,23 +1,23 @@
-use std::{
-	any::{Any, TypeId},
-	borrow::Cow,
-	error::Error,
-	fmt,
-};
+use axum::response::IntoResponse;
+use oauth2::ErrorResponse;
+use std::any::{Any, TypeId};
+use std::borrow::Cow;
+use std::error::Error;
+use std::fmt;
 
 mod json;
 
-use axum::{response::IntoResponse, Extension};
-use deadpool_redis::PoolError as RedisPoolError;
+use axum::Extension;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
-use json::custom;
 use reqwest::StatusCode;
 use tokio::task::JoinError;
 use tracing::error;
 
 use crate::middleware::log_request::ErrorField;
 
-use self::json::ReadOnlyMode;
+pub use json::TOKEN_FORMAT_ERROR;
+pub(crate) use json::{custom, InsecurelyGeneratedTokenRevoked, ReadOnlyMode};
+
 pub type BoxedAppError = Box<dyn AppError>;
 
 /// Return an error with status 400 and the provided description as JSON
@@ -106,12 +106,6 @@ impl From<diesel::ConnectionError> for BoxedAppError {
 	}
 }
 
-impl From<RedisPoolError> for BoxedAppError {
-	fn from(err: RedisPoolError) -> BoxedAppError {
-		Box::new(err)
-	}
-}
-
 impl From<DieselError> for BoxedAppError {
 	fn from(err: DieselError) -> BoxedAppError {
 		match err {
@@ -129,18 +123,48 @@ impl From<DieselError> for BoxedAppError {
 	}
 }
 
+impl From<serenity_oauth::Error> for BoxedAppError {
+	fn from(err: serenity_oauth::Error) -> BoxedAppError {
+		match err {
+			serenity_oauth::Error::Json(err) => Box::new(err),
+			serenity_oauth::Error::Reqwest(err) => Box::new(err),
+			serenity_oauth::Error::UrlEncode(err) => Box::new(err),
+		}
+	}
+}
+
+impl From<url::ParseError> for BoxedAppError {
+	fn from(err: url::ParseError) -> BoxedAppError {
+		Box::new(err)
+	}
+}
+
+impl<E, T> From<oauth2::RequestTokenError<E, T>> for BoxedAppError
+where
+	T: ErrorResponse + 'static,
+	E: Error + Send + 'static,
+{
+	fn from(err: oauth2::RequestTokenError<E, T>) -> BoxedAppError {
+		match err {
+			oauth2::RequestTokenError::Request(err) => Box::new(err),
+			oauth2::RequestTokenError::Parse(err, _) => {
+				custom(StatusCode::BAD_REQUEST, err.to_string())
+			}
+			oauth2::RequestTokenError::Other(err) => {
+				custom(StatusCode::BAD_REQUEST, err.to_string())
+			}
+			oauth2::RequestTokenError::ServerResponse(_) => {
+				custom(StatusCode::BAD_REQUEST, "Invalid response from server")
+			}
+		}
+	}
+}
 impl From<diesel_async::pooled_connection::deadpool::PoolError> for BoxedAppError {
 	fn from(err: diesel_async::pooled_connection::deadpool::PoolError) -> BoxedAppError {
 		error!("Database pool error: {err}");
 		service_unavailable()
 	}
 }
-
-// impl From<prometheus::Error> for BoxedAppError {
-//     fn from(err: prometheus::Error) -> BoxedAppError {
-//         Box::new(err)
-//     }
-// }
 
 impl From<reqwest::Error> for BoxedAppError {
 	fn from(err: reqwest::Error) -> BoxedAppError {

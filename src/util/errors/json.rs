@@ -1,9 +1,11 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::Json;
+use axum::{Extension, Json};
 use serde_json::json;
 use std::borrow::Cow;
 use std::fmt;
+
+use crate::middleware::log_request::CauseField;
 
 use super::{AppError, BoxedAppError};
 
@@ -20,7 +22,7 @@ pub(crate) struct ReadOnlyMode;
 
 impl AppError for ReadOnlyMode {
 	fn response(&self) -> Response {
-		let detail = "crates.io is currently in read-only mode for maintenance. \
+		let detail = "dbots.fun is currently in read-only mode for maintenance. \
                       Please try again later.";
 		json_error(detail, StatusCode::SERVICE_UNAVAILABLE)
 	}
@@ -56,5 +58,32 @@ impl fmt::Display for CustomApiError {
 impl AppError for CustomApiError {
 	fn response(&self) -> Response {
 		json_error(&self.detail, self.status)
+	}
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct InsecurelyGeneratedTokenRevoked;
+
+impl InsecurelyGeneratedTokenRevoked {
+	pub fn boxed() -> BoxedAppError {
+		Box::new(Self)
+	}
+}
+
+impl AppError for InsecurelyGeneratedTokenRevoked {
+	fn response(&self) -> Response {
+		let cause = CauseField("insecurely generated, revoked 2020-07".to_string());
+		let response = json_error(&self.to_string(), StatusCode::UNAUTHORIZED);
+		(Extension(cause), response).into_response()
+	}
+}
+
+pub const TOKEN_FORMAT_ERROR: &str =
+	"The given API token does not match the format used by dbots.fun.";
+
+impl fmt::Display for InsecurelyGeneratedTokenRevoked {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		f.write_str(TOKEN_FORMAT_ERROR)?;
+		Result::Ok(())
 	}
 }

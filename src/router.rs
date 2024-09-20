@@ -5,7 +5,11 @@ use crate::{
 	middleware,
 	util::errors::{not_found, AppResult},
 };
-use axum::{response::IntoResponse, routing::get, Json, Router};
+use axum::{
+	response::IntoResponse,
+	routing::{delete, get},
+	Json, Router,
+};
 use reqwest::{Method, StatusCode};
 
 use crate::app::{App, AppState};
@@ -20,7 +24,11 @@ pub fn build_handler(app: Arc<App>) -> axum::Router {
 pub fn build_axum_router(state: AppState) -> Router<()> {
 	let router = Router::new()
 		.route("/", get(handler))
-		.route("/me", get(user::me::me));
+		.route("/me", get(user::me::me))
+		// Session management
+		.route("/private/session/login", get(user::session::login))
+		.route("/private/session/authorize", get(user::session::authorize))
+		.route("/private/session", delete(user::session::logout));
 
 	router
 		.fallback(|method: Method| async move {
@@ -41,6 +49,6 @@ async fn handler(state: AppState) -> AppResult<Json<Empty>> {
 	let _ = state;
 
 	Ok(Json(Empty {
-		hello: String::from("Yoyoyoyo"),
+		hello: String::from("Hello World"),
 	}))
 }

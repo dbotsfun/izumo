@@ -15,13 +15,18 @@ mod db;
 mod headers;
 mod middleware;
 mod models;
-mod redis;
 mod router;
 mod schema;
 mod sentry;
 mod sql;
+mod task;
 mod util;
 mod views;
+
+#[macro_use]
+extern crate serde;
+#[macro_use]
+extern crate serde_json;
 
 const CORE_THREADS: usize = 4;
 

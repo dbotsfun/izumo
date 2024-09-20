@@ -3,22 +3,10 @@ use crate::models::util::diesel::Conn;
 use crate::models::Bot;
 use crate::schema::{bot_owners, users};
 use diesel::prelude::*;
-use serde::{Deserialize, Serialize};
 
 /// User model
-#[derive(
-	Debug,
-	Serialize,
-	Deserialize,
-	Queryable,
-	Identifiable,
-	PartialEq,
-	Selectable,
-	AsChangeset,
-	Eq,
-	Clone,
-)]
-#[diesel(table_name = users)]
+#[derive(Clone, Debug, PartialEq, Eq, Queryable, Identifiable, AsChangeset)]
+#[diesel(table_name = users, check_for_backend(diesel::pg::Pg))]
 pub struct User {
 	/// Unique identifier for the user.
 	pub id: String,
@@ -30,12 +18,12 @@ pub struct User {
 	pub banner: Option<String>,
 	/// A beautiful biography.
 	pub bio: Option<String>,
-	/// Permissions bitfield
-	pub permissions: i32,
 	/// When the user was created.
 	pub created_at: chrono::NaiveDateTime,
 	/// Last time the user changed something.
 	pub updated_at: chrono::NaiveDateTime,
+	/// Discord access token
+	pub dc_access_token: String,
 }
 
 impl User {
@@ -55,34 +43,43 @@ impl User {
 	}
 }
 
-#[derive(Insertable, AsChangeset, Default, Debug)]
+#[derive(Insertable, Debug, Default)]
 #[diesel(table_name = users, check_for_backend(diesel::pg::Pg))]
 pub struct NewUser<'a> {
 	pub id: &'a str,
 	pub username: &'a str,
 	pub avatar: Option<&'a str>,
-	pub banner: Option<&'a str>,
-	pub bio: Option<&'a str>,
+	pub dc_access_token: &'a str,
 }
 
 impl<'a> NewUser<'a> {
-	pub fn new(id: &'a str, username: &'a str, avatar: Option<&'a str>) -> NewUser<'a> {
+	pub fn new(
+		id: &'a str,
+		username: &'a str,
+		avatar: Option<&'a str>,
+		dc_access_token: &'a str,
+	) -> NewUser<'a> {
 		NewUser {
 			id,
 			username,
 			avatar,
-			banner: None,
-			bio: None,
+			dc_access_token,
 		}
 	}
 
 	/// Insert or update the user in the database.
 	pub fn upsert(&self, conn: &mut impl Conn) -> QueryResult<User> {
+		use diesel::pg::upsert::excluded;
+
 		diesel::insert_into(users::table)
 			.values(self)
 			.on_conflict(users::id)
 			.do_update()
-			.set(self)
+			.set((
+				users::username.eq(excluded(users::username)),
+				users::avatar.eq(excluded(users::avatar)),
+				users::dc_access_token.eq(excluded(users::dc_access_token)),
+			))
 			.get_result(conn)
 	}
 }

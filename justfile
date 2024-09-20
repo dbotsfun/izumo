@@ -12,5 +12,8 @@ clippy:
 dev:
     docker compose up
 
+patch-schema:
+    git diff --staged -U6 > src/schema.patch
+
 undev:
     docker-compose down

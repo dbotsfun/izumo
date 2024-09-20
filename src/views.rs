@@ -14,7 +14,6 @@ pub struct EncodablePrivateUser {
 	pub avatar: Option<String>,
 	pub banner: Option<String>,
 	pub bio: Option<String>,
-	pub permissions: i32,
 }
 
 impl EncodablePrivateUser {
@@ -25,17 +24,15 @@ impl EncodablePrivateUser {
 			avatar,
 			banner,
 			bio,
-			permissions,
 			..
 		} = user;
 
 		EncodablePrivateUser {
-			id,
+			id: id.clone(),
 			username,
-			avatar,
+			avatar: avatar_url(&id, avatar),
 			banner,
 			bio,
-			permissions,
 		}
 	}
 }
@@ -47,7 +44,6 @@ pub struct EncodablePublicUser {
 	pub avatar: Option<String>,
 	pub banner: Option<String>,
 	pub bio: Option<String>,
-	pub permissions: i32,
 }
 
 impl From<User> for EncodablePublicUser {
@@ -58,19 +54,28 @@ impl From<User> for EncodablePublicUser {
 			avatar,
 			banner,
 			bio,
-			permissions,
 			..
 		} = user;
 
 		EncodablePublicUser {
-			id,
+			id: id.clone(),
 			username,
-			avatar,
+			avatar: avatar_url(&id, avatar),
 			banner,
 			bio,
-			permissions,
 		}
 	}
+}
+
+fn avatar_url(user_id: &str, hash: Option<String>) -> Option<String> {
+	let avatar = hash.unwrap_or("0".to_string());
+	let animated = avatar.starts_with("a_");
+	let format = if animated { "gif" } else { "png" };
+
+	Some(format!(
+		"https://cdn.discordapp.com/avatars/{}/{}.{}",
+		user_id, avatar, format
+	))
 }
 
 #[derive(Serialize, Deserialize, Debug)]
