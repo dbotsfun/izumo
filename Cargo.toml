@@ -38,7 +38,7 @@ sha2 = "=0.10.8"
 thiserror = "=1.0.63"
 base64 = "=0.22.1"
 cookie = { version = "=0.18.1", features = ["secure"] }
-oauth2 = "4.4.2"
+oauth2 = "=4.4.2"
 
 [workspace.dependencies]
 reqwest = { version = "=0.12.7", features = ["blocking", "gzip", "json"] }
