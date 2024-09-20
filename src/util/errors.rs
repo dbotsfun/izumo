@@ -123,16 +123,6 @@ impl From<DieselError> for BoxedAppError {
 	}
 }
 
-impl From<serenity_oauth::Error> for BoxedAppError {
-	fn from(err: serenity_oauth::Error) -> BoxedAppError {
-		match err {
-			serenity_oauth::Error::Json(err) => Box::new(err),
-			serenity_oauth::Error::Reqwest(err) => Box::new(err),
-			serenity_oauth::Error::UrlEncode(err) => Box::new(err),
-		}
-	}
-}
-
 impl From<url::ParseError> for BoxedAppError {
 	fn from(err: url::ParseError) -> BoxedAppError {
 		Box::new(err)
