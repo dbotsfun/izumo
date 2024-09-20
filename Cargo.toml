@@ -49,7 +49,7 @@ axum-extra = { version = "=0.9.3", features = [
     "cookie-signed",
     "typed-header",
 ] }
-diesel = { version = "=2.2.2", features = [
+diesel = { version = "=2.2.3", features = [
     "postgres",
     "chrono",
     "uuid",
