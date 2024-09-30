@@ -41,7 +41,7 @@ cookie = { version = "=0.18.1", features = ["secure"] }
 oauth2 = "=4.4.2"
 
 [workspace.dependencies]
-reqwest = { version = "=0.12.7", features = ["blocking", "gzip", "json"] }
+reqwest = { version = "=0.12.8", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "=9.3.0"
 anyhow = "=1.0.87"
 axum = { version = "=0.7.6", features = ["macros", "matched-path"] }
