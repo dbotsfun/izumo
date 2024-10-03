@@ -39,7 +39,7 @@ thiserror = "=1.0.63"
 base64 = "=0.22.1"
 cookie = { version = "=0.18.1", features = ["secure"] }
 oauth2 = "=4.4.2"
-indexmap = "=2.5.0"
+indexmap = "=2.6.0"
 
 [workspace.dependencies]
 reqwest = { version = "=0.12.8", features = ["blocking", "gzip", "json"] }
