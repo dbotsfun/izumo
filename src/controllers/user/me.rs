@@ -12,6 +12,7 @@ use crate::{
 use axum::{http::request::Parts, Json};
 use diesel_async::async_connection_wrapper::AsyncConnectionWrapper;
 
+/// Handles the `GET /me` route.
 pub async fn me(app: AppState, req: Parts) -> AppResult<Json<EncodableMe>> {
 	let conn = app.db_read_prefer_primary().await?;
 
