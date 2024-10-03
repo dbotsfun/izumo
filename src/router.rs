@@ -10,7 +10,9 @@ use axum::{
 	routing::{delete, get},
 	Json, Router,
 };
+use crates_io_env_vars::required_var;
 use reqwest::{Method, StatusCode};
+use serde_json::Value;
 
 use crate::app::{App, AppState};
 
@@ -28,7 +30,10 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		// Session management
 		.route("/private/session/login", get(user::session::login))
 		.route("/private/session/authorize", get(user::session::authorize))
-		.route("/private/session", delete(user::session::logout));
+		.route("/private/session", delete(user::session::logout))
+		// Bots
+		.route("/bots/:bot_id", get(bot::metadata::show))
+		.route("/bots/:bot_id/owners", get(bot::owners::owners));
 
 	router
 		.fallback(|method: Method| async move {
@@ -40,15 +45,11 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		.with_state(state)
 }
 
-#[derive(serde::Serialize)]
-struct Empty {
-	hello: String,
-}
+async fn handler() -> AppResult<Json<Value>> {
+	let version = required_var("CARGO_PKG_VERSION");
 
-async fn handler(state: AppState) -> AppResult<Json<Empty>> {
-	let _ = state;
-
-	Ok(Json(Empty {
-		hello: String::from("Hello World"),
-	}))
+	Ok(Json(serde_json::json!({
+		"name": "izumo (api)",
+		"version": version.unwrap_or("unknown".to_string()),
+	})))
 }

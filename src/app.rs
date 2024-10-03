@@ -97,6 +97,34 @@ impl App {
 		self.primary_database.get().await
 	}
 
+	/// Obtain a readonly database connection from the replica pool
+	///
+	/// If the replica pool is disabled or unavailable, the primary pool is used instead.
+	#[instrument(skip_all)]
+	pub async fn db_read(&self) -> DeadpoolResult {
+		let Some(read_only_pool) = self.replica_database.as_ref() else {
+			// Replica is disabled, but primary might be available
+			return self.primary_database.get().await;
+		};
+
+		match read_only_pool.get().await {
+			// Replica is available
+			Ok(connection) => Ok(connection),
+
+			// Replica is not available, but primary might be available
+			Err(error) => {
+				// let _ = self
+				// 	.instance_metrics
+				// 	.database_fallback_used
+				// 	.get_metric_with_label_values(&["follower"])
+				// 	.map(|metric| metric.inc());
+
+				warn!("Replica is unavailable, falling back to primary ({error})");
+				self.primary_database.get().await
+			}
+		}
+	}
+
 	/// Obtain a readonly database connection from the primary pool
 	///
 	/// If the primary pool is unavailable, the replica pool is used instead, if not disabled.

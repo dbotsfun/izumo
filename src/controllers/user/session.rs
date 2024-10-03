@@ -57,6 +57,7 @@ fn get_oauth_client(app: &AppState) -> AppResult<BasicClient> {
 	Ok(client)
 }
 
+/// Handles the `GET /private/session/login` route.
 pub async fn login(app: AppState, session: SessionExtension) -> AppResult<Json<Value>> {
 	let client = get_oauth_client(&app)?;
 	let (pkce_code_challenge, pkce_code_verifier) = PkceCodeChallenge::new_random_sha256();
@@ -80,6 +81,7 @@ pub async fn login(app: AppState, session: SessionExtension) -> AppResult<Json<V
 	))
 }
 
+/// Handles the `GET /private/session/authorize` route.
 pub async fn authorize(
 	query: AuthorizeQuery,
 	app: AppState,
@@ -172,7 +174,7 @@ fn save_user_to_database(
 	})
 }
 
-/// Handles the `DELETE /api/private/session` route.
+/// Handles the `DELETE /private/session` route.
 pub async fn logout(session: SessionExtension) -> Json<bool> {
 	session.remove("user_id");
 	Json(true)
