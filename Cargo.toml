@@ -45,7 +45,7 @@ indexmap = "=2.5.0"
 reqwest = { version = "=0.12.8", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "=9.3.0"
 anyhow = "=1.0.87"
-axum = { version = "=0.7.6", features = ["macros", "matched-path"] }
+axum = { version = "=0.7.7", features = ["macros", "matched-path"] }
 axum-extra = { version = "=0.9.4", features = [
     "cookie-signed",
     "typed-header",
