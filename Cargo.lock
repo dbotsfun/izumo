@@ -1242,6 +1242,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "187674a687eed5fe42285b40c6291f9a01517d415fad1c3cbc6a9f778af7fcd4"
 
 [[package]]
+name = "ipnetwork"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf466541e9d546596ee94f9f69590f89473455f88372423e0008fc1a7daf100e"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1267,15 +1276,16 @@ dependencies = [
  "futures-util",
  "http-body-util",
  "indexmap",
+ "ipnetwork",
  "oauth2",
  "parking_lot",
+ "paste",
  "rand",
  "reqwest 0.12.8",
  "secrecy",
  "sentry",
  "serde",
  "serde_json",
- "sha2",
  "thiserror",
  "tokio",
  "tokio-postgres",
@@ -1592,6 +1602,12 @@ dependencies = [
  "smallvec",
  "windows-targets 0.52.6",
 ]
+
+[[package]]
+name = "paste"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "pem"

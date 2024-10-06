@@ -1,3 +1,4 @@
+use crate::util::SHA256;
 use diesel::{
 	self,
 	deserialize::{FromSql, FromSqlRow},
@@ -8,7 +9,6 @@ use diesel::{
 };
 use rand::{distributions::Uniform, rngs::OsRng, Rng};
 use secrecy::{ExposeSecret, SecretString, SecretVec};
-use sha2::{Digest, Sha256};
 
 const TOKEN_LENGTH: usize = 32;
 
@@ -40,7 +40,12 @@ impl HashedToken {
 	}
 
 	pub fn hash(plaintext: &str) -> Vec<u8> {
-		Sha256::digest(plaintext.as_bytes()).as_slice().to_vec()
+		let mut res = SHA256::new_default();
+		for _ in 0..TOKEN_LENGTH {
+			res.update(plaintext.as_bytes());
+		}
+
+		res.get_hash().to_vec()
 	}
 }
 
