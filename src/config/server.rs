@@ -1,11 +1,17 @@
-use std::{collections::HashSet, net::IpAddr, str::FromStr};
-
+use anyhow::anyhow;
+use anyhow::Context;
 use axum::http::HeaderValue;
-use crates_io_env_vars::{list_parsed, required_var, var, var_parsed};
+use crates_io_env_vars::{list, list_parsed, required_var, var, var_parsed};
+use ipnetwork::IpNetwork;
+use std::collections::HashSet;
+use std::net::IpAddr;
+use std::str::FromStr;
 
 use crate::util::env::Env;
 
-use super::{base::Base, database_pools::DatabasePools, discord::DiscordConfig};
+use super::base::Base;
+use super::database_pools::DatabasePools;
+use super::discord::DiscordConfig;
 
 pub struct Server {
 	pub base: Base,
@@ -17,6 +23,9 @@ pub struct Server {
 	pub session_key: cookie::Key,
 	pub blocked_ips: HashSet<IpAddr>,
 	pub db: DatabasePools,
+	pub max_allowed_page_offset: u32,
+	pub page_offset_ua_blocklist: Vec<String>,
+	pub page_offset_cidr_blocklist: Vec<IpNetwork>,
 }
 
 impl Server {
@@ -36,6 +45,10 @@ impl Server {
 		let max_blocking_threads = var_parsed("SERVER_THREADS")?;
 		let allowed_origins = AllowedOrigins::from_default_env()?;
 
+		let page_offset_ua_blocklist = list("WEB_PAGE_OFFSET_UA_BLOCKLIST")?;
+		let page_offset_cidr_blocklist =
+			list_parsed("WEB_PAGE_OFFSET_CIDR_BLOCKLIST", parse_cidr_block)?;
+
 		let base = Base::from_environment()?;
 		let discord = DiscordConfig::from_environment()?;
 
@@ -45,6 +58,9 @@ impl Server {
 			ip,
 			port,
 			max_blocking_threads,
+			max_allowed_page_offset: var_parsed("WEB_MAX_ALLOWED_PAGE_OFFSET")?.unwrap_or(200),
+			page_offset_ua_blocklist,
+			page_offset_cidr_blocklist,
 			session_key: cookie::Key::derive_from(required_var("SESSION_KEY")?.as_bytes()),
 			allowed_origins,
 			discord,
@@ -57,6 +73,32 @@ impl Server {
 	pub fn env(&self) -> Env {
 		self.base.env
 	}
+}
+
+/// Parses a CIDR block string to a valid `IpNetwork` struct.
+///
+/// The purpose is to be able to block IP ranges that overload the API that uses pagination.
+///
+/// The minimum number of bits for a host prefix must be
+///
+/// * at least 16 for IPv4 based CIDRs.
+/// * at least 64 for IPv6 based CIDRs
+///
+fn parse_cidr_block(block: &str) -> anyhow::Result<IpNetwork> {
+	let cidr = block
+		.parse()
+		.context("WEB_PAGE_OFFSET_CIDR_BLOCKLIST must contain IPv4 or IPv6 CIDR blocks.")?;
+
+	let host_prefix = match cidr {
+		IpNetwork::V4(_) => 16,
+		IpNetwork::V6(_) => 64,
+	};
+
+	if cidr.prefix() < host_prefix {
+		return Err(anyhow!("WEB_PAGE_OFFSET_CIDR_BLOCKLIST only allows CIDR blocks with a host prefix of at least 16 bits (IPv4) or 64 bits (IPv6)."));
+	}
+
+	Ok(cidr)
 }
 
 #[derive(Clone, Debug, Default)]

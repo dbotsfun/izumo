@@ -7,6 +7,7 @@ pub use self::user::User;
 
 pub mod bot;
 pub mod category;
+pub mod helpers;
 pub mod owners;
 pub mod review;
 pub mod token;
