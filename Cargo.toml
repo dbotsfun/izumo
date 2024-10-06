@@ -34,12 +34,13 @@ derivative = "=2.2.0"
 tokio-postgres-rustls = "=0.12.0"
 tracing-subscriber = { version = "=0.3.18", features = ["env-filter", "json"] }
 rand = "=0.8.5"
-sha2 = "=0.10.8"
 thiserror = "=1.0.64"
 base64 = "=0.22.1"
 cookie = { version = "=0.18.1", features = ["secure"] }
 oauth2 = "=4.4.2"
 indexmap = "=2.6.0"
+paste = "1.0.15"
+ipnetwork = "0.20.0"
 
 [workspace.dependencies]
 reqwest = { version = "=0.12.8", features = ["blocking", "gzip", "json"] }
