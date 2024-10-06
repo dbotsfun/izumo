@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 use tracing::info;
@@ -15,6 +16,7 @@ mod db;
 mod headers;
 mod middleware;
 mod models;
+mod real_ip;
 mod router;
 mod schema;
 mod sentry;
@@ -52,16 +54,15 @@ fn main() -> anyhow::Result<()> {
 
 	let rt = builder.build()?;
 
-	rt.block_on(async move {
+	rt.block_on(async {
 		let listener = TcpListener::bind((app.config.ip, app.config.port)).await?;
 
+		let axum_router = build_handler(app).into_make_service_with_connect_info::<SocketAddr>();
 		let addr = listener.local_addr()?;
 
 		info!("listening on {addr}");
 
-		let axum_router = build_handler(app);
-
-		axum::serve(listener, axum_router.into_make_service())
+		axum::serve(listener, axum_router)
 			.with_graceful_shutdown(shutdown_signal())
 			.await
 	})?;

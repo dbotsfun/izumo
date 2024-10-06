@@ -2,6 +2,7 @@ pub mod app;
 pub mod debug;
 pub mod log_request;
 pub mod normalize_path;
+pub mod real_ip;
 mod require_user_agent;
 pub mod session;
 
@@ -26,6 +27,7 @@ pub fn apply_middleware(state: AppState, router: Router<()>) -> Router {
 	let middlewares_1 = tower::ServiceBuilder::new()
 		.layer(sentry_tower::NewSentryLayer::new_from_top())
 		.layer(sentry_tower::SentryHttpLayer::with_transaction())
+		.layer(from_fn(self::real_ip::middleware))
 		.layer(CatchPanicLayer::new())
 		.layer(from_fn(log_request::log_requests))
 		.layer(conditional_layer(env == Env::Development, || {

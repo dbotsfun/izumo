@@ -46,9 +46,7 @@ pub struct EncodableCategoryWithSubcategories {
 	pub description: String,
 	#[serde(with = "rfc3339")]
 	pub created_at: NaiveDateTime,
-	pub crates_cnt: i32,
-	pub subcategories: Vec<EncodableCategory>,
-	pub parent_categories: Vec<EncodableCategory>,
+	pub bots_cnt: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -76,6 +76,27 @@ impl Category {
 		})
 	}
 
+	pub fn toplevel(
+		conn: &mut impl Conn,
+		sort: &str,
+		limit: i64,
+		offset: i64,
+	) -> QueryResult<Vec<Category>> {
+		use diesel::sql_types::Int8;
+
+		let sort_sql = match sort {
+			"bots" => "ORDER BY bots_cnt DESC",
+			_ => "ORDER BY category ASC",
+		};
+
+		// Collect all the top-level categories and sum up the crates_cnt of
+		// the crates in all subcategories
+		sql_query(format!(include_str!("toplevel.sql"), sort_sql))
+			.bind::<Int8, _>(limit)
+			.bind::<Int8, _>(offset)
+			.load(conn)
+	}
+
 	pub fn count_toplevel(conn: &mut impl Conn) -> QueryResult<i64> {
 		categories::table
 			.filter(categories::category.not_like("%::%"))
