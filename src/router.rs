@@ -26,7 +26,6 @@ pub fn build_handler(app: Arc<App>) -> axum::Router {
 pub fn build_axum_router(state: AppState) -> Router<()> {
 	let router = Router::new()
 		.route("/", get(handler))
-		.route("/me", get(user::me::me))
 		// Session management
 		.route("/private/session/login", get(user::session::login))
 		.route("/private/session/authorize", get(user::session::authorize))
@@ -37,7 +36,12 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		// Categories
 		.route("/categories", get(category::index))
 		.route("/categories/:category_id", get(category::show))
-		.route("/category_slugs", get(category::slugs));
+		.route("/category_slugs", get(category::slugs))
+		// Tokens
+		.route("/me", get(user::me::me))
+		.route("/me/tokens", get(token::list).put(token::new))
+		.route("/me/tokens/:id", get(token::show).delete(token::revoke))
+		.route("/tokens/current", delete(token::revoke_current));
 
 	router
 		.fallback(|method: Method| async move {
