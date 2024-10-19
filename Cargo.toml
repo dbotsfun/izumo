@@ -31,7 +31,7 @@ http-body-util = "=0.1.2"
 parking_lot = "=0.12.3"
 tokio-postgres = "=0.7.12"
 derivative = "=2.2.0"
-tokio-postgres-rustls = "=0.12.0"
+tokio-postgres-rustls = "=0.13.0"
 tracing-subscriber = { version = "=0.3.18", features = ["env-filter", "json"] }
 rand = "=0.8.5"
 thiserror = "=1.0.64"
