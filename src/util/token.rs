@@ -8,7 +8,7 @@ use diesel::{
 	sql_types::Bytea,
 };
 use rand::{distributions::Uniform, rngs::OsRng, Rng};
-use secrecy::{ExposeSecret, SecretString, SecretVec};
+use secrecy::{ExposeSecret, SecretSlice, SecretString};
 
 const TOKEN_LENGTH: usize = 32;
 
@@ -26,7 +26,7 @@ pub struct InvalidTokenError;
 
 #[derive(FromSqlRow, AsExpression)]
 #[diesel(sql_type = Bytea)]
-pub struct HashedToken(SecretVec<u8>);
+pub struct HashedToken(SecretSlice<u8>);
 
 impl HashedToken {
 	pub fn parse(plaintext: &str) -> Result<Self, InvalidTokenError> {
@@ -89,8 +89,8 @@ impl PlainToken {
 	}
 }
 
-impl ExposeSecret<String> for PlainToken {
-	fn expose_secret(&self) -> &String {
+impl ExposeSecret<str> for PlainToken {
+	fn expose_secret(&self) -> &str {
 		self.0.expose_secret()
 	}
 }
