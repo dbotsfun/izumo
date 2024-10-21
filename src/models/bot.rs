@@ -34,6 +34,36 @@ impl From<BotStatus> for String {
 	}
 }
 
+pg_enum! {
+	pub enum BotLanguages {
+		ENGLISH = 0,
+		SPANISH = 1,
+		GERMAN = 2,
+		JAPANESE = 3,
+		CHINESE = 4,
+	}
+}
+
+impl From<BotLanguages> for &'static str {
+	fn from(lang: BotLanguages) -> Self {
+		match lang {
+			BotLanguages::ENGLISH => "English",
+			BotLanguages::SPANISH => "Spanish",
+			BotLanguages::GERMAN => "German",
+			BotLanguages::JAPANESE => "Japanese",
+			BotLanguages::CHINESE => "Chinese",
+		}
+	}
+}
+
+impl From<BotLanguages> for String {
+	fn from(status: BotLanguages) -> Self {
+		let string: &'static str = status.into();
+
+		string.into()
+	}
+}
+
 /// Bot model
 #[derive(Debug, Clone, Queryable, Identifiable, AsChangeset, QueryableByName, Selectable)]
 #[diesel(
@@ -77,6 +107,8 @@ pub struct Bot {
 	pub created_at: chrono::NaiveDateTime,
 	/// Last time the bot was updated
 	pub updated_at: chrono::NaiveDateTime,
+	/// Yeah
+	pub supported_languages: Vec<Option<BotLanguages>>,
 }
 
 impl Bot {
@@ -124,6 +156,7 @@ pub struct NewBot<'a> {
 	pub support_server: Option<&'a str>,
 	pub api_key: Option<&'a str>,
 	pub imported_from: Option<&'a str>,
+	pub supported_languages: Vec<Option<BotLanguages>>,
 }
 
 #[derive(Debug, Default, Derivative)]
@@ -141,6 +174,7 @@ pub struct NewBotBuilder<'a> {
 	pub website: Option<&'a str>,
 	pub invite_link: Option<&'a str>,
 	pub support_server: Option<&'a str>,
+	pub supported_languages: Vec<Option<BotLanguages>>,
 }
 
 impl<'a> NewBot<'a> {
@@ -158,6 +192,7 @@ impl<'a> NewBot<'a> {
 			website,
 			invite_link,
 			support_server,
+			supported_languages,
 		} = options;
 
 		Self {
@@ -176,6 +211,7 @@ impl<'a> NewBot<'a> {
 			support_server,
 			api_key: None,
 			imported_from,
+			supported_languages,
 		}
 	}
 }
