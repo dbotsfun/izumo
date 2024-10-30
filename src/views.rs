@@ -1,3 +1,4 @@
+use crate::models::bot::BotLanguages;
 use crate::models::token::{ApiToken, CreatedApiToken};
 use crate::models::Category;
 use crate::models::{Bot, User};
@@ -171,6 +172,7 @@ pub struct EncodableBot {
 	pub created_at: NaiveDateTime,
 	pub description: String,
 	pub short_description: String,
+	pub supported_languages: Vec<Option<BotLanguages>>,
 }
 
 impl EncodableBot {
@@ -182,6 +184,7 @@ impl EncodableBot {
 			created_at,
 			description,
 			short_description,
+			supported_languages,
 			..
 		} = bot;
 
@@ -195,6 +198,7 @@ impl EncodableBot {
 			categories: category_ids,
 			description,
 			short_description,
+			supported_languages,
 		}
 	}
 }
