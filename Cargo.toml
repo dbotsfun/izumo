@@ -41,7 +41,7 @@ oauth2 = "=4.4.2"
 indexmap = "=2.6.0"
 paste = "=1.0.15"
 ipnetwork = "=0.20.0"
-openssl = { version = "=0.10.66", features = ["vendored"] }
+openssl = { version = "=0.10.68", features = ["vendored"] }
 
 [workspace.dependencies]
 reqwest = { version = "=0.12.9", features = ["blocking", "gzip", "json"] }
