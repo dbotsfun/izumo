@@ -21,8 +21,8 @@ mod headers;
 mod middleware;
 mod models;
 mod real_ip;
-#[rustfmt::skip]
 mod router;
+#[rustfmt::skip]
 mod schema;
 mod sentry;
 mod sql;
