@@ -79,7 +79,7 @@ diesel-async = { version = "=0.5.0", features = [
     "deadpool",
 ] }
 chrono = { version = "=0.4.38", features = ["serde"] }
-serde = { version = "=1.0.210", features = ["derive"] }
+serde = { version = "=1.0.214", features = ["derive"] }
 serde_json = "=1.0.132"
 tracing = "=0.1.40"
 futures-util = "=0.3.31"
