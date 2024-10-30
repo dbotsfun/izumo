@@ -3,19 +3,20 @@ use crate::models::{Bot, User};
 use crate::schema::{bot_owners, bots};
 use diesel::{pg::Pg, prelude::*};
 
-#[derive(Identifiable, Selectable, Queryable, Associations, Debug, Clone)]
+#[derive(Insertable, Identifiable, Selectable, Queryable, Associations, Debug, Clone)]
 #[diesel(
     table_name = bot_owners,
+	check_for_backend(diesel::pg::Pg),
     belongs_to(User, foreign_key = user_id),
     belongs_to(Bot, foreign_key = bot_id),
     primary_key(bot_id, user_id)
 )]
 pub struct BotOwner {
-	bot_id: String,
-	user_id: String,
-	is_owner: bool,
-	permissions: i32,
-	created_at: chrono::NaiveDateTime,
+	pub bot_id: String,
+	pub user_id: String,
+	pub is_owner: bool,
+	pub permissions: i32,
+	pub created_at: chrono::NaiveDateTime,
 }
 
 type BoxedQuery<'a> = bot_owners::BoxedQuery<'a, Pg, bot_owners::SqlType>;

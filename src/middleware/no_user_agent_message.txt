@@ -1,1 +1,14 @@
-asd {}
+We require that all requests include an `User-Agent` header.
+Please provide more information about your bot so we can take actions against your bot in case you are abusing our service.
+
+Bad:
+  User-Agent: reqwest/0.9.1
+
+Better:
+  User-Agent: my_crawler
+
+Best:
+  User-Agent: my_crawler (my_crawler.com/info)
+  User-Agent: my_crawler (help@my_crawler.com)
+
+If you believe you've received this message in error, feel free to contact us in our Discord server https://dc.dbots.fun, and include the request id {}.

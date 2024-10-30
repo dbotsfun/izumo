@@ -5,6 +5,7 @@ use crate::{
 	middleware,
 	util::errors::{not_found, AppResult},
 };
+use axum::routing::post;
 use axum::{
 	response::IntoResponse,
 	routing::{delete, get},
@@ -32,6 +33,7 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		.route("/private/session", delete(user::session::logout))
 		// Bots
 		.route("/bots/:bot_id", get(bot::metadata::show))
+		.route("/bots/new", post(bot::manage::publish))
 		.route("/bots/:bot_id/owners", get(bot::owners::owners))
 		// Categories
 		.route("/categories", get(category::index))

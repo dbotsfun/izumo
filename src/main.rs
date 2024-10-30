@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate serde;
+#[macro_use]
+extern crate serde_json;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
@@ -18,17 +22,13 @@ mod middleware;
 mod models;
 mod real_ip;
 mod router;
+#[rustfmt::skip]
 mod schema;
 mod sentry;
 mod sql;
 mod task;
 mod util;
 mod views;
-
-#[macro_use]
-extern crate serde;
-#[macro_use]
-extern crate serde_json;
 
 const CORE_THREADS: usize = 4;
 

@@ -1,11 +1,4 @@
 //! Middleware that blocks requests with no user-agent header
-//!
-//! By default the middleware will treat "" and "Amazon CloudFront" as a missing user-agent. To
-//! change the 2nd value, set `WEB_CDN_USER_AGENT` to the appropriate string. To disable the CDN
-//! check, set `WEB_CDN_USER_AGENT` to the empty string.
-//!
-//! Requests to the download endpoint are always allowed, to support versions of cargo older than
-//! 0.17 (released alongside rustc 1.17).
 
 use crate::middleware::log_request::RequestLogExt;
 use axum::extract::Request;
@@ -25,10 +18,7 @@ pub async fn require_user_agent(
 		None => "",
 	};
 
-	let has_user_agent = !agent.is_empty();
-	let is_download = req.uri().path().ends_with("download");
-
-	if !has_user_agent && !is_download {
+	if agent.is_empty() {
 		req.request_log().add("cause", "no user agent");
 
 		let request_id = req
