@@ -44,7 +44,7 @@ ipnetwork = "=0.20.0"
 openssl = { version = "=0.10.66", features = ["vendored"] }
 
 [workspace.dependencies]
-reqwest = { version = "=0.12.8", features = ["blocking", "gzip", "json"] }
+reqwest = { version = "=0.12.9", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "=9.3.0"
 anyhow = "=1.0.87"
 axum = { version = "=0.7.7", features = ["macros", "matched-path"] }
