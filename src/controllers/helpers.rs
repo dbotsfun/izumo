@@ -10,4 +10,3 @@ pub fn ok_true() -> AppResult<Response> {
 	let json = json!({ "ok": true });
 	Ok(Json(json).into_response())
 }
-

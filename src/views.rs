@@ -201,6 +201,10 @@ impl EncodableBot {
 			supported_languages,
 		}
 	}
+
+	pub fn from_minimal(bot: Bot) -> Self {
+		Self::from(bot, None)
+	}
 }
 
 /// The serialization format for the `ApiToken` model with its token value.
@@ -221,4 +225,16 @@ impl From<CreatedApiToken> for EncodableApiTokenWithToken {
 			plaintext: token.plaintext.expose_secret().to_string(),
 		}
 	}
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GoodBot {
+	pub bot: EncodableBot,
+	pub warnings: PublishWarnings,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PublishWarnings {
+	pub invalid_categories: Vec<String>,
+	pub other: Vec<String>,
 }
