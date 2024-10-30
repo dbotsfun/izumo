@@ -43,12 +43,7 @@ impl Category {
 		categories::table.filter(filter)
 	}
 
-	pub fn update_bot(
-		&self,
-		conn: &mut impl Conn,
-		bot: &Bot,
-		slugs: &[&str],
-	) -> QueryResult<Vec<String>> {
+	pub fn update_bot(conn: &mut impl Conn, bot: &Bot, slugs: &[&str]) -> QueryResult<Vec<String>> {
 		conn.transaction(|conn| {
 			let categories: Vec<Category> = categories::table
 				.filter(categories::slug.eq_any(slugs))

@@ -26,6 +26,7 @@ pub struct Server {
 	pub max_allowed_page_offset: u32,
 	pub page_offset_ua_blocklist: Vec<String>,
 	pub page_offset_cidr_blocklist: Vec<IpNetwork>,
+	pub domain_name: String,
 }
 
 impl Server {
@@ -52,6 +53,8 @@ impl Server {
 		let base = Base::from_environment()?;
 		let discord = DiscordConfig::from_environment()?;
 
+		let domain_name = var("DOMAIN_NAME")?.unwrap_or(String::from("dbots.fun"));
+
 		Ok(Self {
 			db: DatabasePools::full_from_environment(&base)?,
 			base,
@@ -65,6 +68,7 @@ impl Server {
 			allowed_origins,
 			discord,
 			blocked_ips,
+			domain_name,
 		})
 	}
 }

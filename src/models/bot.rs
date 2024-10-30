@@ -91,7 +91,7 @@ pub struct Bot {
     pub prefix: String,
     /// Whether the bot uses slash commands
     pub is_slash: bool,
-    /// Github repository URL
+    /// GitHub repository URL
     pub github: Option<String>,
     /// Website URL
     pub website: Option<String>,
@@ -109,6 +109,8 @@ pub struct Bot {
     pub updated_at: chrono::NaiveDateTime,
     /// Yeah
     pub supported_languages: Vec<Option<BotLanguages>>,
+    /// Approximate Guild Count
+    pub guild_count: i32,
 }
 
 impl Bot {
@@ -157,6 +159,7 @@ pub struct NewBot<'a> {
     pub api_key: Option<&'a str>,
     pub imported_from: Option<&'a str>,
     pub supported_languages: Vec<Option<BotLanguages>>,
+    pub guild_count: i32,
 }
 
 #[derive(Debug, Default, Derivative)]
@@ -164,6 +167,7 @@ pub struct NewBotBuilder<'a> {
     pub id: &'a str,
     pub name: &'a str,
     pub avatar: Option<&'a str>,
+    pub banner: Option<&'a str>,
     pub description: &'a str,
     pub short_description: &'a str,
     pub prefix: &'a str,
@@ -175,6 +179,7 @@ pub struct NewBotBuilder<'a> {
     pub invite_link: Option<&'a str>,
     pub support_server: Option<&'a str>,
     pub supported_languages: Vec<Option<BotLanguages>>,
+    pub guild_count: i32,
 }
 
 impl<'a> NewBot<'a> {
@@ -183,6 +188,7 @@ impl<'a> NewBot<'a> {
             id,
             name,
             avatar,
+            banner,
             description,
             short_description,
             prefix,
@@ -193,13 +199,14 @@ impl<'a> NewBot<'a> {
             invite_link,
             support_server,
             supported_languages,
+            guild_count,
         } = options;
 
         Self {
             id,
             name,
             avatar,
-            banner: None,
+            banner,
             certified: false,
             description,
             short_description,
@@ -212,6 +219,7 @@ impl<'a> NewBot<'a> {
             api_key: None,
             imported_from,
             supported_languages,
+            guild_count,
         }
     }
 
