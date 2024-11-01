@@ -14,4 +14,6 @@ RUN apt-get update \
 WORKDIR /app
 COPY . /app
 
+RUN chmod +x /app/docker_entrypoint.sh
+
 ENTRYPOINT ["/app/docker_entrypoint.sh"]
