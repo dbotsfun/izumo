@@ -1,9 +1,22 @@
 #!/bin/sh
 
-# If the backend is started before postgres is ready, the migrations will fail
+# Maximum number of retries
+RETRIES=10
+COUNTER=0
+
+echo "Waiting for PostgreSQL to be ready..."
+
+# Check for database readiness
 until diesel migration run --locked-schema; do
-  echo "Migrations failed, retrying in 5 seconds..."
+  COUNTER=$((COUNTER + 1))
+  if [ "$COUNTER" -ge "$RETRIES" ]; then
+    echo "Exceeded maximum retries, exiting."
+    exit 1
+  fi
+
+  echo "Migrations failed, retrying in 5 seconds... (Attempt $COUNTER/$RETRIES)"
   sleep 5
 done
 
-cargo run
+echo "Migrations ran successfully, starting the application..."
+exec cargo run --release
