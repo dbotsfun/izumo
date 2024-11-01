@@ -1,28 +1,17 @@
-# ================ #
-#    Base Stage    #
-# ================ #
+# renovate: datasource=github-tags depName=rust lookupName=rust-lang/rust
+ARG RUST_VERSION=1.82.0
 
-FROM node:22-alpine@sha256:f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3 as base
+FROM rust:$RUST_VERSION
 
-WORKDIR /usr/src/app
+# renovate: datasource=crate depName=diesel_cli versioning=semver
+ARG DIESEL_CLI_VERSION=2.2.4
 
+RUN apt-get update \
+    && apt-get install -y postgresql \
+    && rm -rf /var/lib/apt/lists/* \
+    && cargo install diesel_cli --version $DIESEL_CLI_VERSION --no-default-features --features postgres
 
-# ================ #
-#   Builder Stage  #
-# ================ #
+WORKDIR /app
+COPY . /app
 
-FROM base as builder
-
-
-# ================ #
-#   Runner Stage   #
-# ================ #
-
-FROM base as runner
-
-
-USER node
-
-# EXPOSE ${API_PORT}
-
-# CMD ["pnpm", "start:prod"]
+ENTRYPOINT ["/app/docker_entrypoint.sh"]
