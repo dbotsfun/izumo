@@ -17,26 +17,26 @@ use diesel_async::async_connection_wrapper::AsyncConnectionWrapper;
 
 #[derive(Deserialize)]
 pub struct RequestNewBot {
-	pub id: String,
-	pub description: String,
-	pub short_description: String,
-	pub prefix: String,
-	pub is_slash: bool,
-	pub invite_link: Option<String>,
-	pub categories: Vec<String>,
+    pub id: String,
+    pub description: String,
+    pub short_description: String,
+    pub prefix: String,
+    pub is_slash: bool,
+    pub invite_link: Option<String>,
+    pub categories: Vec<String>,
 }
 
 /// Handles the `POST /bots/new` route.
 pub async fn publish(
-	app: AppState,
-	parts: Parts,
-	Json(bot): Json<RequestNewBot>,
+    app: AppState,
+    parts: Parts,
+    Json(bot): Json<RequestNewBot>,
 ) -> AppResult<Json<GoodBot>> {
-	let request_log = parts.request_log().clone();
-	request_log.add("bot_id", bot.id.clone());
+    let request_log = parts.request_log().clone();
+    request_log.add("bot_id", bot.id.clone());
 
-	let conn = app.db_write().await?;
-	spawn_blocking(move || {
+    let conn = app.db_write().await?;
+    spawn_blocking(move || {
         let conn: &mut AsyncConnectionWrapper<_> = &mut conn.into();
 
         let auth = AuthCheck::default()
@@ -82,7 +82,7 @@ pub async fn publish(
 
             let bot = persist.create(conn, user.id.clone())?;
 
-            let unknown_categories = Category::update_bot(conn, &bot_id.to_owned(), &categories)?;
+            let unknown_categories = Category::update_bot(conn, bot_id, &categories)?;
             if !unknown_categories.is_empty() {
                 let unknown_categories = unknown_categories.join(", ");
                 let domain = &app.config.domain_name;
@@ -104,44 +104,44 @@ pub async fn publish(
 }
 
 fn bot_exists(id: &str, conn: &mut impl Conn) -> QueryResult<bool> {
-	select(exists(bots::table.filter(bots::id.eq(id)))).get_result(conn)
+    select(exists(bots::table.filter(bots::id.eq(id)))).get_result(conn)
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct APIBot {
-	pub application: Application,
-	pub bot: Bot,
+    pub application: Application,
+    pub bot: Bot,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Application {
-	pub id: String,
-	pub name: String,
-	pub icon: String,
-	pub description: String,
-	pub is_verified: bool,
-	pub bot_public: bool,
-	// maybe I'm going to use this in a future.
-	// pub tags: Vec<String>,
+    pub id: String,
+    pub name: String,
+    pub icon: String,
+    pub description: String,
+    pub is_verified: bool,
+    pub bot_public: bool,
+    // maybe I'm going to use this in a future.
+    // pub tags: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Bot {
-	pub id: String,
-	pub username: String,
-	pub avatar: String,
-	pub bot: bool,
-	pub approximate_guild_count: i32,
+    pub id: String,
+    pub username: String,
+    pub avatar: String,
+    pub bot: bool,
+    pub approximate_guild_count: i32,
 }
 
 /// Gets information about the bot directly from the Discord API.
 fn get_bot_information(
-	state: &AppState,
-	request_log: &RequestLog,
-	bot_id: &str,
+    state: &AppState,
+    request_log: &RequestLog,
+    bot_id: &str,
 ) -> AppResult<APIBot> {
-	let domain = state.config.domain_name.as_str();
-	let bot = state
+    let domain = state.config.domain_name.as_str();
+    let bot = state
         .http
         .get(format!(
             "https://discord.com/api/v9/oauth2/authorize?client_id={bot_id}&scope=bot"
@@ -154,5 +154,5 @@ fn get_bot_information(
             server_error(format!("Error getting bot information from Discord. If the error persists, please report it on our Discord server https://dc.{domain}"))
         })?;
 
-	Ok(bot)
+    Ok(bot)
 }
