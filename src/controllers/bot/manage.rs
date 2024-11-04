@@ -82,7 +82,7 @@ pub async fn publish(
 
             let bot = persist.create(conn, user.id.clone())?;
 
-            let unknown_categories = Category::update_bot(conn, &bot.clone(), &categories)?;
+            let unknown_categories = Category::update_bot(conn, &bot_id.to_owned(), &categories)?;
             if !unknown_categories.is_empty() {
                 let unknown_categories = unknown_categories.join(", ");
                 let domain = &app.config.domain_name;

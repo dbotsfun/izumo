@@ -1,7 +1,12 @@
 use super::util::diesel::Conn;
 use crate::models::Bot;
 use crate::schema::*;
-use diesel::{self, *};
+use diesel::{
+	delete, dsl, insert_into, pg, sql_query, ExpressionMethods, QueryDsl, QueryResult,
+	TextExpressionMethods,
+};
+
+use diesel_async::AsyncPgConnection;
 
 #[derive(Clone, Identifiable, Queryable, QueryableByName, Debug)]
 #[diesel(
@@ -43,7 +48,12 @@ impl Category {
 		categories::table.filter(filter)
 	}
 
-	pub fn update_bot(conn: &mut impl Conn, bot: &Bot, slugs: &[&str]) -> QueryResult<Vec<String>> {
+	pub fn update_bot(
+		conn: &mut impl Conn,
+		bot_id: &String,
+		slugs: &[&str],
+	) -> QueryResult<Vec<String>> {
+		use diesel::RunQueryDsl;
 		conn.transaction(|conn| {
 			let categories: Vec<Category> = categories::table
 				.filter(categories::slug.eq_any(slugs))
@@ -59,44 +69,51 @@ impl Category {
 				.iter()
 				.map(|c| BotCategory {
 					category_id: c.id,
-					bot_id: bot.id.to_owned(),
+					bot_id: bot_id.clone(),
 				})
 				.collect::<Vec<_>>();
 
-			delete(BotCategory::belonging_to(bot)).execute(conn)?;
+			delete(bots_categories::table)
+				.filter(bots_categories::bot_id.eq(bot_id.as_str()))
+				.execute(conn)?;
+
 			insert_into(bots_categories::table)
 				.values(&bot_categories)
 				.execute(conn)?;
+
 			Ok(invalid_categories)
 		})
 	}
 
-	pub fn toplevel(
-		conn: &mut impl Conn,
+	pub async fn count_toplevel(conn: &mut AsyncPgConnection) -> QueryResult<i64> {
+		use diesel_async::RunQueryDsl;
+		categories::table
+			.filter(categories::category.not_like("%::%"))
+			.count()
+			.get_result(conn)
+			.await
+	}
+	pub async fn toplevel(
+		conn: &mut AsyncPgConnection,
 		sort: &str,
 		limit: i64,
 		offset: i64,
 	) -> QueryResult<Vec<Category>> {
 		use diesel::sql_types::Int8;
+		use diesel_async::RunQueryDsl;
 
 		let sort_sql = match sort {
 			"bots" => "ORDER BY bots_cnt DESC",
 			_ => "ORDER BY category ASC",
 		};
 
-		// Collect all the top-level categories and sum up the crates_cnt of
-		// the crates in all subcategories
+		// Collect all the top-level categories and sum up the bots_cnt of
+		// the bots in all subcategories
 		sql_query(format!(include_str!("toplevel.sql"), sort_sql))
 			.bind::<Int8, _>(limit)
 			.bind::<Int8, _>(offset)
 			.load(conn)
-	}
-
-	pub fn count_toplevel(conn: &mut impl Conn) -> QueryResult<i64> {
-		categories::table
-			.filter(categories::category.not_like("%::%"))
-			.count()
-			.get_result(conn)
+			.await
 	}
 }
 
@@ -111,6 +128,7 @@ pub struct NewCategory<'a> {
 impl<'a> NewCategory<'a> {
 	/// Insert or update a category in the database.
 	pub fn upsert(&self, conn: &mut impl Conn) -> QueryResult<Category> {
+		use diesel::RunQueryDsl;
 		insert_into(categories::table)
 			.values(self)
 			.on_conflict(categories::slug)
