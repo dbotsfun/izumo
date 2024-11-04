@@ -27,6 +27,7 @@ pub fn build_handler(app: Arc<App>) -> axum::Router {
 pub fn build_axum_router(state: AppState) -> Router<()> {
 	let router = Router::new()
 		.route("/", get(handler))
+		.route("/summary", get(summary::summary))
 		// Session management
 		.route("/private/session/login", get(user::session::login))
 		.route("/private/session/authorize", get(user::session::authorize))

@@ -17,31 +17,26 @@ use serde_json::Value;
 pub async fn index(app: AppState, req: Parts) -> AppResult<Json<Value>> {
 	let options = PaginationOptions::builder().gather(&req)?;
 
-	let conn = app.db_read().await?;
-	spawn_blocking(move || {
-		let conn: &mut AsyncConnectionWrapper<_> = &mut conn.into();
+	let mut conn = app.db_read().await?;
 
-		let query = req.query();
-		let sort = query.get("sort").map_or("alpha", String::as_str);
+	let query = req.query();
+	let sort = query.get("sort").map_or("alpha", String::as_str);
 
-		let offset = options.offset().unwrap_or_default();
+	let offset = options.offset().unwrap_or_default();
 
-		let categories = Category::toplevel(conn, sort, options.per_page, offset)?;
-		print!("{:?}", categories);
-		let categories = categories
-			.into_iter()
-			.map(Category::into)
-			.collect::<Vec<EncodableCategory>>();
+	let categories = Category::toplevel(&mut conn, sort, options.per_page, offset).await?;
+	let categories = categories
+		.into_iter()
+		.map(Category::into)
+		.collect::<Vec<EncodableCategory>>();
 
-		// Query for the total count of categories
-		let total = Category::count_toplevel(conn)?;
+	// Query for the total count of categories
+	let total = Category::count_toplevel(&mut conn).await?;
 
-		Ok(Json(json!({
-			"categories": categories,
-			"meta": { "total": total },
-		})))
-	})
-	.await
+	Ok(Json(json!({
+		"categories": categories,
+		"meta": { "total": total },
+	})))
 }
 
 /// Handles the `GET /categories/:category_id` route.

@@ -1,7 +1,10 @@
 #[macro_use]
+extern crate diesel;
+#[macro_use]
 extern crate serde;
 #[macro_use]
 extern crate serde_json;
+
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
