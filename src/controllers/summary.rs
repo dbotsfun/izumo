@@ -26,7 +26,7 @@ pub async fn summary(state: AppState) -> AppResult<Json<Value>> {
 		fn encode_bots(bot_list: Vec<Bot>) -> AppResult<Vec<EncodableBot>> {
 			bot_list
 				.into_iter()
-				.map(|b| Ok(EncodableBot::from_minimal(b)))
+				.map(|b| Ok(EncodableBot::from_minimal_no_desc(b)))
 				.collect()
 		}
 
