@@ -1,5 +1,5 @@
 pub use self::bot::Bot;
-pub use self::category::Category;
+pub use self::category::{BotCategory, Category};
 pub use self::owners::BotOwner;
 pub use self::review::BotReview;
 pub use self::token::{ApiToken, CreatedApiToken};

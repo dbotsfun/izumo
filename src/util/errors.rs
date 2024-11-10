@@ -44,7 +44,7 @@ pub fn service_unavailable() -> BoxedAppError {
 }
 
 pub fn bot_not_found(bot: &str) -> BoxedAppError {
-	let detail = format!("crate `{bot}` does not exist");
+	let detail = format!("bot `{bot}` does not exist");
 	custom(StatusCode::NOT_FOUND, detail)
 }
 

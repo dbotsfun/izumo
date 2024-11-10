@@ -162,11 +162,17 @@ pub struct OwnedBot {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct EncodableBotWithDescription<T> {
+	#[serde(flatten)]
+	pub inner: T,
+	pub description: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct EncodableBot {
 	pub id: String,
 	pub name: String,
 	pub avatar: Option<String>,
-	pub description: String,
 	pub short_description: String,
 	pub supported_languages: Vec<Option<BotLanguages>>,
 	pub categories: Option<Vec<String>>,
@@ -179,7 +185,7 @@ pub struct EncodableBot {
 }
 
 impl EncodableBot {
-	pub fn from(bot: Bot, categories: Option<&[Category]>) -> Self {
+	pub fn from(bot: Bot, categories: Option<&[Category]>) -> EncodableBotWithDescription<Self> {
 		let Bot {
 			id,
 			name,
@@ -196,23 +202,53 @@ impl EncodableBot {
 
 		let category_ids = categories.map(|cats| cats.iter().map(|cat| cat.slug.clone()).collect());
 
+		EncodableBotWithDescription::<EncodableBot> {
+			inner: EncodableBot {
+				id,
+				name,
+				updated_at,
+				created_at,
+				categories: category_ids,
+				short_description,
+				supported_languages,
+				guild_count,
+				status: status.into(),
+				avatar,
+			},
+			description,
+		}
+	}
+
+	pub fn from_minimal(bot: Bot) -> EncodableBotWithDescription<Self> {
+		Self::from(bot, None)
+	}
+
+	pub fn from_with_no_desc(bot: Bot, categories: Vec<String>) -> Self {
+		let Bot {
+			id,
+			name,
+			updated_at,
+			created_at,
+			short_description,
+			supported_languages,
+			guild_count,
+			status,
+			avatar,
+			..
+		} = bot;
+
 		EncodableBot {
 			id,
 			name,
 			updated_at,
 			created_at,
-			categories: category_ids,
-			description,
+			categories: Some(categories),
 			short_description,
 			supported_languages,
 			guild_count,
 			status: status.into(),
 			avatar,
 		}
-	}
-
-	pub fn from_minimal(bot: Bot) -> Self {
-		Self::from(bot, None)
 	}
 }
 
@@ -238,7 +274,7 @@ impl From<CreatedApiToken> for EncodableApiTokenWithToken {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GoodBot {
-	pub bot: EncodableBot,
+	pub bot: EncodableBotWithDescription<EncodableBot>,
 	pub warnings: PublishWarnings,
 }
 
