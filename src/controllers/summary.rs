@@ -1,12 +1,14 @@
 use crate::app::AppState;
-use crate::models::{Bot, Category};
-use crate::schema::bots;
-use crate::task::spawn_blocking;
+use crate::models::{Bot, BotCategory, Category};
+use crate::schema::{bots, bots_categories, categories};
 use crate::util::errors::AppResult;
 use crate::views::{EncodableBot, EncodableCategory};
 use axum::Json;
 use diesel::prelude::*;
-use diesel_async::async_connection_wrapper::AsyncConnectionWrapper;
+use diesel::{BelongingToDsl, ExpressionMethods, QueryDsl, SelectableHelper};
+
+use diesel_async::AsyncPgConnection;
+use diesel_async::RunQueryDsl;
 use serde_json::Value;
 
 pub async fn summary(state: AppState) -> AppResult<Json<Value>> {
@@ -18,40 +20,59 @@ pub async fn summary(state: AppState) -> AppResult<Json<Value>> {
 		.map(Category::into)
 		.collect::<Vec<EncodableCategory>>();
 
-	spawn_blocking(move || {
-		let conn: &mut AsyncConnectionWrapper<_> = &mut conn.into();
+	let num_bots: i64 = bots::table.count().get_result(&mut conn).await?;
 
-		let num_bots: i64 = bots::table.count().get_result(conn)?;
+	async fn encode_bots(
+		conn: &mut AsyncPgConnection,
+		bot_list: Vec<Bot>,
+	) -> AppResult<Vec<EncodableBot>> {
+		use diesel_async::RunQueryDsl;
 
-		fn encode_bots(bot_list: Vec<Bot>) -> AppResult<Vec<EncodableBot>> {
-			bot_list
-				.into_iter()
-				.map(|b| Ok(EncodableBot::from_minimal_no_desc(b)))
-				.collect()
-		}
+		let cats = BotCategory::belonging_to(&bot_list)
+			.inner_join(categories::table)
+			.select((bots_categories::bot_id, categories::slug))
+			.load::<(String, String)>(conn)
+			.await?;
 
-		let selection = Bot::as_select();
+		let encodable_bots = bot_list
+			.into_iter()
+			.map(|bot| {
+				let bot_id = bot.id.clone();
+				let cat_slugs = cats
+					.iter()
+					.filter(|(id, _)| *id == bot_id)
+					.map(|(_, slug)| slug.clone())
+					.collect::<Vec<_>>();
 
-		let new_bots = bots::table
-			.order(bots::created_at.desc())
-			.select(selection)
-			.limit(10)
-			.load(conn)?;
+				EncodableBot::from_with_no_desc(bot, cat_slugs)
+			})
+			.collect();
 
-		let just_updated = bots::table
-			.filter(bots::updated_at.ne(bots::created_at))
-			.order(bots::updated_at.desc())
-			.select(selection)
-			.limit(10)
-			.load(conn)?;
+		Ok(encodable_bots)
+	}
 
-		// TODO: top rated, most voted
-		Ok(Json(json!({
-			"num_bots": num_bots,
-			"new_bots": encode_bots(new_bots)?,
-			"just_updated": encode_bots(just_updated)?,
-			"popular_categories": popular_categories,
-		})))
-	})
-	.await
+	let selection = Bot::as_select();
+
+	let new_bots = bots::table
+		.order(bots::created_at.desc())
+		.select(selection)
+		.limit(10)
+		.load(&mut conn)
+		.await?;
+
+	let just_updated = bots::table
+		.filter(bots::updated_at.ne(bots::created_at))
+		.order(bots::updated_at.desc())
+		.select(selection)
+		.limit(10)
+		.load(&mut conn)
+		.await?;
+
+	// TODO: top rated, most voted
+	Ok(Json(json!({
+		"num_bots": num_bots,
+		"new_bots": encode_bots(&mut conn, new_bots).await?,
+		"just_updated": encode_bots(&mut conn, just_updated).await?,
+		"popular_categories": popular_categories,
+	})))
 }

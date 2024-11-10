@@ -173,7 +173,6 @@ pub struct EncodableBot {
 	pub id: String,
 	pub name: String,
 	pub avatar: Option<String>,
-	// pub description: String,
 	pub short_description: String,
 	pub supported_languages: Vec<Option<BotLanguages>>,
 	pub categories: Option<Vec<String>>,
@@ -224,7 +223,7 @@ impl EncodableBot {
 		Self::from(bot, None)
 	}
 
-	pub fn from_minimal_no_desc(bot: Bot) -> Self {
+	pub fn from_with_no_desc(bot: Bot, categories: Vec<String>) -> Self {
 		let Bot {
 			id,
 			name,
@@ -243,7 +242,7 @@ impl EncodableBot {
 			name,
 			updated_at,
 			created_at,
-			categories: None,
+			categories: Some(categories),
 			short_description,
 			supported_languages,
 			guild_count,
