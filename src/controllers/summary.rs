@@ -21,8 +21,6 @@ pub async fn summary(state: AppState) -> AppResult<Json<Value>> {
 	spawn_blocking(move || {
 		let conn: &mut AsyncConnectionWrapper<_> = &mut conn.into();
 
-		let config = &state.config;
-
 		let num_bots: i64 = bots::table.count().get_result(conn)?;
 
 		fn encode_bots(bot_list: Vec<Bot>) -> AppResult<Vec<EncodableBot>> {
@@ -50,8 +48,8 @@ pub async fn summary(state: AppState) -> AppResult<Json<Value>> {
 		// TODO: top rated, most voted
 		Ok(Json(json!({
 			"num_bots": num_bots,
-			"new_bots": encode_bots( new_bots)?,
-			"just_updated": encode_bots( just_updated)?,
+			"new_bots": encode_bots(new_bots)?,
+			"just_updated": encode_bots(just_updated)?,
 			"popular_categories": popular_categories,
 		})))
 	})
