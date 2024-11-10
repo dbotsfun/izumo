@@ -165,14 +165,17 @@ pub struct OwnedBot {
 pub struct EncodableBot {
 	pub id: String,
 	pub name: String,
-	#[serde(with = "rfc3339")]
-	pub updated_at: NaiveDateTime,
-	pub categories: Option<Vec<String>>,
-	#[serde(with = "rfc3339")]
-	pub created_at: NaiveDateTime,
+	pub avatar: Option<String>,
 	pub description: String,
 	pub short_description: String,
 	pub supported_languages: Vec<Option<BotLanguages>>,
+	pub categories: Option<Vec<String>>,
+	pub guild_count: i32,
+	pub status: String,
+	#[serde(with = "rfc3339")]
+	pub updated_at: NaiveDateTime,
+	#[serde(with = "rfc3339")]
+	pub created_at: NaiveDateTime,
 }
 
 impl EncodableBot {
@@ -185,6 +188,9 @@ impl EncodableBot {
 			description,
 			short_description,
 			supported_languages,
+			guild_count,
+			status,
+			avatar,
 			..
 		} = bot;
 
@@ -199,6 +205,9 @@ impl EncodableBot {
 			description,
 			short_description,
 			supported_languages,
+			guild_count,
+			status: status.into(),
+			avatar,
 		}
 	}
 
