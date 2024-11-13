@@ -1,6 +1,7 @@
 //! Log all requests in a format similar to Heroku's router, but with additional
 //! information that we care about like User-Agent
 
+use super::real_ip::RealIp;
 use crate::controllers::util::RequestPartsExt;
 use crate::headers::XRequestId;
 use crate::middleware::normalize_path::OriginalPath;
@@ -32,6 +33,7 @@ pub struct RequestMetadata {
 	uri: Uri,
 	original_path: Option<Extension<OriginalPath>>,
 	matched_path: Option<Extension<MatchedPath>>,
+	real_ip: Extension<RealIp>,
 	user_agent: Option<TypedHeader<UserAgent>>,
 	request_id: Option<TypedHeader<XRequestId>>,
 }
@@ -75,6 +77,7 @@ pub async fn log_requests(
 		target: "http",
 		Level::INFO,
 		duration = duration.as_nanos(),
+		network.client.ip = %**request_metadata.real_ip,
 		http.method = %method,
 		http.url = %url,
 		http.matched_path = %matched_path,
