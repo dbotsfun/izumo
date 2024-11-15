@@ -34,8 +34,9 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		.route("/private/session", delete(user::session::logout))
 		// Bots
 		.route("/bots/:bot_id", get(bot::metadata::show))
-		.route("/bots/new", post(bot::manage::publish))
+		.route("/bots/total_votesnew", post(bot::manage::publish))
 		.route("/bots/:bot_id/owners", get(bot::owners::owners))
+		.route("/bots/:bot_id/votes", get(bot::votes::votes))
 		// Categories
 		.route("/categories", get(category::index))
 		.route("/categories/:category_id", get(category::show))

@@ -2,8 +2,7 @@ use crate::app::AppState;
 use crate::models::category::{BotCategory, Category};
 use crate::models::Bot;
 use crate::schema::categories;
-use crate::task::spawn_blocking;
-use crate::util::errors::{bad_request, bot_not_found, AppResult, BoxedAppError};
+use crate::util::errors::{bad_request, AppResult, BoxedAppError};
 use crate::util::request_helper::RequestUtils;
 use crate::views::{EncodableBot, EncodableCategory};
 
@@ -12,54 +11,49 @@ use axum::http::request::Parts;
 use axum::Json;
 
 use diesel::prelude::*;
-use diesel_async::async_connection_wrapper::AsyncConnectionWrapper;
+use diesel_async::RunQueryDsl;
 use serde_json::Value;
 use std::str::FromStr;
 
 /// Handles the `GET /bots/:bot_id`
 pub async fn show(app: AppState, Path(id): Path<String>, req: Parts) -> AppResult<Json<Value>> {
-	let conn = app.db_read().await?;
+	let mut conn = app.db_read().await?;
 
-	spawn_blocking(move || {
-		let conn: &mut AsyncConnectionWrapper<_> = &mut conn.into();
-		let id = id.as_str();
+	let id = id.as_str();
 
-		let include = req
-			.query()
-			.get("include")
-			.map(|mode| ShowIncludeMode::from_str(mode))
-			.transpose()?
-			.unwrap_or_default();
+	let include = req
+		.query()
+		.get("include")
+		.map(|mode| ShowIncludeMode::from_str(mode))
+		.transpose()?
+		.unwrap_or_default();
 
-		let bot = Bot::find(conn, id)
-			.optional()?
-			.ok_or_else(|| bot_not_found(id))?;
+	let bot = Bot::find(&mut conn, id).await?;
 
-		let cats = if include.categories {
-			Some(
-				BotCategory::belonging_to(&bot)
-					.inner_join(categories::table)
-					.select(categories::all_columns)
-					.load(conn)?,
-			)
-		} else {
-			None
-		};
+	let cats = if include.categories {
+		Some(
+			BotCategory::belonging_to(&bot)
+				.inner_join(categories::table)
+				.select(categories::all_columns)
+				.load(&mut conn)
+				.await?,
+		)
+	} else {
+		None
+	};
 
-		let encodable_bot = EncodableBot::from(bot.clone(), cats.as_deref());
+	let encodable_bot = EncodableBot::from(bot.clone(), cats.as_deref());
 
-		let encodable_cats = cats.map(|cats| {
-			cats.into_iter()
-				.map(Category::into)
-				.collect::<Vec<EncodableCategory>>()
-		});
+	let encodable_cats = cats.map(|cats| {
+		cats.into_iter()
+			.map(Category::into)
+			.collect::<Vec<EncodableCategory>>()
+	});
 
-		Ok(Json(serde_json::json!({
-			"bot": encodable_bot,
-			"categories": encodable_cats,
-		})))
-	})
-	.await
+	Ok(Json(serde_json::json!({
+		"bot": encodable_bot,
+		"categories": encodable_cats,
+	})))
 }
 
 #[derive(Debug)]

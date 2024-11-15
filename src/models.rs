@@ -4,6 +4,7 @@ pub use self::owners::BotOwner;
 pub use self::review::BotReview;
 pub use self::token::{ApiToken, CreatedApiToken};
 pub use self::user::User;
+pub use self::vote::BotVote;
 
 pub mod bot;
 pub mod category;
@@ -14,3 +15,4 @@ pub mod token;
 pub mod user;
 pub mod util;
 pub mod vanity;
+pub mod vote;
