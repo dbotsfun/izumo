@@ -1,21 +1,14 @@
-use std::sync::Arc;
-
 use super::controllers::*;
-use crate::{
-	middleware,
-	util::errors::{not_found, AppResult},
-};
+use crate::app::{App, AppState};
+use crate::middleware;
+use crate::util::errors::{not_found, AppResult};
+use axum::response::IntoResponse;
 use axum::routing::post;
-use axum::{
-	response::IntoResponse,
-	routing::{delete, get},
-	Json, Router,
-};
-use crates_io_env_vars::required_var;
+use axum::routing::{delete, get};
+use axum::{Json, Router};
 use reqwest::{Method, StatusCode};
 use serde_json::Value;
-
-use crate::app::{App, AppState};
+use std::sync::Arc;
 
 pub fn build_handler(app: Arc<App>) -> axum::Router {
 	let state = AppState(app);
@@ -34,9 +27,12 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		.route("/private/session", delete(user::session::logout))
 		// Bots
 		.route("/bots/:bot_id", get(bot::metadata::show))
-		.route("/bots/total_votesnew", post(bot::manage::publish))
+		.route("/bots/new", post(bot::manage::publish))
 		.route("/bots/:bot_id/owners", get(bot::owners::owners))
-		.route("/bots/:bot_id/votes", get(bot::votes::votes))
+		.route(
+			"/bots/:bot_id/votes",
+			get(bot::votes::votes).post(bot::votes::vote),
+		)
 		// Categories
 		.route("/categories", get(category::index))
 		.route("/categories/:category_id", get(category::show))
@@ -57,11 +53,12 @@ pub fn build_axum_router(state: AppState) -> Router<()> {
 		.with_state(state)
 }
 
-async fn handler() -> AppResult<Json<Value>> {
-	let version = required_var("CARGO_PKG_VERSION");
+// imports `VERSION` constant
+include!(concat!(env!("OUT_DIR"), "/version.rs"));
 
+async fn handler() -> AppResult<Json<Value>> {
 	Ok(Json(serde_json::json!({
-		"name": "izumo (api)",
-		"version": version.unwrap_or("unknown".to_string()),
+		"name": "Izumo (api)",
+		"version": VERSION
 	})))
 }

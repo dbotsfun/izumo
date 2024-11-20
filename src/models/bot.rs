@@ -129,7 +129,7 @@ impl Bot {
 
 	#[dsl::auto_type(no_type_alias)]
 	pub fn by_id(id: &str) -> _ {
-		bots::table.find(id).select(bots::id)
+		bots::table.find(id)
 	}
 
 	pub async fn owners(&self, conn: &mut AsyncPgConnection) -> AppResult<Vec<User>> {

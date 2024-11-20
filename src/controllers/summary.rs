@@ -4,7 +4,6 @@ use crate::schema::{bots, bots_categories, categories};
 use crate::util::errors::AppResult;
 use crate::views::{EncodableBot, EncodableCategory};
 use axum::Json;
-use diesel::prelude::*;
 use diesel::{BelongingToDsl, ExpressionMethods, QueryDsl, SelectableHelper};
 
 use diesel_async::AsyncPgConnection;
