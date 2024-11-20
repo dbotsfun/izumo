@@ -1,7 +1,7 @@
 use crate::models::bot::BotLanguages;
 use crate::models::token::{ApiToken, CreatedApiToken};
-use crate::models::Category;
 use crate::models::{Bot, User};
+use crate::models::{BotVote, Category};
 use crate::util::rfc3339;
 use chrono::NaiveDateTime;
 use secrecy::ExposeSecret;
@@ -282,4 +282,21 @@ pub struct GoodBot {
 pub struct PublishWarnings {
 	pub invalid_categories: Vec<String>,
 	pub other: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EncodableBotVote {
+	pub bot_id: String,
+	pub votes: i32,
+	pub date: String,
+}
+
+impl From<BotVote> for EncodableBotVote {
+	fn from(vote: BotVote) -> Self {
+		EncodableBotVote {
+			bot_id: vote.bot_id,
+			date: vote.date.to_string(),
+			votes: vote.votes,
+		}
+	}
 }

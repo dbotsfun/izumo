@@ -2,10 +2,11 @@ use crate::models::util::diesel::Conn;
 use crate::models::{BotOwner, User};
 use crate::schema::{bot_owners, bots, users};
 use crate::sql::pg_enum;
-use crate::util::errors::AppResult;
+use crate::util::errors::{bot_not_found, AppResult};
 use derivative::Derivative;
-use diesel::prelude::*;
 use diesel::{deserialize::FromSqlRow, expression::AsExpression};
+use diesel::{dsl, ExpressionMethods, QueryDsl, QueryResult, SelectableHelper};
+use diesel_async::AsyncPgConnection;
 use serde::{Deserialize, Serialize};
 
 pg_enum! {
@@ -114,15 +115,30 @@ pub struct Bot {
 }
 
 impl Bot {
-	pub fn find(conn: &mut impl Conn, id: &str) -> QueryResult<Bot> {
-		bots::table.find(id).first(conn)
+	pub async fn find(conn: &mut AsyncPgConnection, id: &str) -> AppResult<Bot> {
+		use diesel::OptionalExtension;
+		use diesel_async::RunQueryDsl;
+
+		bots::table
+			.find(id)
+			.first::<Bot>(conn)
+			.await
+			.optional()?
+			.ok_or_else(|| bot_not_found(id))
 	}
 
-	pub fn owners(&self, conn: &mut impl Conn) -> AppResult<Vec<User>> {
+	#[dsl::auto_type(no_type_alias)]
+	pub fn by_id(id: &str) -> _ {
+		bots::table.find(id)
+	}
+
+	pub async fn owners(&self, conn: &mut AsyncPgConnection) -> AppResult<Vec<User>> {
+		use diesel_async::RunQueryDsl;
 		let owners = BotOwner::by_bot_id(&self.id)
 			.inner_join(users::table)
 			.select(users::all_columns)
-			.load(conn)?;
+			.load(conn)
+			.await?;
 
 		Ok(owners)
 	}
@@ -224,6 +240,7 @@ impl<'a> NewBot<'a> {
 	}
 
 	pub fn create(&self, conn: &mut impl Conn, user_id: String) -> QueryResult<Bot> {
+		use diesel::RunQueryDsl;
 		conn.transaction(|conn| {
 			let bot: Bot = diesel::insert_into(bots::table)
 				.values(self)
