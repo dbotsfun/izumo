@@ -9,8 +9,17 @@ ARG DIESEL_CLI_VERSION=2.2.4
 
 RUN apt-get update \
     && apt-get install -y postgresql \
-    && rm -rf /var/lib/apt/lists/* \
-    && cargo install diesel_cli --version $DIESEL_CLI_VERSION --no-default-features --features postgres
+    && rm -rf /var/lib/apt/lists/*
+
+# Install diesel-cli
+RUN cargo install diesel_cli --version $DIESEL_CLI_VERSION --no-default-features --features postgres
+
+# Cache cargo dependencies
+COPY Cargo.toml Cargo.lock ./
+COPY build.rs ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs \
+    && cargo build --release \
+    && rm -rf src
 
 COPY . .
 
