@@ -26,7 +26,7 @@ serde_json.workspace = true
 chrono.workspace = true
 dotenvy = "=0.15.7"
 secrecy = "=0.10.3"
-url = "=2.5.3"
+url = "=2.5.4"
 deadpool-diesel = { version = "=0.6.1", features = ["postgres", "tracing"] }
 http-body-util = "=0.1.2"
 parking_lot = "=0.12.3"
