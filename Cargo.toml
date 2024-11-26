@@ -74,7 +74,7 @@ sentry = { version = "=0.34.0", features = [
     "tower-http",
 ] }
 crates_io_env_vars = { git = "https://github.com/rust-lang/crates.io.git", branch = "main" }
-diesel-async = { version = "=0.5.0", features = [
+diesel-async = { version = "=0.5.2", features = [
     "postgres",
     "async-connection-wrapper",
     "deadpool",
