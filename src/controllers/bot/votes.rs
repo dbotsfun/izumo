@@ -40,7 +40,8 @@ pub async fn votes(app: AppState, Path(bot_id): Path<String>) -> AppResult<Json<
 	let total_votes: i64 = BotVote::belonging_to(&bot)
 		.select(sum_votes)
 		.get_result(&mut conn)
-		.await?;
+		.await
+		.unwrap_or(0);
 
 	Ok(Json(json!({
 		"bot_votes": votes,
