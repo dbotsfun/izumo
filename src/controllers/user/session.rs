@@ -1,14 +1,13 @@
+use crate::app::AppState;
+use crate::middleware::session::encode;
+use crate::middleware::{log_request::RequestLogExt, session::SessionExtension};
 use crate::models::user::NewUser;
 use crate::models::util::diesel::Conn;
 use crate::models::User;
 use crate::schema::users;
 use crate::task::spawn_blocking;
 use crate::util::errors::{bad_request, server_error, AppResult, BoxedAppError, ReadOnlyMode};
-use crate::{
-	app::AppState,
-	middleware::{log_request::RequestLogExt, session::SessionExtension},
-	views::EncodableMe,
-};
+use crate::views::EncodableMe;
 use axum::extract::{FromRequestParts, Query};
 use axum::http::request::Parts;
 use axum::Json;
@@ -20,7 +19,6 @@ use oauth2::{
 };
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl};
 use serde_json::Value;
-
 pub const COOKIE_AUTH_CSRF_STATE: &str = "auth_csrf_state";
 pub const COOKIE_AUTH_CODE_VERIFIER: &str = "auth_code_verifier";
 
@@ -87,12 +85,12 @@ pub async fn authorize(
 	app: AppState,
 	session: SessionExtension,
 	req: Parts,
-) -> AppResult<Json<EncodableMe>> {
+) -> AppResult<Json<Value>> {
 	let app_clone = app.clone();
 	let request_log = req.request_log().clone();
 
 	let conn = app.db_write().await?;
-	spawn_blocking(move || {
+	let res = spawn_blocking(move || {
 		let conn: &mut AsyncConnectionWrapper<_> = &mut conn.into();
 
 		let session_state = session.remove(COOKIE_AUTH_CSRF_STATE).map(CsrfToken::new);
@@ -120,8 +118,6 @@ pub async fn authorize(
 			.request(http_client)?;
 
 		let access_token = token_response.access_token().secret();
-
-		// let token = token.access_token;
 		let discord_user = app
 			.http
 			.get("https://discord.com/api/users/@me")
@@ -137,11 +133,21 @@ pub async fn authorize(
 
 		session.insert("user_id".to_string(), user.id.clone());
 
-		Ok::<_, BoxedAppError>(())
+		let session = session.read();
+
+		Ok::<_, BoxedAppError>(encode(&session.data))
 	})
 	.await?;
 
-	super::me::me(app_clone, req).await
+	let user = super::me::me(app_clone, req).await?;
+
+	Ok(Json(json!({
+		"user": {
+			"user": user.user,
+			"owned_bots": user.owned_bots,
+		},
+		"session": res,
+	})))
 }
 
 fn save_user_to_database(
