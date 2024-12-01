@@ -39,7 +39,7 @@ thiserror = "=1.0.68"
 base64 = "=0.22.1"
 cookie = { version = "=0.18.1", features = ["secure"] }
 oauth2 = "=4.4.2"
-indexmap = "=2.6.0"
+indexmap = "=2.7.0"
 paste = "=1.0.15"
 ipnetwork = "=0.20.0"
 openssl = { version = "=0.10.68", features = ["vendored"] }
