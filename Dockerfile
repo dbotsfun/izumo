@@ -5,7 +5,7 @@ FROM rust:$RUST_VERSION
 WORKDIR /app
 
 # renovate: datasource=crate depName=diesel_cli versioning=semver
-ARG DIESEL_CLI_VERSION=2.2.4
+ARG DIESEL_CLI_VERSION=2.2.6
 
 RUN apt-get update \
     && apt-get install -y postgresql \
