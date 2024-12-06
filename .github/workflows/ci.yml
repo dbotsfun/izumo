@@ -14,7 +14,7 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   # renovate: datasource=crate depName=cargo-deny versioning=semver
-  CARGO_DENY_VERSION: 0.16.1
+  CARGO_DENY_VERSION: 0.16.3
   # renovate: datasource=docker depName=postgres
   POSTGRES_VERSION: 16
 
