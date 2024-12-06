@@ -35,7 +35,7 @@ derivative = "=2.2.0"
 tokio-postgres-rustls = "=0.13.0"
 tracing-subscriber = { version = "=0.3.18", features = ["env-filter", "json"] }
 rand = "=0.8.5"
-thiserror = "=1.0.68"
+thiserror = "=1.0.69"
 base64 = "=0.22.1"
 cookie = { version = "=0.18.1", features = ["secure"] }
 oauth2 = "=4.4.2"
