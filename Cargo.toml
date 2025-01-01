@@ -48,7 +48,7 @@ openssl = { version = "=0.10.68", features = ["vendored"] }
 reqwest = { version = "=0.12.9", features = ["blocking", "gzip", "json"] }
 jsonwebtoken = "=9.3.0"
 anyhow = "=1.0.87"
-axum = { version = "=0.7.7", features = ["macros", "matched-path"] }
+axum = { version = "=0.8.1", features = ["macros", "matched-path"] }
 axum-extra = { version = "=0.9.4", features = [
     "cookie-signed",
     "typed-header",
