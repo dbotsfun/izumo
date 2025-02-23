@@ -601,9 +601,9 @@ dependencies = [
 
 [[package]]
 name = "diesel"
-version = "2.2.4"
+version = "2.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "158fe8e2e68695bd615d7e4f3227c0727b151330d3e253b525086c348d055d5e"
+checksum = "04001f23ba8843dc315804fa324000376084dfb1c30794ff68dd279e6e5696d5"
 dependencies = [
  "bitflags 2.6.0",
  "byteorder",
@@ -617,9 +617,9 @@ dependencies = [
 
 [[package]]
 name = "diesel-async"
-version = "0.5.0"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcb799bb6f8ca6a794462125d7b8983b0c86e6c93a33a9c55934a4a5de4409d3"
+checksum = "51a307ac00f7c23f526a04a77761a0519b9f0eb2838ebf5b905a58580095bdcb"
 dependencies = [
  "async-trait",
  "deadpool",
@@ -1427,7 +1427,6 @@ dependencies = [
  "indexmap",
  "ipnetwork",
  "oauth2",
- "openssl",
  "parking_lot",
  "paste",
  "rand",
@@ -1708,15 +1707,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
-name = "openssl-src"
-version = "300.4.0+3.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a709e02f2b4aca747929cca5ed248880847c650233cf8b8cdc48f40aaf4898a6"
-dependencies = [
- "cc",
-]
-
-[[package]]
 name = "openssl-sys"
 version = "0.9.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1724,7 +1714,6 @@ checksum = "45abf306cbf99debc8195b66b7346498d7b10c210de50418b5ccd7ceba08c741"
 dependencies = [
  "cc",
  "libc",
- "openssl-src",
  "pkg-config",
  "vcpkg",
 ]
@@ -1895,10 +1884,11 @@ dependencies = [
 
 [[package]]
 name = "pq-sys"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a24ff9e4cf6945c988f0db7005d87747bf72864965c3529d259ad155ac41d584"
+checksum = "30b51d65ebe1cb1f40641b15abae017fed35ccdda46e3dab1ff8768f625a3222"
 dependencies = [
+ "libc",
  "vcpkg",
 ]
 

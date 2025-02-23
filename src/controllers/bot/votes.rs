@@ -13,10 +13,20 @@ use axum::extract::Path;
 use axum::http::request::Parts;
 use axum::Json;
 use diesel_async::async_connection_wrapper::AsyncConnectionWrapper;
-use serde_json::Value;
+
+#[derive(Serialize)]
+pub struct BotVotes {
+	bot_votes: Vec<EncodableBotVote>,
+	extra: VoteExtra,
+}
+
+#[derive(Serialize)]
+pub struct VoteExtra {
+	total_votes: i64,
+}
 
 /// Handles the `GET /bots/:bot_id/votes` route.
-pub async fn votes(app: AppState, Path(bot_id): Path<String>) -> AppResult<Json<Value>> {
+pub async fn votes(app: AppState, Path(bot_id): Path<String>) -> AppResult<Json<BotVotes>> {
 	let mut conn = app.db_read().await?;
 
 	use diesel::dsl::*;
@@ -43,12 +53,10 @@ pub async fn votes(app: AppState, Path(bot_id): Path<String>) -> AppResult<Json<
 		.await
 		.unwrap_or(0);
 
-	Ok(Json(json!({
-		"bot_votes": votes,
-		"extra": {
-			"total_votes": total_votes,
-		}
-	})))
+	Ok(Json(BotVotes {
+		bot_votes: votes,
+		extra: VoteExtra { total_votes },
+	}))
 }
 
 // TODO: 12h user ratelimit

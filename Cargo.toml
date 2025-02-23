@@ -42,7 +42,6 @@ oauth2 = "=4.4.2"
 indexmap = "=2.6.0"
 paste = "=1.0.15"
 ipnetwork = "=0.20.0"
-openssl = { version = "=0.10.68", features = ["vendored"] }
 
 [workspace.dependencies]
 reqwest = { version = "=0.12.9", features = ["blocking", "gzip", "json"] }
@@ -50,34 +49,34 @@ jsonwebtoken = "=9.3.0"
 anyhow = "=1.0.87"
 axum = { version = "=0.7.7", features = ["macros", "matched-path"] }
 axum-extra = { version = "=0.9.4", features = [
-    "cookie-signed",
-    "typed-header",
+  "cookie-signed",
+  "typed-header",
 ] }
-diesel = { version = "=2.2.4", features = [
-    "postgres",
-    "chrono",
-    "uuid",
-    "serde_json",
+diesel = { version = "=2.2.7", features = [
+  "postgres",
+  "chrono",
+  "uuid",
+  "serde_json",
 ] }
 tower = "=0.4.13"
 tower-http = { version = "=0.6.1", features = [
-    "add-extension",
-    "fs",
-    "catch-panic",
-    "timeout",
-    "compression-full",
+  "add-extension",
+  "fs",
+  "catch-panic",
+  "timeout",
+  "compression-full",
 ] }
 sentry = { version = "=0.34.0", features = [
-    "tracing",
-    "tower",
-    "tower-axum-matched-path",
-    "tower-http",
+  "tracing",
+  "tower",
+  "tower-axum-matched-path",
+  "tower-http",
 ] }
 crates_io_env_vars = { git = "https://github.com/rust-lang/crates.io.git", branch = "main" }
-diesel-async = { version = "=0.5.0", features = [
-    "postgres",
-    "async-connection-wrapper",
-    "deadpool",
+diesel-async = { version = "=0.5.2", features = [
+  "postgres",
+  "async-connection-wrapper",
+  "deadpool",
 ] }
 chrono = { version = "=0.4.38", features = ["serde"] }
 serde = { version = "=1.0.214", features = ["derive"] }
@@ -85,9 +84,9 @@ serde_json = "=1.0.132"
 tracing = "=0.1.40"
 futures-util = "=0.3.31"
 tokio = { version = "=1.41.0", default-features = false, features = [
-    "macros",
-    "rt-multi-thread",
-    "signal",
+  "macros",
+  "rt-multi-thread",
+  "signal",
 ] }
 
 [dev-dependencies]
