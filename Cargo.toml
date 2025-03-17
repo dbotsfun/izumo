@@ -38,7 +38,7 @@ rand = "=0.8.5"
 thiserror = "=1.0.68"
 base64 = "=0.22.1"
 cookie = { version = "=0.18.1", features = ["secure"] }
-oauth2 = "=4.4.2"
+oauth2 = "=5.0.0"
 indexmap = "=2.6.0"
 paste = "=1.0.15"
 ipnetwork = "=0.20.0"
